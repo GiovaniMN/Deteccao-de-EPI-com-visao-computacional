@@ -1,35 +1,50 @@
-# **Detecção de EPI´s com com YOLO aplicado na Raspberry Pi 4**
+# Sistema de Monitoramento de EPIs com Raspberry Pi e YOLOv8 🚨📷
 
-## PASSO A PASSO DE CONFIGURAÇÃO NA RASPBERRY:
+Este projeto tem como objetivo detectar a presença ou ausência de Equipamentos de Proteção Individual (EPIs) — como **capacete**, **óculos de proteção** e **botas de segurança** — utilizando uma **Raspberry Pi 4**, **modelo YOLOv8** quantizado para Coral Edge TPU, e alertar via **Telegram** e **Firebase** quando um ou mais EPIs estiverem ausentes.
 
-### comandos no terminal:
+## 🎯 Funcionalidades
 
-### VERIFICA E ATUALIZA A RASPBERRY PI
-sudo apt update && sudo apt upgrade -y
+- 📦 Detecção em tempo real com YOLOv8 quantizado (TensorFlow Lite).
+- 🧠 Integração com **Coral Edge TPU** para aceleração da inferência.
+- 🔥 Integração com **Firebase Firestore** para registrar alertas e salvar imagens.
+- 📲 Notificações instantâneas via **Telegram Bot** para usuários cadastrados.
+- 🌐 Painel web (Firebase Hosting) para:
+  - Configuração de parâmetros do sistema
+  - Cadastro de usuários para notificações
+  - Visualização de alertas
 
-### CRIA UM AMBIENTE VIRTUAL PARA INSTALAR AS BIBLIOTECAS E EVITAR CONFLITOS
-python3 -m venv --system-site-packages venv
+---
 
-### ATIVA O AMBIENTE VIRTUAL
-source venv/bin/activate
+## 🛠️ Tecnologias e Ferramentas
 
-### INSTALA A BIBLIOTECA ULTRALYTICS COM A EXTENSÃO NCNN
-pip install ultralytics ncnn
+- **Raspberry Pi 4** com Raspbian
+- **YOLOv8n quantizado** (`.tflite`) com **Coral Edge TPU**
+- **OpenCV + cvzone** para visualização e desenho dos resultados
+- **Firebase Firestore** (armazenamento de alertas e configurações)
+- **Firebase Hosting** (interface web de administração)
+- **Telegram Bot** para envio de mensagens e imagens
+- **Python 3.9+**
+- **pyTelegramBotAPI** ou `requests` para envio via Telegram
 
-### APÓS CONECTAR A WEBCAM RODAR O CÓDIGO PARA VER SE ELE FOI RECONHECIDA NO SISTEMA
-ls /dev/video*
+---
 
-### EXPORTAR O MODELO CUSTOMIZADO DO YOLO DO FORMATO PYTORCH PARA NCNN QUE É MAIS LEVE PARA A RASPBERRY PI
-yolo export model=modelo_v1.pt format=ncnn
+# 📷 Exemplo de Detecção 
 
-**Deu erro. Pra arrumar:**
+![Exemplo de Detecção](docs/exemplo-deteccao.jpg)
 
-pip install ultralytics==8.3.70 torch==2.5.0 torchvision==0.20
+---
 
-**rodar denovo:**
+## 📁 Estrutura do Projeto
 
-yolo export model=modelo_v1.pt format=ncnn
+```bash
+📦 projeto/
+ ┣ 📁 modelos/
+ ┃ ┗ 📄 yolov8n_full_integer_quant_edgetpu.tflite
+ ┣ 📁 docs/
+ ┃ ┗ 📄 exemplo-deteccao.jpg
+ ┣ 📄 firebase_key.json
+ ┣ 📄 classes.txt
+ ┣ 📄 main.py
+ ┣ 📄 README.md
 
-wget https://ejtech.io/code/yolo_detect.py
 
-python yolol_detect.py --model=modelo_v1_ncnn_model --source=usb0 --resolution=1280x720
