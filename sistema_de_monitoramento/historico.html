@@ -5,320 +5,192 @@
       rel="stylesheet"
       as="style"
       onload="this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"
     />
 
-    <title>Histórico de Ocorrências - Jupiter Supervision</title>
+    <title>Ocorrências - Monitoramento</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              'inter': ['Inter', 'sans-serif'],
-              'space': ['Space Grotesk', 'sans-serif'],
-            },
-            colors: {
-              primary: {
-                50: '#f0f9ff',
-                100: '#e0f2fe',
-                200: '#bae6fd',
-                300: '#7dd3fc',
-                400: '#38bdf8',
-                500: '#0ea5e9',
-                600: '#0284c7',
-                700: '#0369a1',
-                800: '#075985',
-                900: '#0c4a6e',
-              },
-              dark: {
-                50: '#f8fafc',
-                100: '#f1f5f9',
-                200: '#e2e8f0',
-                300: '#cbd5e1',
-                400: '#94a3b8',
-                500: '#64748b',
-                600: '#475569',
-                700: '#334155',
-                800: '#1e293b',
-                900: '#0f172a',
-                950: '#020617',
-              }
-            }
-          }
-        }
-      }
-    </script>
-    <style> 
-      body.modal-open { overflow: hidden; }
-      .table-container {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
-        backdrop-filter: blur(10px);
-      }
-    </style>
+<style> body.modal-open { overflow: hidden; } </style>
   </head>
-  <body class="bg-gradient-to-br from-dark-950 via-dark-900 to-dark-800 text-white font-inter">
-    <div class="relative flex size-full min-h-screen flex-col overflow-x-hidden">
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-      
-      <div class="layout-container flex h-full grow flex-col relative z-10">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-dark-700/50 backdrop-blur-sm bg-dark-900/80 px-6 lg:px-10 py-4 sticky top-0 z-50">
+  <body class="bg-[#141414] text-white">
+    <div
+      class="relative flex size-full min-h-screen flex-col dark group/design-root overflow-x-hidden"
+      style='--select-button-svg: url(&apos;data:image/svg+xml,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2724px%27 height=%2724px%27 fill=%27rgb(171,171,171)%27 viewBox=%270 0 256 256%27%3e%3cpath d=%27M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z%27%3e%3c/path%3e%3c/svg%3e&apos;); font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'
+    >
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#303030] px-10 py-3">
           <div class="flex items-center gap-4 text-white">
-            <button id="sidebarToggle" class="p-2 hover:bg-dark-700/50 rounded-xl transition-all duration-300 lg:hidden">
+            <button id="sidebarToggle" class="p-2 hover:bg-[#303030] rounded-full transition-colors duration-150">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 256 256">
                 <path d="M224,128a8,8,0,0,1-8,8H40a8,8,0,0,1,0-16H216A8,8,0,0,1,224,128ZM40,72H216a8,8,0,0,0,0-16H40a8,8,0,0,0,0,16ZM216,184H40a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Z"></path>
               </svg>
             </button>
-            <div class="size-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 35.9988 39.5563 34.1455Z"
+                  fill="currentColor"
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M10.4485 13.8519C10.4749 13.9271 10.6203 14.246 11.379 14.7361C12.298 15.3298 13.7492 15.9145 15.6717 16.3735C18.0007 16.9296 20.8712 17.2655 24 17.2655C27.1288 17.2655 29.9993 16.9296 32.3283 16.3735C34.2508 15.9145 35.702 15.3298 36.621 14.7361C37.3796 14.246 37.5251 13.9271 37.5515 13.8519C37.5287 13.7876 37.4333 13.5973 37.0635 13.2931C36.5266 12.8516 35.6288 12.3647 34.343 11.9175C31.79 11.0295 28.1333 10.4437 24 10.4437C19.8667 10.4437 16.2099 11.0295 13.657 11.9175C12.3712 12.3647 11.4734 12.8516 10.9365 13.2931C10.5667 13.5973 10.4713 13.7876 10.4485 13.8519ZM37.5563 18.7877C36.3176 19.3925 34.8502 19.8839 33.2571 20.2642C30.5836 20.9025 27.3973 21.2655 24 21.2655C20.6027 21.2655 17.4164 20.9025 14.7429 20.2642C13.1498 19.8839 11.6824 19.3925 10.4436 18.7877V34.1275C10.4515 34.1545 10.5427 34.4867 11.379 35.027C12.298 35.6207 13.7492 36.2054 15.6717 36.6644C18.0007 37.2205 20.8712 37.5564 24 37.5564C27.1288 37.5564 29.9993 37.2205 32.3283 36.6644C34.2508 36.2054 35.702 35.6207 36.621 35.027C37.4573 34.4867 37.5485 34.1546 37.5563 34.1275V18.7877ZM41.5563 13.8546V34.1455C41.5563 36.1078 40.158 37.5042 38.7915 38.3869C37.3498 39.3182 35.4192 40.0389 33.2571 40.5551C30.5836 41.1934 27.3973 41.5564 24 41.5564C20.6027 41.5564 17.4164 41.1934 14.7429 40.5551C12.5808 40.0389 10.6502 39.3182 9.20848 38.3869C7.84205 37.5042 6.44365 36.1078 6.44365 34.1455L6.44365 13.8546C6.44365 12.2684 7.37223 11.0454 8.39581 10.2036C9.43325 9.3505 10.8137 8.67141 12.343 8.13948C15.4203 7.06909 19.5418 6.44366 24 6.44366C28.4582 6.44366 32.5797 7.06909 35.657 8.13948C37.1863 8.67141 38.5667 9.3505 39.6042 10.2036C40.6278 11.0454 41.5563 12.2684 41.5563 13.8546Z"
+                  fill="currentColor"
+                ></path>
               </svg>
             </div>
-            <h2 id="titulo" class="text-white text-xl font-space font-bold tracking-tight">Histórico de Ocorrências</h2>
+            <h2 id="titulo" class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Ocorrências Registradas</h2>
           </div>
           <div id="menuAcoes" class="flex items-center gap-4">
-            <div class="hidden sm:flex items-center gap-2 bg-orange-500/10 text-orange-300 px-3 py-2 rounded-full text-sm border border-orange-500/20">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-              Relatórios
-            </div>
           </div>
         </header>
-
-        <div class="flex flex-1">
-          <!-- Sidebar -->
-          <div id="sidebar" class="w-80 bg-dark-900/50 backdrop-blur-sm border-r border-dark-700/50 transition-all duration-300 lg:relative absolute inset-y-0 left-0 z-40">
-            <div class="flex flex-col h-full">
-              <div class="p-6">
-                <button
-                  onclick="location.href='dashboard.html'"
-                  class="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-primary-500/20 to-primary-600/20 hover:from-primary-500/30 hover:to-primary-600/30 text-primary-300 font-semibold py-3 px-4 rounded-xl transition-all duration-300 border border-primary-500/20"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                  </svg>
-                  Menu Principal
-                </button>
-              </div>
-
-              <div class="flex-1 px-6">
-                <nav class="space-y-3">
-                  <a href="historico.html" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-orange-500/20 to-orange-600/20 border border-orange-500/30">
-                    <div class="w-10 h-10 bg-gradient-to-br from-orange-400/30 to-orange-600/30 rounded-lg flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256" class="text-orange-400">
-                        <path d="M56,128a16,16,0,1,1-16-16A16,16,0,0,1,56,128ZM40,48A16,16,0,1,0,56,64,16,16,0,0,0,40,48Zm0,128a16,16,0,1,0,16,16A16,16,0,0,0,40,176Zm176-64H88a8,8,0,0,0-8,8v16a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V120A8,8,0,0,0,216,112Zm0-64H88a8,8,0,0,0-8,8V72a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V56A8,8,0,0,0,216,48Zm0,128H88a8,8,0,0,0-8,8v16a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V184A8,8,0,0,0,216,176Z"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <p class="text-orange-300 font-medium">Ocorrências</p>
-                      <p class="text-orange-400/70 text-sm">Histórico de alertas</p>
+        <div class="gap-1 px-6 flex flex-1 justify-center py-5">
+          <div id="sidebar" class="layout-content-container flex flex-col w-80 transition-all duration-300">
+            <div class="flex px-4 py-3">
+              <button
+                onclick="location.href='dashboard.html'"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-10 px-4 flex-1 bg-[#303030] text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#404040] transition-colors duration-150"
+              >
+                <span class="truncate">Menu</span>
+              </button>
+            </div>
+            <div class="flex h-full min-h-[700px] flex-col justify-between bg-[#141414] p-4">
+              <div class="flex flex-col gap-4">
+                <div class="flex flex-col gap-2">
+                  <a href="historico.html" class="block hover:bg-gray-600 rounded-full transition-colors duration-150">
+                    <div class="flex items-center gap-3 px-3 py-2 rounded-full bg-[#303030] hover:bg-[#404040]">
+                      <div class="text-white" data-icon="ListBullets" data-size="24px" data-weight="fill">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                          <path
+                            d="M56,128a16,16,0,1,1-16-16A16,16,0,0,1,56,128ZM40,48A16,16,0,1,0,56,64,16,16,0,0,0,40,48Zm0,128a16,16,0,1,0,16,16A16,16,0,0,0,40,176Zm176-64H88a8,8,0,0,0-8,8v16a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V120A8,8,0,0,0,216,112Zm0-64H88a8,8,0,0,0-8,8V72a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V56A8,8,0,0,0,216,48Zm0,128H88a8,8,0,0,0-8,8v16a8,8,0,0,0,8,8H216a8,8,0,0,0,8-8V184A8,8,0,0,0,216,176Z"
+                          ></path>
+                        </svg>
+                      </div>
+                      <p class="text-white text-sm font-medium leading-normal">Ocorrências</p>
                     </div>
                   </a>
-
-                  <a href="usuarios.html" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-dark-800/50 hover:bg-dark-700/50 transition-all duration-300 border border-dark-700/30 hover:border-dark-600/50">
-                    <div class="w-10 h-10 bg-gradient-to-br from-blue-400/20 to-blue-600/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256" class="text-blue-400">
-                        <path d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"></path>
-                      </svg>
-                    </div>
-                    <div>
-                      <p class="text-white font-medium">Usuários</p>
-                      <p class="text-gray-400 text-sm">Gerenciar acessos</p>
+                  <a href="usuarios.html" class="block hover:bg-gray-600 rounded-full transition-colors duration-150">
+                    <div class="flex items-center gap-3 px-3 py-2 rounded-full bg-[#303030] hover:bg-[#404040]">
+                      <div class="text-white" data-icon="Users" data-size="24px" data-weight="regular">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                          <path
+                            d="M117.25,157.92a60,60,0,1,0-66.5,0A95.83,95.83,0,0,0,3.53,195.63a8,8,0,1,0,13.4,8.74,80,80,0,0,1,134.14,0,8,8,0,0,0,13.4-8.74A95.83,95.83,0,0,0,117.25,157.92ZM40,108a44,44,0,1,1,44,44A44.05,44.05,0,0,1,40,108Zm210.14,98.7a8,8,0,0,1-11.07-2.33A79.83,79.83,0,0,0,172,168a8,8,0,0,1,0-16,44,44,0,1,0-16.34-84.87,8,8,0,1,1-5.94-14.85,60,60,0,0,1,55.53,105.64,95.83,95.83,0,0,1,47.22,37.71A8,8,0,0,1,250.14,206.7Z"
+                          ></path>
+                        </svg>
+                      </div>
+                      <p class="text-white text-sm font-medium leading-normal">Usuários</p>
                     </div>
                   </a>
-                </nav>
+                </div>
               </div>
-
-              <div class="p-6 border-t border-dark-700/50">
-                <a href="login.html" class="group flex items-center gap-3 px-4 py-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition-all duration-300 border border-red-500/20 hover:border-red-500/30">
-                  <div class="w-10 h-10 bg-gradient-to-br from-red-400/20 to-red-600/20 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256" class="text-red-400">
-                      <path d="M112,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h56a8,8,0,0,1,0,16H48V208h56A8,8,0,0,1,112,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L196.69,120H104a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,221.66,122.34Z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-red-300 font-medium">Sair</p>
-                    <p class="text-red-400/70 text-sm">Encerrar sessão</p>
+              <div class="flex flex-col gap-2">
+                <a href="login.html" class="block hover:bg-gray-600 rounded-full transition-colors duration-150">
+                  <div class="flex items-center gap-3 px-3 py-2 rounded-full bg-[#303030] hover:bg-[#404040]">
+                    <div class="text-white" data-icon="SignOut" data-size="24px" data-weight="regular">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                        <path d="M112,216a8,8,0,0,1-8,8H48a16,16,0,0,1-16-16V48A16,16,0,0,1,48,32h56a8,8,0,0,1,0,16H48V208h56A8,8,0,0,1,112,216Zm109.66-93.66-40-40a8,8,0,0,0-11.32,11.32L196.69,120H104a8,8,0,0,0,0,16h92.69l-26.35,26.34a8,8,0,0,0,11.32,11.32l40-40A8,8,0,0,0,221.66,122.34Z"></path>
+                      </svg>
+                    </div>
+                    <p class="text-white text-sm font-medium leading-normal">Sair</p>
                   </div>
                 </a>
               </div>
             </div>
           </div>
-
-          <!-- Main Content -->
-          <div class="flex-1 p-6 lg:p-8 overflow-auto">
-            <div class="max-w-7xl mx-auto space-y-8">
-              <!-- Header -->
-              <div class="flex flex-col gap-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <h1 class="text-3xl font-space font-bold text-white">Histórico de Ocorrências</h1>
-                    <p class="text-gray-400">Registro completo de alertas e detecções do sistema</p>
-                  </div>
+          <!-- Main content area for table -->
+          <div class="flex flex-1 flex-col justify-center py-5 px-4 sm:px-6 lg:px-8">
+            <!-- Controls and Table Container -->
+            <div class="layout-content-container flex flex-col max-w-[960px] w-full mx-auto">
+                <div class="flex flex-wrap justify-between gap-3 p-4">
+                  <p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Ocorrências</p>
                 </div>
-              </div>
-
-              <!-- Controls -->
-              <div class="bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm border border-dark-700/50 rounded-2xl p-6">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                  <div class="flex items-center gap-4">
-                    <label for="ordenarPor" class="text-white font-medium">Ordenar por:</label>
-                    <select id="ordenarPor" class="bg-dark-800/50 border border-dark-600/50 text-white rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all duration-300">
-                      <option value="data_desc">Data (Mais recente)</option>
-                      <option value="data_asc">Data (Mais antiga)</option>
+                <div class="controls flex items-center gap-2 p-4">
+                    <label for="ordenarPor" class="text-white font-bold"><strong>Ordenar por:</strong></label>
+                    <select id="ordenarPor" class="form-select block w-auto bg-[#303030] border border-[#474747] text-white rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 p-2">
+                        <option value="data_desc">Data (Mais recente)</option>
+                        <option value="data_asc">Data (Mais antiga)</option>
                     </select>
-                  </div>
-                  
-                  <div class="flex items-center gap-2 text-gray-400 text-sm">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Clique em "Ver Imagem" para visualizar detalhes
-                  </div>
                 </div>
-              </div>
 
-              <!-- Table -->
-              <div class="table-container border border-dark-700/50 rounded-2xl overflow-hidden">
-                <div class="overflow-x-auto">
-                  <table class="w-full">
-                    <thead class="bg-dark-800/50 border-b border-dark-700/50">
-                      <tr>
-                        <th class="px-6 py-4 text-left text-white font-semibold">
-                          <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                            </svg>
-                            Classe Detectada
-                          </div>
-                        </th>
-                        <th class="px-6 py-4 text-left text-white font-semibold">
-                          <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Hora da Ocorrência
-                          </div>
-                        </th>
-                        <th class="px-6 py-4 text-left text-white font-semibold">
-                          <div class="flex items-center gap-2">
-                            <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            Visualizar Imagem
-                          </div>
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <!-- Preenchido dinamicamente pelo carregarTabela.js -->
-                    </tbody>
-                  </table>
+                <div class="px-4 py-3 @container">
+                    <div class="flex overflow-hidden rounded-xl border border-[#474747] bg-[#141414]">
+                        <table class="flex-1 w-full">
+                            <thead>
+                                <tr class="bg-[#212121]">
+                                    <th class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Classe Detectada</th>
+                                    <th class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Hora da Ocorrência</th>
+                                    <th class="px-4 py-3 text-left text-white text-sm font-medium leading-normal">Visualizar Imagem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Preenchido dinamicamente pelo carregarTabela.js -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
 
-      <!-- Image Modal -->
-      <div id="imageModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div class="bg-gradient-to-br from-dark-800/90 to-dark-900/90 backdrop-blur-sm border border-dark-700/50 rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-auto relative">
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center">
-                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                </div>
-                <h3 class="text-xl font-space font-semibold text-white">Imagem da Ocorrência</h3>
-              </div>
-              <button id="closeModalButton" class="w-10 h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 rounded-xl transition-all duration-300 flex items-center justify-center border border-red-500/30">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-              </button>
-            </div>
-            <div class="bg-dark-900/50 rounded-2xl p-4 border border-dark-700/30">
-              <img id="modalImage" src="" alt="Imagem da Ocorrência" class="w-full h-auto rounded-xl mx-auto">
-            </div>
-          </div>
-        </div>
       </div>
     </div>
+<!-- Image Modal -->
+<div id="imageModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+  <div class="bg-[#212121] p-4 rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-auto relative">
+    <img id="modalImage" src="" alt="Imagem da Ocorrência" class="w-full h-auto rounded-md mx-auto">
+    <button id="closeModalButton" class="absolute top-2 right-2 mt-2 mr-2 bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded-full text-xl">&times;</button>
+  </div>
+</div>
 
     <script type="module" src="firebaseConfig.js"></script>
     <script type="module" src="carregarTabela.js"></script>
-    <script>
-      // Sidebar toggle functionality
-      const sidebar = document.getElementById('sidebar');
-      const sidebarToggle = document.getElementById('sidebarToggle');
-      let isSidebarOpen = true;
+<script>
+  // Sidebar toggle functionality
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  let isSidebarOpen = true;
 
-      function toggleSidebar() {
-        isSidebarOpen = !isSidebarOpen;
-        if (isSidebarOpen) {
-          sidebar.classList.remove('-translate-x-full');
-        } else {
-          sidebar.classList.add('-translate-x-full');
-        }
+  function toggleSidebar() {
+    isSidebarOpen = !isSidebarOpen;
+    if (isSidebarOpen) {
+      sidebar.style.width = '20rem'; // w-80 = 20rem
+      sidebar.style.opacity = '1';
+      sidebar.style.visibility = 'visible';
+    } else {
+      sidebar.style.width = '0';
+      sidebar.style.opacity = '0';
+      sidebar.style.visibility = 'hidden';
+    }
+  }
+
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', toggleSidebar);
+  }
+
+  // Existing modal code
+  const imageModal = document.getElementById("imageModal");
+  const closeModalButton = document.getElementById("closeModalButton");
+
+  function closeModal() {
+    if (imageModal) {
+      imageModal.classList.add("hidden");
+      document.body.classList.remove("modal-open");
+    }
+  }
+
+  if (closeModalButton) {
+    closeModalButton.addEventListener("click", closeModal);
+  }
+
+  if (imageModal) {
+    imageModal.addEventListener("click", function(event) {
+      if (event.target === imageModal) { 
+        closeModal();
       }
+    });
+  }
+</script>
 
-      if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', toggleSidebar);
-      }
-
-      // Close sidebar when clicking outside on mobile
-      document.addEventListener('click', function(event) {
-        if (window.innerWidth < 1024) {
-          if (!sidebar.contains(event.target) && !sidebarToggle.contains(event.target)) {
-            sidebar.classList.add('-translate-x-full');
-            isSidebarOpen = false;
-          }
-        }
-      });
-
-      // Modal functionality
-      const imageModal = document.getElementById("imageModal");
-      const closeModalButton = document.getElementById("closeModalButton");
-
-      function closeModal() {
-        if (imageModal) {
-          imageModal.classList.add("hidden");
-          document.body.classList.remove("modal-open");
-        }
-      }
-
-      if (closeModalButton) {
-        closeModalButton.addEventListener("click", closeModal);
-      }
-
-      if (imageModal) {
-        imageModal.addEventListener("click", function(event) {
-          if (event.target === imageModal) { 
-            closeModal();
-          }
-        });
-      }
-
-      // Escape key to close modal
-      document.addEventListener('keydown', function(event) {
-        if (event.key === 'Escape' && !imageModal.classList.contains('hidden')) {
-          closeModal();
-        }
-      });
-    </script>
   </body>
 </html>
