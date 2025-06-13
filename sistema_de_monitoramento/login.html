@@ -5,203 +5,74 @@
       rel="stylesheet"
       as="style"
       onload="this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Plus+Jakarta+Sans%3Awght%40400%3B500%3B700%3B800"
     />
 
-    <title>Login - Jupiter Supervision</title>
+    <title>Stitch Design</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              'inter': ['Inter', 'sans-serif'],
-              'space': ['Space Grotesk', 'sans-serif'],
-            },
-            colors: {
-              primary: {
-                50: '#f0f9ff',
-                100: '#e0f2fe',
-                200: '#bae6fd',
-                300: '#7dd3fc',
-                400: '#38bdf8',
-                500: '#0ea5e9',
-                600: '#0284c7',
-                700: '#0369a1',
-                800: '#075985',
-                900: '#0c4a6e',
-              },
-              dark: {
-                50: '#f8fafc',
-                100: '#f1f5f9',
-                200: '#e2e8f0',
-                300: '#cbd5e1',
-                400: '#94a3b8',
-                500: '#64748b',
-                600: '#475569',
-                700: '#334155',
-                800: '#1e293b',
-                900: '#0f172a',
-                950: '#020617',
-              }
-            },
-            animation: {
-              'fade-in': 'fadeIn 0.5s ease-in-out',
-              'slide-up': 'slideUp 0.6s ease-out',
-              'float': 'float 6s ease-in-out infinite',
-              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            },
-            keyframes: {
-              fadeIn: {
-                '0%': { opacity: '0' },
-                '100%': { opacity: '1' },
-              },
-              slideUp: {
-                '0%': { transform: 'translateY(20px)', opacity: '0' },
-                '100%': { transform: 'translateY(0)', opacity: '1' },
-              },
-              float: {
-                '0%, 100%': { transform: 'translateY(0px)' },
-                '50%': { transform: 'translateY(-10px)' },
-              }
-            }
-          }
-        }
-      }
-    </script>
   </head>
-  <body class="bg-gradient-to-br from-dark-950 via-dark-900 to-dark-800 text-white font-inter min-h-screen">
-    <div class="relative flex size-full min-h-screen flex-col overflow-x-hidden">
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
-      
-      <!-- Floating Elements -->
-      <div class="absolute top-20 left-10 w-32 h-32 bg-primary-500/5 rounded-full blur-3xl animate-pulse-slow"></div>
-      <div class="absolute bottom-20 right-10 w-40 h-40 bg-primary-400/3 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
-      
-      <div class="layout-container flex h-full grow flex-col relative z-10">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-dark-700/50 backdrop-blur-sm bg-dark-900/80 px-6 lg:px-10 py-4">
+  <body>
+    <div
+      class="relative flex size-full min-h-screen flex-col bg-[#141414] dark group/design-root overflow-x-hidden"
+      style='font-family: "Plus Jakarta Sans", "Noto Sans", sans-serif;'
+    >
+      <div class="layout-container flex h-full grow flex-col">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#303030] px-10 py-3">
           <div class="flex items-center gap-4 text-white">
-            <div class="size-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center animate-float">
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
-                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="size-4">
+              <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M39.5563 34.1455V13.8546C39.5563 15.708 36.8773 17.3437 32.7927 18.3189C30.2914 18.916 27.263 19.2655 24 19.2655C20.737 19.2655 17.7086 18.916 15.2073 18.3189C11.1227 17.3437 8.44365 15.708 8.44365 13.8546V34.1455C8.44365 35.9988 11.1227 37.6346 15.2073 38.6098C17.7086 39.2069 20.737 39.5564 24 39.5564C27.263 39.5564 30.2914 39.2069 32.7927 38.6098C36.8773 37.6346 39.5563 35.9988 39.5563 34.1455Z"
+                  fill="currentColor"
+                ></path>
+                <path
+                  fill-rule="evenodd"
+                  clip-rule="evenodd"
+                  d="M10.4485 13.8519C10.4749 13.9271 10.6203 14.246 11.379 14.7361C12.298 15.3298 13.7492 15.9145 15.6717 16.3735C18.0007 16.9296 20.8712 17.2655 24 17.2655C27.1288 17.2655 29.9993 16.9296 32.3283 16.3735C34.2508 15.9145 35.702 15.3298 36.621 14.7361C37.3796 14.246 37.5251 13.9271 37.5515 13.8519C37.5287 13.7876 37.4333 13.5973 37.0635 13.2931C36.5266 12.8516 35.6288 12.3647 34.343 11.9175C31.79 11.0295 28.1333 10.4437 24 10.4437C19.8667 10.4437 16.2099 11.0295 13.657 11.9175C12.3712 12.3647 11.4734 12.8516 10.9365 13.2931C10.5667 13.5973 10.4713 13.7876 10.4485 13.8519ZM37.5563 18.7877C36.3176 19.3925 34.8502 19.8839 33.2571 20.2642C30.5836 20.9025 27.3973 21.2655 24 21.2655C20.6027 21.2655 17.4164 20.9025 14.7429 20.2642C13.1498 19.8839 11.6824 19.3925 10.4436 18.7877V34.1275C10.4515 34.1545 10.5427 34.4867 11.379 35.027C12.298 35.6207 13.7492 36.2054 15.6717 36.6644C18.0007 37.2205 20.8712 37.5564 24 37.5564C27.1288 37.5564 29.9993 37.2205 32.3283 36.6644C34.2508 36.2054 35.702 35.6207 36.621 35.027C37.4573 34.4867 37.5485 34.1546 37.5563 34.1275V18.7877ZM41.5563 13.8546V34.1455C41.5563 36.1078 40.158 37.5042 38.7915 38.3869C37.3498 39.3182 35.4192 40.0389 33.2571 40.5551C30.5836 41.1934 27.3973 41.5564 24 41.5564C20.6027 41.5564 17.4164 41.1934 14.7429 40.5551C12.5808 40.0389 10.6502 39.3182 9.20848 38.3869C7.84205 37.5042 6.44365 36.1078 6.44365 34.1455L6.44365 13.8546C6.44365 12.2684 7.37223 11.0454 8.39581 10.2036C9.43325 9.3505 10.8137 8.67141 12.343 8.13948C15.4203 7.06909 19.5418 6.44366 24 6.44366C28.4582 6.44366 32.5797 7.06909 35.657 8.13948C37.1863 8.67141 38.5667 9.3505 39.6042 10.2036C40.6278 11.0454 41.5563 12.2684 41.5563 13.8546Z"
+                  fill="currentColor"
+                ></path>
               </svg>
             </div>
-            <h2 class="text-white text-xl font-space font-bold tracking-tight">Jupiter Supervision</h2>
+            <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Jupiter Supervision</h2>
           </div>
-          <button onclick="location.href='home.html'" class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Voltar
-          </button>
         </header>
-
-        <div class="flex flex-1 items-center justify-center px-6 py-12">
-          <div class="w-full max-w-md animate-slide-up">
-            <!-- Login Card -->
-            <div class="bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm border border-dark-700/50 rounded-3xl p-8 shadow-2xl">
-              <!-- Header -->
-              <div class="text-center mb-8">
-                <div class="inline-flex items-center gap-2 bg-primary-500/10 text-primary-300 px-4 py-2 rounded-full text-sm font-medium border border-primary-500/20 mb-4">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                  </svg>
-                  Área Restrita
-                </div>
-                <h2 class="text-white text-3xl font-space font-bold mb-2">Bem-vindo de volta</h2>
-                <p class="text-gray-400 text-base">Acesse o painel de controle do sistema</p>
-              </div>
-
-              <!-- Login Form -->
-              <form class="space-y-6">
-                <div class="space-y-2">
-                  <label for="usuario" class="block text-sm font-medium text-gray-300">Usuário</label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      id="usuario"
-                      placeholder="Digite seu usuário"
-                      class="w-full pl-10 pr-4 py-3 bg-dark-800/50 border border-dark-600/50 text-white placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all duration-300"
-                    />
-                  </div>
-                </div>
-
-                <div class="space-y-2">
-                  <label for="senha" class="block text-sm font-medium text-gray-300">Senha</label>
-                  <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="password"
-                      id="senha"
-                      placeholder="Digite sua senha"
-                      class="w-full pl-10 pr-4 py-3 bg-dark-800/50 border border-dark-600/50 text-white placeholder-gray-400 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all duration-300"
-                    />
-                  </div>
-                </div>
-
-                <!-- Forgot Password -->
-                <div class="text-center">
-                  <p class="text-gray-400 text-sm">
-                    Esqueceu a senha? 
-                    <span class="text-primary-400 hover:text-primary-300 cursor-pointer transition-colors duration-300">
-                      Entre em contato com o administrador
-                    </span>
-                  </p>
-                </div>
-
-                <!-- Error/Success Message -->
-                <div id="saida" class="text-center py-2 min-h-[1.5rem]"></div>
-
-                <!-- Login Button -->
-                <button
-                  type="button"
-                  id="btnLogin"
-                  class="w-full group relative overflow-hidden bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg hover:shadow-primary-500/25 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
-                >
-                  <span class="relative z-10 flex items-center justify-center gap-2">
-                    <svg class="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                    </svg>
-                    Entrar
-                  </span>
-                  <div class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </button>
-              </form>
-
-              <!-- Additional Info -->
-              <div class="mt-8 pt-6 border-t border-dark-700/50">
-                <div class="flex items-center justify-center gap-2 text-gray-400 text-sm">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                  </svg>
-                  Conexão segura e criptografada
-                </div>
-              </div>
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col w-[512px] max-w-[512px] py-5 max-w-[960px] flex-1 items-center">
+            <h2 class="text-white tracking-light text-[28px] font-bold leading-tight px-4 text-center pb-3 pt-5">Login</h2>
+            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3 w-full">
+              <label class="flex flex-col min-w-40 flex-1">
+                <p class="text-white text-base font-medium leading-normal pb-2">Usuário</p>
+                <input
+                  placeholder="Usuário"
+                  id="usuario"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border border-[#474747] bg-[#212121] focus:border-[#474747] h-14 placeholder:text-[#ababab] p-[15px] text-base font-normal leading-normal"
+                  value=""
+                />
+              </label>
             </div>
-
-            <!-- Demo Credentials -->
-            <div class="mt-6 p-4 bg-dark-800/30 border border-dark-700/30 rounded-xl backdrop-blur-sm">
-              <div class="text-center">
-                <p class="text-gray-400 text-sm mb-2">Credenciais de demonstração:</p>
-                <div class="flex flex-col gap-1 text-xs">
-                  <span class="text-gray-300">Usuário: <code class="bg-dark-700/50 px-2 py-1 rounded text-primary-300">adm</code></span>
-                  <span class="text-gray-300">Senha: <code class="bg-dark-700/50 px-2 py-1 rounded text-primary-300">123</code></span>
-                </div>
-              </div>
+            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3 w-full">
+              <label class="flex flex-col min-w-40 flex-1">
+                <p class="text-white text-base font-medium leading-normal pb-2">Senha</p>
+                <input
+                  placeholder="Senha"
+                  id="senha"
+                  type="password"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-xl text-white focus:outline-0 focus:ring-0 border border-[#474747] bg-[#212121] focus:border-[#474747] h-14 placeholder:text-[#ababab] p-[15px] text-base font-normal leading-normal"
+                  value=""
+                />
+              </label>
+            </div>
+            <p class="text-[#ababab] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">Esqueceu a senha? Entre em contato com o administrador</p>
+            <p id="saida" class="text-red-500 text-center py-2"></p>
+            <div class="flex px-4 py-3 w-full max-w-[480px]">
+              <button
+                id="btnLogin"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-5 flex-1 bg-black text-white text-base font-bold leading-normal tracking-[0.015em]"
+              >
+                <span class="truncate">Entrar</span>
+              </button>
             </div>
           </div>
         </div>
