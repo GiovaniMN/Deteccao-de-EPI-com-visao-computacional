@@ -1,0 +1,310 @@
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700"
+    />
+
+    <title>Jupiter Supervision - Sistema de Monitoramento de EPIs</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              'inter': ['Inter', 'sans-serif'],
+              'space': ['Space Grotesk', 'sans-serif'],
+            },
+            colors: {
+              primary: {
+                50: '#f0f9ff',
+                100: '#e0f2fe',
+                200: '#bae6fd',
+                300: '#7dd3fc',
+                400: '#38bdf8',
+                500: '#0ea5e9',
+                600: '#0284c7',
+                700: '#0369a1',
+                800: '#075985',
+                900: '#0c4a6e',
+              },
+              dark: {
+                50: '#f8fafc',
+                100: '#f1f5f9',
+                200: '#e2e8f0',
+                300: '#cbd5e1',
+                400: '#94a3b8',
+                500: '#64748b',
+                600: '#475569',
+                700: '#334155',
+                800: '#1e293b',
+                900: '#0f172a',
+                950: '#020617',
+              }
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-in-out',
+              'slide-up': 'slideUp 0.6s ease-out',
+              'float': 'float 6s ease-in-out infinite',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              slideUp: {
+                '0%': { transform: 'translateY(20px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-10px)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-gradient-to-br from-dark-950 via-dark-900 to-dark-800 text-white font-inter">
+    <div class="relative flex size-full min-h-screen flex-col overflow-x-hidden">
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.02"%3E%3Ccircle cx="30" cy="30" r="1"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50"></div>
+      
+      <div class="layout-container flex h-full grow flex-col relative z-10">
+        <header class="flex items-center justify-between whitespace-nowrap border-b border-dark-700/50 backdrop-blur-sm bg-dark-900/80 px-6 lg:px-10 py-4 sticky top-0 z-50">
+          <div class="flex items-center gap-4 text-white">
+            <div class="size-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center animate-float">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5">
+                <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h2 class="text-white text-xl font-space font-bold tracking-tight">Jupiter Supervision</h2>
+          </div>
+          <div class="flex items-center gap-4">
+            <button onclick="location.href='login.html'" class="group relative overflow-hidden bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-primary-500/25">
+              <span class="relative z-10">Acesso Privado</span>
+              <div class="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+            </button>
+          </div>
+        </header>
+
+        <!-- Hero Section -->
+        <div class="px-6 lg:px-40 flex flex-1 justify-center py-12">
+          <div class="layout-content-container flex flex-col max-w-7xl flex-1">
+            <div class="@container">
+              <div class="@[480px]:p-4">
+                <div class="flex min-h-[600px] flex-col gap-8 bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm @[480px]:gap-10 @[480px]:rounded-3xl items-center justify-center p-8 lg:p-16 border border-dark-700/30 relative overflow-hidden">
+                  <!-- Animated background elements -->
+                  <div class="absolute top-10 left-10 w-20 h-20 bg-primary-500/10 rounded-full blur-xl animate-pulse"></div>
+                  <div class="absolute bottom-10 right-10 w-32 h-32 bg-primary-400/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
+                  
+                  <div class="flex flex-col gap-6 text-center animate-slide-up">
+                    <div class="inline-flex items-center gap-2 bg-primary-500/10 text-primary-300 px-4 py-2 rounded-full text-sm font-medium border border-primary-500/20">
+                      <div class="w-2 h-2 bg-primary-400 rounded-full animate-pulse"></div>
+                      Sistema Avançado de Monitoramento
+                    </div>
+                    <h1 class="text-white text-4xl lg:text-6xl font-space font-bold leading-tight tracking-tight bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent">
+                      Detecção Inteligente de EPIs
+                    </h1>
+                    <h2 class="text-gray-300 text-lg lg:text-xl font-normal leading-relaxed max-w-2xl mx-auto">
+                      Monitore automaticamente o uso de equipamentos de proteção individual com tecnologia de visão computacional avançada e alertas em tempo real.
+                    </h2>
+                  </div>
+                  
+                  <div class="flex flex-col sm:flex-row gap-4 animate-fade-in">
+                    <button onclick="location.href='login.html'" class="group relative overflow-hidden bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary-500/25">
+                      <span class="relative z-10 flex items-center gap-2">
+                        Começar Agora
+                        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                      </span>
+                    </button>
+                    <button class="group bg-dark-800/50 hover:bg-dark-700/50 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 border border-dark-600/50 hover:border-dark-500/50">
+                      <span class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Saiba Mais
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="flex flex-col gap-16 px-4 py-16 @container">
+              <div class="flex flex-col gap-6 text-center">
+                <div class="inline-flex items-center gap-2 bg-primary-500/10 text-primary-300 px-4 py-2 rounded-full text-sm font-medium border border-primary-500/20 mx-auto">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
+                  Recursos Principais
+                </div>
+                <h1 class="text-white text-3xl lg:text-5xl font-space font-bold leading-tight max-w-4xl mx-auto">
+                  Tecnologia de Ponta para Sua Segurança
+                </h1>
+                <p class="text-gray-300 text-lg font-normal leading-relaxed max-w-2xl mx-auto">
+                  Nossa plataforma oferece recursos avançados para garantir o cumprimento das normas de segurança em tempo real.
+                </p>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="group flex flex-col gap-6 rounded-2xl border border-dark-700/50 bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm p-8 hover:border-primary-500/30 transition-all duration-300 hover:transform hover:scale-105">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary-400 to-primary-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                      </svg>
+                    </div>
+                    <h3 class="text-white text-xl font-space font-semibold">Detecção Inteligente</h3>
+                  </div>
+                  <p class="text-gray-300 text-base leading-relaxed">
+                    Algoritmos de IA avançados para identificar automaticamente capacetes, óculos de proteção e botas de segurança em tempo real.
+                  </p>
+                </div>
+
+                <div class="group flex flex-col gap-6 rounded-2xl border border-dark-700/50 bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm p-8 hover:border-primary-500/30 transition-all duration-300 hover:transform hover:scale-105">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4.828 4.828A4 4 0 015.5 4H9v1H5.5a3 3 0 00-2.121.879l-.707.707A1 1 0 002 7.414V16a2 2 0 002 2h8a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-.707-.707A3 3 0 0010.5 7H7V6h3.5a4 4 0 012.828 1.172L14 8h5a1 1 0 011 1v8a1 1 0 01-1 1h-5l-5-5z"></path>
+                      </svg>
+                    </div>
+                    <h3 class="text-white text-xl font-space font-semibold">Alertas Instantâneos</h3>
+                  </div>
+                  <p class="text-gray-300 text-base leading-relaxed">
+                    Notificações imediatas via Telegram e dashboard web quando EPIs obrigatórios não são detectados.
+                  </p>
+                </div>
+
+                <div class="group flex flex-col gap-6 rounded-2xl border border-dark-700/50 bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm p-8 hover:border-primary-500/30 transition-all duration-300 hover:transform hover:scale-105">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                      </svg>
+                    </div>
+                    <h3 class="text-white text-xl font-space font-semibold">Análise Avançada</h3>
+                  </div>
+                  <p class="text-gray-300 text-base leading-relaxed">
+                    Dashboard completo com relatórios detalhados, histórico de ocorrências e métricas de conformidade.
+                  </p>
+                </div>
+
+                <div class="group flex flex-col gap-6 rounded-2xl border border-dark-700/50 bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm p-8 hover:border-primary-500/30 transition-all duration-300 hover:transform hover:scale-105">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                      </svg>
+                    </div>
+                    <h3 class="text-white text-xl font-space font-semibold">Edge Computing</h3>
+                  </div>
+                  <p class="text-gray-300 text-base leading-relaxed">
+                    Processamento local com Raspberry Pi e Coral Edge TPU para resposta ultra-rápida e privacidade dos dados.
+                  </p>
+                </div>
+
+                <div class="group flex flex-col gap-6 rounded-2xl border border-dark-700/50 bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm p-8 hover:border-primary-500/30 transition-all duration-300 hover:transform hover:scale-105">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                      </svg>
+                    </div>
+                    <h3 class="text-white text-xl font-space font-semibold">Segurança Total</h3>
+                  </div>
+                  <p class="text-gray-300 text-base leading-relaxed">
+                    Criptografia avançada e controle de acesso rigoroso para proteger dados sensíveis da sua organização.
+                  </p>
+                </div>
+
+                <div class="group flex flex-col gap-6 rounded-2xl border border-dark-700/50 bg-gradient-to-br from-dark-800/50 to-dark-900/50 backdrop-blur-sm p-8 hover:border-primary-500/30 transition-all duration-300 hover:transform hover:scale-105">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                      </svg>
+                    </div>
+                    <h3 class="text-white text-xl font-space font-semibold">Fácil Integração</h3>
+                  </div>
+                  <p class="text-gray-300 text-base leading-relaxed">
+                    Interface intuitiva e APIs simples para integração rápida com sistemas existentes de gestão de segurança.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="@container">
+              <div class="flex flex-col justify-center gap-8 px-4 py-16 @[480px]:gap-10 @[480px]:px-10 @[480px]:py-20">
+                <div class="flex flex-col gap-6 text-center">
+                  <h1 class="text-white text-3xl lg:text-5xl font-space font-bold leading-tight max-w-4xl mx-auto">
+                    Pronto para Revolucionar a Segurança?
+                  </h1>
+                  <p class="text-gray-300 text-lg font-normal leading-relaxed max-w-2xl mx-auto">
+                    Implemente nossa solução de monitoramento inteligente e garanta 100% de conformidade com as normas de segurança.
+                  </p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button onclick="location.href='login.html'" class="group relative overflow-hidden bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary-500/25">
+                    <span class="relative z-10 flex items-center gap-2 justify-center">
+                      Começar Agora
+                      <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                      </svg>
+                    </span>
+                  </button>
+                  <button class="group bg-dark-800/50 hover:bg-dark-700/50 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 border border-dark-600/50 hover:border-dark-500/50">
+                    <span class="flex items-center gap-2 justify-center">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      Documentação
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="border-t border-dark-700/50 bg-dark-900/50 backdrop-blur-sm">
+          <div class="flex justify-center">
+            <div class="flex max-w-7xl flex-1 flex-col">
+              <footer class="flex flex-col gap-8 px-6 lg:px-10 py-12 text-center @container">
+                <div class="flex flex-wrap items-center justify-center gap-8 @[480px]:flex-row @[480px]:justify-around">
+                  <a class="text-gray-400 hover:text-white text-base font-normal leading-normal transition-colors duration-300 min-w-40" href="#">Política de Privacidade</a>
+                  <a class="text-gray-400 hover:text-white text-base font-normal leading-normal transition-colors duration-300 min-w-40" href="#">Termos de Serviço</a>
+                  <a class="text-gray-400 hover:text-white text-base font-normal leading-normal transition-colors duration-300 min-w-40" href="#">Contato</a>
+                  <a class="text-gray-400 hover:text-white text-base font-normal leading-normal transition-colors duration-300 min-w-40" href="#">Suporte</a>
+                </div>
+                <div class="flex items-center justify-center gap-4">
+                  <div class="w-8 h-8 bg-gradient-to-br from-primary-400 to-primary-600 rounded-lg flex items-center justify-center">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-white">
+                      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <p class="text-gray-400 text-base font-normal leading-normal">© 2024 Jupiter Supervision. Todos os direitos reservados.</p>
+                </div>
+              </footer>
+            </div>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>

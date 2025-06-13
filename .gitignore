@@ -1,0 +1,9 @@
+# Firebase config
+firebaseConfig.js
+
+# Dependencies
+node_modules/
+
+# IDE files
+.vscode/
+.idea/ 
