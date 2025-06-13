@@ -1,53 +1,70 @@
-const btnLogin = document.getElementById('btnLogin');
-const usuario = document.getElementById('usuario');
-const senha = document.getElementById('senha');
-const saida = document.getElementById('saida');
+import { db } from './firebaseConfig.js';
+import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-// Evento para validar alterações nos campos
-usuario.addEventListener('change', onChange);
-senha.addEventListener('change', onChange);
+document.addEventListener('DOMContentLoaded', function() {
+    const btnLogin = document.getElementById('btnLogin');
+    const usuarioInput = document.getElementById('usuario');
+    const senhaInput = document.getElementById('senha');
+    const saidaElement = document.getElementById('saida');
 
-// Lista de usuários e senhas
-let usuarios = [
-    { user: 'adm', pass: '123' }
-];
+    btnLogin.addEventListener('click', async function() {
+        const usuario = usuarioInput.value.trim();
+        const senha = senhaInput.value.trim();
 
-function onChange() {
-    if (!validNt(this.value)) {
-        this.value = '';
-        this.focus();
-    }
-}
+        console.log('Login attempt:', { usuario, senha });
 
-// Validações adicionais podem ser feitas na função abaixo
-function validNt(value) {
-    return value.trim().length > 0; // Garante que não está vazio
-}
+        // Basic validation
+        if (!usuario || !senha) {
+            saidaElement.textContent = 'Por favor, preencha todos os campos';
+            saidaElement.style.color = 'red';
+            return;
+        }
 
-function gtUsuario() {
-    return usuario.value.trim();
-}
+        try {
+            console.log('Querying Firestore for user:', usuario);
+            // Query Firestore for the user
+            const usersCollection = collection(db, 'users');
+            const q = query(usersCollection, where('user', '==', usuario));
+            const querySnapshot = await getDocs(q);
 
-function gtSenha() {
-    return senha.value.trim();
-}
+            console.log('Query results:', querySnapshot.empty ? 'No user found' : 'User found');
 
-function comparar(user, pass) {
-    const match = usuarios.find(u => u.user === user && u.pass === pass);
-    return match ? true : false;
-}
+            if (querySnapshot.empty) {
+                saidaElement.textContent = 'Usuário não encontrado';
+                saidaElement.style.color = 'red';
+                return;
+            }
 
-btnLogin.addEventListener('click', onClick);
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+            console.log('User data:', { ...userData, pass: '***' });
 
-function onClick() {
-    const user = gtUsuario();
-    const pass = gtSenha();
+            if (userData.pass !== senha) {
+                console.log('Password mismatch');
+                saidaElement.textContent = 'Senha incorreta';
+                saidaElement.style.color = 'red';
+                return;
+            }
 
-    if (comparar(user, pass)) {
-        // Redireciona para a nova página em caso de sucesso
-        window.location.href = "pagina-principal.html";
-    } else {
-        saida.textContent = "Usuário ou Senha Incorretos";
-    }
-}
+            console.log('Login successful, storing user info');
+            // Store user info in sessionStorage
+            sessionStorage.setItem('currentUser', JSON.stringify({
+                id: userDoc.id,
+                username: userData.user
+            }));
 
+            // Show success message
+            saidaElement.textContent = 'Login realizado com sucesso!';
+            saidaElement.style.color = 'green';
+            
+            // Redirect to dashboard after a short delay
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+        } catch (error) {
+            console.error("Error during login:", error);
+            saidaElement.textContent = 'Erro ao realizar login. Tente novamente.';
+            saidaElement.style.color = 'red';
+        }
+    });
+});
