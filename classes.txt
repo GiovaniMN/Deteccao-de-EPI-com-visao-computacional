@@ -1,4 +1,0 @@
-bota
-capacete
-oculos
-pessoa
