@@ -1,5 +1,7 @@
-# Firebase configuration files with sensitive data
-firebase_key.json
+# Firebase configuration files with sensitive data (user-generated from .example files)
+config/firebase_key.json
+config/firebaseConfig.js
+# Also ignore if copied to the web public directory for deployment
 sistema_de_monitoramento/firebaseConfig.js
 
 # Environment variables
@@ -47,4 +49,8 @@ logs/
 *.tmp
 *.temp
 
-deteccao.py
+# Python script generated from template
+src/deteccao.py
+
+# Model files (PyTorch .pt files can be large)
+models/*.pt
