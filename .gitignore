@@ -1,6 +1,7 @@
 # Firebase configuration files with sensitive data (user-generated from .example files)
 config/firebase_key.json
 config/firebaseConfig.js
+firebase_key.json
 # Also ignore if copied to the web public directory for deployment
 sistema_de_monitoramento/firebaseConfig.js
 
