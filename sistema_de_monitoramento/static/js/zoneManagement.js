@@ -1,20 +1,23 @@
 // sistema_de_monitoramento/static/js/zoneManagement.js
 
-import { db } from '../firebaseConfig.js';
-import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
+import { db, rtdb } from '../firebaseConfig.js'; // Import rtdb
+import { getStorage, ref, getDownloadURL, getMetadata } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { ref as dbRef, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const imageContainer = document.getElementById('image-container');
     const image = document.getElementById('reference-image');
     const canvas = document.getElementById('zone-canvas');
     const saveButton = document.getElementById('saveButton');
+    const captureImageButton = document.getElementById('captureImageButton'); // New button
     const feedback = document.getElementById('feedback');
     const ctx = canvas.getContext('2d');
 
     const storage = getStorage();
     const imageRef = ref(storage, 'reference_image/camera_frame.jpg');
     const zoneDocRef = doc(db, "configuracoes", "zona_deteccao");
+    const captureRequestRef = dbRef(rtdb, 'configuracoes/tirar_foto_request'); // Realtime DB ref
 
     let rect = {};
     let isDrawing = false;
@@ -23,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let dragStart = { x: 0, y: 0 };
     let resizeHandle = null;
     const handleSize = 8;
+    let lastImageUpdateTime = null;
 
     function setCanvasSize() {
         canvas.width = image.clientWidth;
@@ -30,22 +34,49 @@ document.addEventListener('DOMContentLoaded', () => {
         loadZone();
     }
 
-    function showFeedback(message, isError = false) {
+    function showFeedback(message, isError = false, isLoading = false) {
         feedback.textContent = message;
-        feedback.className = isError ? 'mt-4 text-center text-sm text-red-400' : 'mt-4 text-center text-sm text-green-400';
-        setTimeout(() => feedback.textContent = '', 3000);
+        if (isLoading) {
+            feedback.className = 'mt-4 text-center text-sm text-blue-400 animate-pulse';
+        } else {
+            feedback.className = isError ? 'mt-4 text-center text-sm text-red-400' : 'mt-4 text-center text-sm text-green-400';
+            setTimeout(() => feedback.textContent = '', 4000);
+        }
     }
 
-    async function loadReferenceImage() {
+    async function loadReferenceImage(forceReload = false) {
         try {
+            // Add a cache-busting query parameter if forcing a reload
             const url = await getDownloadURL(imageRef);
-            image.src = url;
+            const finalUrl = forceReload ? `${url}?t=${new Date().getTime()}` : url;
+            
+            image.src = finalUrl;
             image.onload = setCanvasSize;
+            
+            // Store the last modified time after loading
+            const metadata = await getMetadata(imageRef);
+            lastImageUpdateTime = metadata.updated;
+
         } catch (error) {
             console.error("Erro ao carregar imagem de referência:", error);
-            showFeedback('Não foi possível carregar a imagem da câmera. Tente recarregar.', true);
-            image.src = 'https://via.placeholder.com/800x600.png?text=Falha+ao+carregar+imagem';
+            showFeedback('Não foi possível carregar a imagem da câmera. Verifique se há uma imagem de referência no sistema.', true);
+            image.src = 'https://via.placeholder.com/800x600.png?text=Nenhuma+imagem+de+referência';
         }
+    }
+
+    async function listenForImageUpdate() {
+        // Simple polling to check for image metadata changes
+        setInterval(async () => {
+            try {
+                const metadata = await getMetadata(imageRef);
+                if (lastImageUpdateTime && metadata.updated > lastImageUpdateTime) {
+                    showFeedback('Imagem da câmera atualizada!', false);
+                    loadReferenceImage(true); // Force reload
+                }
+            } catch (error) {
+                // Ignore errors here, as it's a background check
+            }
+        }, 5000); // Check every 5 seconds
     }
 
     async function loadZone() {
@@ -182,7 +213,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    captureImageButton.addEventListener('click', async () => {
+        try {
+            await set(captureRequestRef, true);
+            showFeedback('Solicitando nova imagem da câmera...', false, true);
+        } catch (error) {
+            console.error("Erro ao solicitar captura de imagem:", error);
+            showFeedback('Falha ao solicitar imagem da câmera.', true);
+        }
+    });
+
+
     // Initial Load
     loadReferenceImage();
+    listenForImageUpdate(); // Start listening for updates
     window.addEventListener('resize', setCanvasSize);
 });

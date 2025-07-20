@@ -327,7 +327,7 @@ def main():
 
         # Exibir informações de FPS e contagem de objetos
         elapsed_time_total = time.time() - start_time
-        fps_visual = (frame_count / FRAME_SKIP) / elapsed_time_total if elapsed_time_total > 0 else 0
+        fps_visual = inference_frame_count / elapsed_time_total if elapsed_time_total > 0 else 0
         cvzone.putTextRect(frame, f'FPS (Display): {fps_visual:.2f}', (10, 30), 1, 1)
 
         if total_inference_time > 0:

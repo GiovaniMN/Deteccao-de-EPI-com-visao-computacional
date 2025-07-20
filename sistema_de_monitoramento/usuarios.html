@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800"
     />
     <title>Usuários - Jupiter Supervision</title>
-    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <link rel="icon" type="image/png" href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -51,9 +51,9 @@
         </div>
     </header>
 
-    <div class="flex h-screen pt-16">
+    <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full">
+        <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full flex flex-col">
             <div class="p-6">
                 <nav class="space-y-2">
                     <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
@@ -85,31 +85,29 @@
                 </nav>
             </div>
             
-            <div class="absolute bottom-6 left-6 right-6">
-                <a href="login.html" class="flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                    <span class="font-medium">Sair</span>
-                </a>
-            </div>
+            <a href="login.html" class="flex items-center space-x-3 px-6 py-4 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all mt-auto mx-6 mb-6">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span class="font-medium">Sair</span>
+            </a>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 overflow-auto">
-            <div class="p-6 max-w-7xl mx-auto">
+            <div class="p-4 sm:p-6 max-w-7xl mx-auto">
                 <!-- Page Header -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-white mb-2">Gerenciamento de Usuários</h1>
-                    <p class="text-gray-400">Controle de acesso e permissões do sistema</p>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Gerenciamento de Usuários</h1>
+                    <p class="text-gray-400">Gerencie os membros da equipe que podem acessar e configurar o sistema de monitoramento.</p>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Add User Form -->
-                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50">
+                        <div class="flex items-center space-x-3 mb-5">
+                            <div class="w-10 h-10 bg-green-500/20 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                 </svg>
                             </div>
@@ -119,7 +117,7 @@
                             </div>
                         </div>
 
-                        <form id="addUserForm" class="space-y-6">
+                        <form id="addUserForm" class="space-y-5">
                             <div>
                                 <label for="newUsername" class="block text-sm font-medium text-gray-300 mb-2">
                                     <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,7 +130,7 @@
                                     id="newUsername"
                                     name="newUsername"
                                     required
-                                    class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    class="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                                     placeholder="Digite o nome de usuário"
                                 />
                             </div>
@@ -149,7 +147,7 @@
                                     id="newPassword"
                                     name="newPassword"
                                     required
-                                    class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    class="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                                     placeholder="Digite a senha"
                                 />
                             </div>
@@ -166,7 +164,7 @@
                                     id="confirmPassword"
                                     name="confirmPassword"
                                     required
-                                    class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    class="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                                     placeholder="Confirme a senha"
                                 />
                             </div>
@@ -188,10 +186,10 @@
                     </div>
 
                     <!-- User List -->
-                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-                        <div class="flex items-center space-x-3 mb-6">
-                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-5 border border-gray-700/50">
+                        <div class="flex items-center space-x-3 mb-5">
+                            <div class="w-10 h-10 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                                <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                                 </svg>
                             </div>
@@ -204,10 +202,10 @@
                         <div class="space-y-3 max-h-96 overflow-y-auto">
                             <ul id="userList" class="space-y-3">
                                 <!-- User items will be populated by JavaScript -->
-                                <li class="flex items-center justify-center py-8">
+                                <li class="flex items-center justify-center py-6">
                                     <div class="text-center">
-                                        <div class="w-16 h-16 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-3">
-                                            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div class="w-14 h-14 bg-gray-700/50 rounded-full flex items-center justify-center mx-auto mb-2">
+                                            <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
                                         </div>
@@ -220,16 +218,16 @@
                 </div>
 
                 <!-- Security Notice -->
-                <div class="mt-8 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-6">
-                    <div class="flex items-start space-x-4">
-                        <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="mt-6 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-5">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-10 h-10 bg-yellow-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-yellow-400 mb-2">Aviso de Segurança</h3>
-                            <div class="text-yellow-200 text-sm space-y-2">
+                            <h3 class="text-lg font-semibold text-yellow-400 mb-1">Aviso de Segurança</h3>
+                            <div class="text-yellow-200 text-xs space-y-1">
                                 <p>• Mantenha as senhas seguras e não as compartilhe</p>
                                 <p>• O usuário administrador padrão não pode ser removido</p>
                                 <p>• Remova contas de usuários que não precisam mais de acesso</p>

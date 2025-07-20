@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800"
     />
     <title>Ocorrências - Jupiter Supervision</title>
-    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <link rel="icon" type="image/png" href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -52,9 +52,9 @@
         </div>
     </header>
 
-    <div class="flex h-screen pt-16">
+    <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full">
+        <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full flex flex-col">
             <div class="p-6">
                 <nav class="space-y-2">
                     <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
@@ -86,31 +86,27 @@
                 </nav>
             </div>
             
-            <div class="absolute bottom-6 left-6 right-6">
-                <a href="login.html" class="flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                    <span class="font-medium">Sair</span>
-                </a>
-            </div>
+            <a href="login.html" class="flex items-center space-x-3 px-6 py-4 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all mt-auto mx-6 mb-6">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                <span class="font-medium">Sair</span>
+            </a>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 overflow-auto">
-            <div class="p-6 max-w-7xl mx-auto">
+            <div class="p-4 sm:p-6 max-w-7xl mx-auto">
                 <!-- Page Header -->
                 <div class="mb-8">
-                    <div class="flex items-center justify-between">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div>
-                            <h1 class="text-3xl font-bold text-white mb-2">Histórico de Ocorrências</h1>
-                            <p class="text-gray-400">Registro completo de detecções e alertas do sistema</p>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Histórico de Ocorrências</h1>
+                            <p class="text-gray-400">Visualize, filtre e analise todo o histórico de ocorrências de não conformidade de EPIs.</p>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700/50">
-                                <span class="text-gray-400 text-sm">Total de registros: </span>
-                                <span class="text-white font-semibold">1,247</span>
-                            </div>
+                        <div class="flex items-center space-x-4 bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-700/50">
+                            <span class="text-gray-400 text-sm">Total:</span>
+                            <span id="total-registros" class="text-white font-semibold">-</span>
                         </div>
                     </div>
                 </div>

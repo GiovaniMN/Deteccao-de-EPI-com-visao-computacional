@@ -11,7 +11,7 @@
       href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800"
     />
     <title>Configuração - Jupiter Supervision</title>
-    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <link rel="icon" type="image/png" href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -45,9 +45,9 @@
         </div>
     </header>
 
-    <div class="flex h-screen pt-16">
+    <div class="flex h-screen">
         <!-- Sidebar -->
-        <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full">
+        <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full flex flex-col">
             <div class="p-6">
                 <nav class="space-y-2">
                     <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
@@ -68,30 +68,34 @@
                     </a>
                 </nav>
             </div>
-            <div class="absolute bottom-6 left-6 right-6">
-                <a href="login.html" class="flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                    <span class="font-medium">Sair</span>
-                </a>
-            </div>
+            <a href="login.html" class="flex items-center space-x-3 px-6 py-4 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all mt-auto mx-6 mb-6">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                <span class="font-medium">Sair</span>
+            </a>
         </aside>
 
         <!-- Main Content -->
         <main class="flex-1 overflow-auto">
-            <div class="p-6 max-w-7xl mx-auto">
+            <div class="p-4 sm:p-6 max-w-7xl mx-auto">
                 <!-- Page Header -->
                 <div class="mb-8">
-                    <h1 class="text-3xl font-bold text-white mb-2">Configuração da Zona de Detecção</h1>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Configuração da Zona de Detecção</h1>
                     <p class="text-gray-400">Desenhe um retângulo na imagem para definir onde os objetos serão detectados.</p>
                 </div>
 
                 <!-- Zone Configuration Area -->
-                <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-                    <div class="flex items-center justify-between mb-6">
+                <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-gray-700/50">
+                    <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
                         <h2 class="text-xl font-semibold text-white">Área de Detecção</h2>
-                        <button id="saveButton" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                            Salvar Zona
-                        </button>
+                        <div class="flex flex-col sm:flex-row items-stretch w-full sm:w-auto gap-3">
+                            <button id="captureImageButton" class="flex items-center justify-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-5 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                <span>Atualizar Imagem</span>
+                            </button>
+                            <button id="saveButton" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-5 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                                Salvar Zona
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Image and Canvas Container -->
