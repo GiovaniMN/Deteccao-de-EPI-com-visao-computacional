@@ -1,0 +1,38 @@
+# Nome do Workflow
+name: Deploy to Firebase Hosting
+
+# Gatilhos: o workflow roda em push para o branch 'main' e também manualmente
+on:
+  push:
+    branches:
+      - main # ou 'master', dependendo do seu branch principal
+  workflow_dispatch:
+
+jobs:
+  # Nome do Job
+  build_and_deploy:
+    # A máquina virtual onde o job vai rodar
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Faz o checkout do código do seu repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Faz o deploy para o Firebase Hosting
+      - name: Deploy to Firebase
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          # Token do repositório para a action se comunicar com o GitHub
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          
+          # Segredo contendo as credenciais da sua conta de serviço do Firebase
+          # Veja o passo 3 abaixo para criar este segredo
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DETECCAO_DE_EPI }}'
+          
+          # Canal de deploy (use 'live' para o site principal)
+          channelId: live
+          
+          # ID do seu projeto no Firebase
+          # Substitua 'SEU_PROJECT_ID' pelo ID real do seu projeto
+          projectId: testerasp1-fd9ce
