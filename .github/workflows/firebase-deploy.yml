@@ -22,7 +22,9 @@ jobs:
       # 2. Cria o arquivo firebaseConfig.js a partir do segredo do GitHub
       - name: Create firebaseConfig.js
         run: |
-          echo "${{ secrets.FIREBASE_CONFIG }}" > sistema_de_monitoramento/static/js/firebaseConfig.js
+          cat <<EOF > sistema_de_monitoramento/static/js/firebaseConfig.js
+          ${{ secrets.FIREBASE_CONFIG }}
+          EOF
 
       # 3. Faz o deploy para o Firebase Hosting
       - name: Deploy to Firebase
