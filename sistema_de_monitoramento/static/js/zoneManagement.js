@@ -1,6 +1,6 @@
 // sistema_de_monitoramento/static/js/zoneManagement.js
 
-import { db, rtdb } from '../firebaseConfig.js'; // Import rtdb
+import { db, rtdb } from './firebaseConfig.js';
 import { getStorage, ref, getDownloadURL, getMetadata } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
 import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import { ref as dbRef, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";

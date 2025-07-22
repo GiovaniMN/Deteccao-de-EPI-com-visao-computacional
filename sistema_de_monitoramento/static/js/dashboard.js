@@ -1,6 +1,6 @@
 // sistema_de_monitoramento/static/js/dashboard.js
 
-import { db, rtdb } from '../firebaseConfig.js';
+import { db, rtdb } from './firebaseConfig.js';
 import { collection, query, where, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 

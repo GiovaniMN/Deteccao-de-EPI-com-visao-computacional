@@ -1,4 +1,4 @@
-import { db, auth } from '../firebaseConfig.js'; // Ajustado para carregar da raiz do diretório de deploy
+import { db, auth } from './firebaseConfig.js'; // Ajustado para carregar da raiz do diretório de deploy
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 // Assumindo que firebaseConfig.js está em sistema_de_monitoramento/firebaseConfig.js durante o deploy
 

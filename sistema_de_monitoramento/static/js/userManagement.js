@@ -1,4 +1,4 @@
-import { db, auth } from "../firebaseConfig.js"; // Ajustado para carregar da raiz do diretório de deploy
+import { db, auth } from "./firebaseConfig.js";
 import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 // import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"; // Descomentar se for usar Firebase Auth para criar usuários
 // Assumindo que firebaseConfig.js está em sistema_de_monitoramento/firebaseConfig.js durante o deploy
