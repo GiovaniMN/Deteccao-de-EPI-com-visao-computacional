@@ -19,7 +19,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Faz o deploy para o Firebase Hosting
+      # 2. Cria o arquivo firebaseConfig.js a partir do segredo do GitHub
+      - name: Create firebaseConfig.js
+        run: |
+          echo "${{ secrets.FIREBASE_CONFIG }}" > sistema_de_monitoramento/firebaseConfig.js
+
+      # 3. Faz o deploy para o Firebase Hosting
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
@@ -27,12 +32,10 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           
           # Segredo contendo as credenciais da sua conta de serviço do Firebase
-          # Veja o passo 3 abaixo para criar este segredo
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DETECCAO_DE_EPI }}'
           
           # Canal de deploy (use 'live' para o site principal)
           channelId: live
           
           # ID do seu projeto no Firebase
-          # Substitua 'SEU_PROJECT_ID' pelo ID real do seu projeto
           projectId: testerasp1-fd9ce
