@@ -1,0 +1,10 @@
+{
+  "hosting": {
+    "public": "sistema_de_monitoramento",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}
