@@ -1,6 +1,7 @@
 // carregarTabela.js
-// Removidos os imports, db já está disponível globalmente via firebaseConfig.js
-// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/static/js/firebaseConfig.js durante o deploy
+import { db } from "./firebaseConfig.js";
+import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/firebaseConfig.js durante o deploy
 
 const tabelaBody = document.querySelector("tbody");
 const selectOrdenar = document.getElementById("ordenarPor");
@@ -13,9 +14,9 @@ async function carregarDados() {
     if (tabelaBody) tabelaBody.innerHTML = "<tr><td colspan='3'>Erro de configuração do Firebase.</td></tr>";
     return;
   }
-  const colecao = db.collection("alertas_epi");
+  const colecao = collection(db, "alertas_epi");
   try {
-    const snapshot = await colecao.get();
+    const snapshot = await getDocs(colecao);
 
     if (snapshot.empty) {
       if (tabelaBody) tabelaBody.innerHTML = "<tr><td colspan='3'>Nenhuma ocorrência encontrada.</td></tr>";

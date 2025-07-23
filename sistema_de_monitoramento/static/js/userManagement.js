@@ -1,5 +1,6 @@
-// Removidos os imports, db e auth já estão disponíveis globalmente via firebaseConfig.js
-// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/static/js/firebaseConfig.js durante o deploy
+import { db, auth } from '../../../config/firebaseConfig.js';
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { doc, setDoc, getDocs, collection, query, where, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', async () => {
     const addUserForm = document.getElementById('addUserForm');
@@ -9,41 +10,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userListUL = document.getElementById('userList');
     const feedbackP = document.getElementById('userManagementFeedback');
 
-    const DEFAULT_ADMIN_USER = 'adm'; // Define admin username
-    const DEFAULT_ADMIN_PASSWORD = '123';
-
-    async function initializeAdminUser() {
-        try {
-            console.log('Checking for admin user...');
-            const usersCollection = db.collection('users');
-            const q = usersCollection.where('user', '==', DEFAULT_ADMIN_USER);
-            const querySnapshot = await q.get();
-
-            if (querySnapshot.empty) {
-                console.log('Admin user not found, creating...');
-                const docRef = await usersCollection.add({
-                    user: DEFAULT_ADMIN_USER,
-                    pass: DEFAULT_ADMIN_PASSWORD
-                });
-                console.log('Admin user created successfully with ID:', docRef.id);
-            } else {
-                console.log('Admin user already exists');
-                querySnapshot.forEach((doc) => {
-                    console.log('Admin user data:', doc.id, doc.data());
-                });
-            }
-        } catch (error) {
-            console.error("Error initializing admin user:", error);
-        }
-    }
-
-    // Initialize admin user when the page loads
-    await initializeAdminUser();
+    const DEFAULT_ADMIN_EMAIL = 'adm@jupiter.com'; // Apenas para referência no código
 
     async function getUsersFromFirebase() {
         try {
-            const usersCollection = db.collection('users');
-            const querySnapshot = await usersCollection.get();
+            const usersCollection = collection(db, 'users');
+            const querySnapshot = await getDocs(usersCollection);
             const users = [];
             querySnapshot.forEach((doc) => {
                 users.push({ id: doc.id, ...doc.data() });
@@ -55,20 +27,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function saveUserToFirebase(userData) {
-        try {
-            const usersCollection = db.collection('users');
-            await usersCollection.add(userData);
-            return true;
-        } catch (error) {
-            console.error("Error saving user to Firebase:", error);
-            return false;
-        }
-    }
-
     async function deleteUserFromFirebase(userId) {
+        // ATENÇÃO: Esta função agora só apaga o documento do Firestore.
+        // A exclusão de um usuário do Firebase Auth é uma operação sensível
+        // e deve ser feita com cuidado, geralmente por um backend (Cloud Function).
         try {
-            await db.collection('users').doc(userId).delete();
+            await deleteDoc(doc(db, "users", userId));
             return true;
         } catch (error) {
             console.error("Error deleting user from Firebase:", error);
@@ -84,41 +48,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function renderUserList() {
-        if (!userListUL) {
-            console.error("Element userListUL not found for rendering.");
-            return;
-        }
-        userListUL.innerHTML = ''; // Clear existing list
+        if (!userListUL) return;
+        userListUL.innerHTML = '';
 
         const users = await getUsersFromFirebase();
         if (users.length === 0) {
-            const li = document.createElement('li');
-            li.textContent = 'Nenhum usuário cadastrado.';
-            li.className = 'text-gray-400 text-center';
-            userListUL.appendChild(li);
+            userListUL.innerHTML = '<li class="text-gray-400 text-center">Nenhum usuário cadastrado.</li>';
             return;
         }
         users.forEach(user => {
             const li = document.createElement('li');
-            li.textContent = `${user.user}`;
-            // Adicione botões de exclusão, etc, conforme necessário
+            li.className = 'flex items-center justify-between bg-gray-700/30 p-3 rounded-lg';
+            li.innerHTML = `
+                <div>
+                    <span class="font-medium text-white">${user.email}</span>
+                    <span class="text-xs ${user.role === 'admin' ? 'text-purple-400' : 'text-gray-400'} ml-2">${user.role}</span>
+                </div>
+                <button data-user-id="${user.id}" data-user-email="${user.email}" class="deleteUserButton text-red-500 hover:text-red-400 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            `;
             userListUL.appendChild(li);
         });
     }
 
     async function handleAddUserFormSubmit(event) {
         event.preventDefault();
-        if (!newUsernameInput || !newPasswordInput || !confirmPasswordInput) {
-            displayFeedback("Erro: Elementos do formulário não encontrados.", true);
-            return;
-        }
-
-        const username = newUsernameInput.value.trim();
+        const email = newUsernameInput.value.trim();
         const password = newPasswordInput.value;
         const confirmPassword = confirmPasswordInput.value;
 
-        if (!username || !password) {
-            displayFeedback("Usuário e senha são obrigatórios.", true);
+        if (!email || !password) {
+            displayFeedback("Email e senha são obrigatórios.", true);
             return;
         }
         if (password !== confirmPassword) {
@@ -126,62 +87,59 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const users = await getUsersFromFirebase();
-        if (users.find(u => u.user.toLowerCase() === username.toLowerCase())) {
-            displayFeedback("Este nome de usuário já existe.", true);
-            return;
-        }
+        try {
+            // 1. Criar usuário no Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            
+            // 2. Criar documento correspondente no Firestore
+            const userDocRef = doc(db, "users", user.uid);
+            await setDoc(userDocRef, {
+                email: user.email,
+                role: 'user' // Por padrão, novos usuários são 'user'
+            });
 
-        const success = await saveUserToFirebase({ user: username, pass: password });
-        if (success) {
             displayFeedback("Usuário adicionado com sucesso!", false);
             if(addUserForm) addUserForm.reset();
             renderUserList();
-        } else {
-            displayFeedback("Erro ao adicionar usuário.", true);
+
+        } catch (error) {
+            console.error("Error creating new user:", error);
+            if (error.code === 'auth/email-already-in-use') {
+                displayFeedback("Este endereço de e-mail já está em uso.", true);
+            } else if (error.code === 'auth/weak-password') {
+                displayFeedback("A senha é muito fraca. Use pelo menos 6 caracteres.", true);
+            } else {
+                displayFeedback(`Erro ao criar usuário: ${error.message}`, true);
+            }
         }
     }
 
     async function handleDeleteUserClick(event) {
-        if (event.target.classList.contains('deleteUserButton')) {
-            const userId = event.target.dataset.userId;
-            if (!userId) return;
+        const deleteButton = event.target.closest('.deleteUserButton');
+        if (deleteButton) {
+            const userId = deleteButton.dataset.userId;
+            const userEmail = deleteButton.dataset.userEmail;
 
-            const users = await getUsersFromFirebase();
-            const userToDelete = users.find(u => u.id === userId);
-            if (!userToDelete) return;
-
-            if (!confirm(`Tem certeza que deseja excluir o usuário "${userToDelete.user}"?`)) {
-                return;
-            }
-            
-            if (userToDelete.user.toLowerCase() === DEFAULT_ADMIN_USER) {
+            if (userEmail === DEFAULT_ADMIN_EMAIL) {
                 displayFeedback("O usuário administrador padrão não pode ser excluído.", true);
                 return;
             }
 
-            const success = await deleteUserFromFirebase(userId);
-            if (success) {
-                displayFeedback(`Usuário "${userToDelete.user}" excluído com sucesso.`, false);
-                renderUserList();
-            } else {
-                displayFeedback("Erro ao excluir usuário.", true);
+            if (confirm(`Tem certeza que deseja excluir o registro do usuário "${userEmail}" do Firestore? \n\n(Atenção: Isso não removerá o usuário do sistema de autenticação do Firebase.)`)) {
+                const success = await deleteUserFromFirebase(userId);
+                if (success) {
+                    displayFeedback(`Registro de "${userEmail}" excluído com sucesso.`, false);
+                    renderUserList();
+                } else {
+                    displayFeedback("Erro ao excluir registro do usuário.", true);
+                }
             }
         }
     }
 
-    // Initial setup
-    if (addUserForm) {
-        addUserForm.addEventListener('submit', handleAddUserFormSubmit);
-    } else {
-        console.error("Formulário de adicionar usuário (addUserForm) não encontrado.");
-    }
-
-    if (userListUL) {
-        userListUL.addEventListener('click', handleDeleteUserClick);
-    } else {
-        console.error("Lista de usuários (userListUL) não encontrada.");
-    }
+    if (addUserForm) addUserForm.addEventListener('submit', handleAddUserFormSubmit);
+    if (userListUL) userListUL.addEventListener('click', handleDeleteUserClick);
     
     renderUserList();
 });

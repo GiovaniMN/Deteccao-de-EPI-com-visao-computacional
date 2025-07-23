@@ -1,5 +1,6 @@
-// Removidos os imports, db já está disponível globalmente via firebaseConfig.js
-// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/static/js/firebaseConfig.js durante o deploy
+// carregarImagem.js
+import { db } from "./firebaseConfig.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 // Captura o parâmetro 'index' da URL
 function getIndexFromURL() {
@@ -8,8 +9,8 @@ function getIndexFromURL() {
 }
 
 async function carregarImagemPorIndice() {
-  const colecao = db.collection("alertas_epi");
-  const snapshot = await colecao.get();
+  const colecao = collection(db, "alertas_epi");
+  const snapshot = await getDocs(colecao);
 
   if (snapshot.empty) {
     console.warn("Nenhuma imagem encontrada.");
