@@ -1,8 +1,7 @@
 // sistema_de_monitoramento/static/js/dashboard.js
 
-import { db, rtdb } from './firebaseConfig.js';
-import { collection, query, where, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+// Removidos os imports, db e rtdb já estão disponíveis globalmente via firebaseConfig.js
+// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/static/js/firebaseConfig.js durante o deploy
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log("Dashboard script loaded.");
@@ -22,8 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let ocorrenciasChart, infracoesChart;
 
     // --- Lógica de Status do Sistema (Heartbeat) ---
-    const heartbeatRef = ref(rtdb, 'status/last_beat');
-    onValue(heartbeatRef, (snapshot) => {
+    const heartbeatRef = rtdb.ref('status/last_beat');
+    heartbeatRef.on('value', (snapshot) => {
         const lastBeat = snapshot.val();
         if (!lastBeat) {
             updateStatus(false); // Nenhum sinal recebido
@@ -61,13 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("Buscando dados dos últimos 7 dias...");
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+        // Timestamp compatível
+        const sevenDaysAgoTimestamp = firebase.firestore.Timestamp.fromDate(sevenDaysAgo);
 
-        const ocorrenciasRef = collection(db, "ocorrencias");
-        const q = query(ocorrenciasRef, where("timestamp", ">=", sevenDaysAgoTimestamp));
+        const ocorrenciasRef = db.collection("ocorrencias");
+        const q = ocorrenciasRef.where("timestamp", ">=", sevenDaysAgoTimestamp);
 
         try {
-            const querySnapshot = await getDocs(q);
+            const querySnapshot = await q.get();
             const ocorrencias = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()

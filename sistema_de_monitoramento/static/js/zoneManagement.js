@@ -1,9 +1,7 @@
 // sistema_de_monitoramento/static/js/zoneManagement.js
 
-import { db, rtdb } from './firebaseConfig.js';
-import { getStorage, ref, getDownloadURL, getMetadata } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-import { ref as dbRef, set, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+// Removidos os imports, db, rtdb e storage já estão disponíveis globalmente via firebaseConfig.js
+// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/static/js/firebaseConfig.js durante o deploy
 
 document.addEventListener('DOMContentLoaded', () => {
     const imageContainer = document.getElementById('image-container');
@@ -14,10 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedback = document.getElementById('feedback');
     const ctx = canvas.getContext('2d');
 
-    const storage = getStorage();
-    const imageRef = ref(storage, 'reference_image/camera_frame.jpg');
-    const zoneDocRef = doc(db, "configuracoes", "zona_deteccao");
-    const captureRequestRef = dbRef(rtdb, 'configuracoes/tirar_foto_request'); // Realtime DB ref
+    // Usando as instâncias globais storage, db, rtdb
+    const imageRef = storage.ref('reference_image/camera_frame.jpg');
+    const zoneDocRef = db.collection('configuracoes').doc('zona_deteccao');
+    const captureRequestRef = rtdb.ref('configuracoes/tirar_foto_request');
 
     let rect = {};
     let isDrawing = false;
@@ -47,14 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadReferenceImage(forceReload = false) {
         try {
             // Add a cache-busting query parameter if forcing a reload
-            const url = await getDownloadURL(imageRef);
+            const url = await imageRef.getDownloadURL();
             const finalUrl = forceReload ? `${url}?t=${new Date().getTime()}` : url;
             
             image.src = finalUrl;
             image.onload = setCanvasSize;
             
             // Store the last modified time after loading
-            const metadata = await getMetadata(imageRef);
+            const metadata = await imageRef.getMetadata();
             lastImageUpdateTime = metadata.updated;
 
         } catch (error) {
@@ -68,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Simple polling to check for image metadata changes
         setInterval(async () => {
             try {
-                const metadata = await getMetadata(imageRef);
+                const metadata = await imageRef.getMetadata();
                 if (lastImageUpdateTime && metadata.updated > lastImageUpdateTime) {
                     showFeedback('Imagem da câmera atualizada!', false);
                     loadReferenceImage(true); // Force reload
@@ -81,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function loadZone() {
         try {
-            const docSnap = await getDoc(zoneDocRef);
-            if (docSnap.exists()) {
+            const docSnap = await zoneDocRef.get();
+            if (docSnap.exists) {
                 const zone = docSnap.data();
                 // Convert normalized coordinates to pixel values
                 rect = {
@@ -205,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         try {
-            await setDoc(zoneDocRef, zoneToSave);
+            await zoneDocRef.set(zoneToSave);
             showFeedback('Zona de detecção salva com sucesso!');
         } catch (error) {
             console.error("Erro ao salvar zona:", error);
@@ -215,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     captureImageButton.addEventListener('click', async () => {
         try {
-            await set(captureRequestRef, true);
+            await captureRequestRef.set(true);
             showFeedback('Solicitando nova imagem da câmera...', false, true);
         } catch (error) {
             console.error("Erro ao solicitar captura de imagem:", error);

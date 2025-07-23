@@ -1,43 +1,39 @@
-# Nome do Workflow
 name: Deploy to Firebase Hosting
 
-# Gatilhos: o workflow roda em push para o branch 'main' e também manualmente
 on:
   push:
     branches:
-      - main # ou 'master', dependendo do seu branch principal
+      - main
   workflow_dispatch:
 
 jobs:
-  # Nome do Job
   build_and_deploy:
-    # A máquina virtual onde o job vai rodar
     runs-on: ubuntu-latest
     
     steps:
-      # 1. Faz o checkout do código do seu repositório
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Cria o arquivo firebaseConfig.js a partir do segredo do GitHub
       - name: Create firebaseConfig.js
         run: |
           cat <<EOF > sistema_de_monitoramento/static/js/firebaseConfig.js
-          ${{ secrets.FIREBASE_CONFIG }}
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+          import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+          import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+          
+          const firebaseConfig = ${{ secrets.FIREBASE_CONFIG }};
+          
+          const app = initializeApp(firebaseConfig);
+          const db = getFirestore(app);
+          const auth = getAuth(app);
+          
+          export { db, auth, app };
           EOF
 
-      # 3. Faz o deploy para o Firebase Hosting
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          # Token do repositório para a action se comunicar com o GitHub
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          
-          # Segredo contendo as credenciais da sua conta de serviço do Firebase
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DETECCAO_DE_EPI }}'
-          
-          # Canal de deploy (use 'live' para o site principal)
           channelId: live
-          
-          # ID do seu projeto no Firebase
           projectId: testerasp1-fd9ce

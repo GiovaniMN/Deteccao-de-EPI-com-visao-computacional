@@ -1,14 +1,12 @@
-import { db, auth } from './firebaseConfig.js'; // Ajustado para carregar da raiz do diretório de deploy
-import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/firebaseConfig.js durante o deploy
-
 document.addEventListener('DOMContentLoaded', function() {
     const btnLogin = document.getElementById('btnLogin');
     const usuarioInput = document.getElementById('usuario');
     const senhaInput = document.getElementById('senha');
     const saidaElement = document.getElementById('saida');
 
-    btnLogin.addEventListener('click', async function() {
+    btnLogin.addEventListener('click', async function(event) {
+        event.preventDefault();
+        
         const usuario = usuarioInput.value.trim();
         const senha = senhaInput.value.trim();
 
@@ -24,9 +22,9 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             console.log('Querying Firestore for user:', usuario);
             // Query Firestore for the user
-            const usersCollection = collection(db, 'users');
-            const q = query(usersCollection, where('user', '==', usuario));
-            const querySnapshot = await getDocs(q);
+            const usersCollection = firebase.firestore().collection('users');
+            const q = usersCollection.where('user', '==', usuario);
+            const querySnapshot = await q.get();
 
             console.log('Query results:', querySnapshot.empty ? 'No user found' : 'User found');
 

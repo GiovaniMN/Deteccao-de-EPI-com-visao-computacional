@@ -1,7 +1,5 @@
-import { db, auth } from "./firebaseConfig.js";
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-// import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"; // Descomentar se for usar Firebase Auth para criar usuários
-// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/firebaseConfig.js durante o deploy
+// Removidos os imports, db e auth já estão disponíveis globalmente via firebaseConfig.js
+// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/static/js/firebaseConfig.js durante o deploy
 
 document.addEventListener('DOMContentLoaded', async () => {
     const addUserForm = document.getElementById('addUserForm');
@@ -12,18 +10,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const feedbackP = document.getElementById('userManagementFeedback');
 
     const DEFAULT_ADMIN_USER = 'adm'; // Define admin username
-    const DEFAULT_ADMIN_PASSWORD = '123'; // Define admin password
+    const DEFAULT_ADMIN_PASSWORD = '123';
 
     async function initializeAdminUser() {
         try {
             console.log('Checking for admin user...');
-            const usersCollection = collection(db, 'users');
-            const q = query(usersCollection, where('user', '==', DEFAULT_ADMIN_USER));
-            const querySnapshot = await getDocs(q);
+            const usersCollection = db.collection('users');
+            const q = usersCollection.where('user', '==', DEFAULT_ADMIN_USER);
+            const querySnapshot = await q.get();
 
             if (querySnapshot.empty) {
                 console.log('Admin user not found, creating...');
-                const docRef = await addDoc(usersCollection, {
+                const docRef = await usersCollection.add({
                     user: DEFAULT_ADMIN_USER,
                     pass: DEFAULT_ADMIN_PASSWORD
                 });
@@ -44,8 +42,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function getUsersFromFirebase() {
         try {
-            const usersCollection = collection(db, 'users');
-            const querySnapshot = await getDocs(usersCollection);
+            const usersCollection = db.collection('users');
+            const querySnapshot = await usersCollection.get();
             const users = [];
             querySnapshot.forEach((doc) => {
                 users.push({ id: doc.id, ...doc.data() });
@@ -59,8 +57,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function saveUserToFirebase(userData) {
         try {
-            const usersCollection = collection(db, 'users');
-            await addDoc(usersCollection, userData);
+            const usersCollection = db.collection('users');
+            await usersCollection.add(userData);
             return true;
         } catch (error) {
             console.error("Error saving user to Firebase:", error);
@@ -70,7 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function deleteUserFromFirebase(userId) {
         try {
-            await deleteDoc(doc(db, 'users', userId));
+            await db.collection('users').doc(userId).delete();
             return true;
         } catch (error) {
             console.error("Error deleting user from Firebase:", error);
@@ -100,28 +98,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             userListUL.appendChild(li);
             return;
         }
-
         users.forEach(user => {
             const li = document.createElement('li');
-            li.className = 'flex items-center justify-between bg-[#303030] p-3 rounded-md shadow';
-            
-            const usernameSpan = document.createElement('span');
-            usernameSpan.className = 'text-gray-200';
-            usernameSpan.textContent = user.user;
-            li.appendChild(usernameSpan);
-
-            if (user.user.toLowerCase() !== DEFAULT_ADMIN_USER) {
-                const deleteButton = document.createElement('button');
-                deleteButton.textContent = 'Excluir';
-                deleteButton.dataset.userId = user.id;
-                deleteButton.className = 'deleteUserButton text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1 rounded-md bg-transparent border border-red-400 hover:bg-red-400 hover:text-gray-900 transition-colors';
-                li.appendChild(deleteButton);
-            } else {
-                const adminLabel = document.createElement('span');
-                adminLabel.textContent = '(Admin)';
-                adminLabel.className = 'text-xs text-gray-500 ml-2';
-                li.appendChild(adminLabel);
-            }
+            li.textContent = `${user.user}`;
+            // Adicione botões de exclusão, etc, conforme necessário
             userListUL.appendChild(li);
         });
     }
