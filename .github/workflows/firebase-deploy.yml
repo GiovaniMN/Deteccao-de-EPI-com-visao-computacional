@@ -16,6 +16,7 @@ jobs:
 
       - name: Create firebaseConfig.js
         run: |
+          mkdir -p sistema_de_monitoramento/config
           echo "import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
           import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
           import { getAuth } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
