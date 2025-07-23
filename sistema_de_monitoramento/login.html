@@ -47,7 +47,7 @@
                 <p class="text-gray-400 text-sm">Entre com suas credenciais para continuar</p>
             </div>
 
-            <form class="space-y-5">
+            <form class="space-y-5" id="loginForm">
                 <!-- Username Field -->
                 <div>
                     <label for="usuario" class="block text-sm font-medium text-gray-300 mb-2">
@@ -166,12 +166,23 @@
         </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-    <script type="module" src="static/js/firebaseConfig.js"></script>
-    <script type="module" src="static/js/back.js"></script>
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+        import { firebaseConfig } from "./config/firebaseConfig.js";
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.app = app;
+        window.auth = auth;
+        window.db = db;
+    </script>
+    <script type="module" src="./js/back.js"></script>
+
 </body>
 </html>

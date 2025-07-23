@@ -16,19 +16,15 @@ jobs:
 
       - name: Create firebaseConfig.js
         run: |
-          cat <<EOF > sistema_de_monitoramento/static/js/firebaseConfig.js
-          import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-          import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-          import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-          
-          const firebaseConfig = ${{ secrets.FIREBASE_CONFIG }};
-          
-          const app = initializeApp(firebaseConfig);
-          const db = getFirestore(app);
-          const auth = getAuth(app);
-          
-          export { db, auth, app };
-          EOF
+          echo "const firebaseConfig = {
+            apiKey: '${{ secrets.FIREBASE_API_KEY }}',
+            authDomain: '${{ secrets.FIREBASE_AUTH_DOMAIN }}',
+            projectId: '${{ secrets.FIREBASE_PROJECT_ID }}',
+            storageBucket: '${{ secrets.FIREBASE_STORAGE_BUCKET }}',
+            messagingSenderId: '${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}',
+            appId: '${{ secrets.FIREBASE_APP_ID }}',
+            databaseURL: '${{ secrets.FIREBASE_DATABASE_URL }}'
+          };" > sistema_de_monitoramento/static/js/firebaseConfig.js
 
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0

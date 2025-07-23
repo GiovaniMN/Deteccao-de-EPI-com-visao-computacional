@@ -4,6 +4,14 @@ config/firebaseConfig.js
 firebase_key.json
 # Also ignore if copied to the web public directory for deployment
 sistema_de_monitoramento/firebaseConfig.js
+/sistema_de_monitoramento/static/js/firebaseConfig.js
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencies
+/node_modules
 
 # Environment variables
 .env
@@ -11,9 +19,6 @@ sistema_de_monitoramento/firebaseConfig.js
 .env.development
 .env.test
 .env.production
-
-# Node modules
-node_modules/
 
 # Python
 __pycache__/
@@ -41,10 +46,6 @@ venv.bak/
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Logs
-*.log
-logs/
 
 # Temporary files
 *.tmp
