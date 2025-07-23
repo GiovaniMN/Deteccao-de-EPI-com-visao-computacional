@@ -1,37 +1,35 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const btnLogin = document.getElementById('btnLogin');
-    const usuarioInput = document.getElementById('usuario');
-    const senhaInput = document.getElementById('senha');
-    const saidaElement = document.getElementById('saida');
+import { db, auth } from '../config/firebaseConfig.js';
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const usuario = document.getElementById('usuario').value;
-        const senha = document.getElementById('senha').value;
-        const saida = document.getElementById('saida');
-        
-        console.log('Login attempt:', { usuario, senha });
-
-        try {
-            const userQuery = await window.db.collection('usuarios')
-                .where('usuario', '==', usuario)
-                .where('senha', '==', senha)
-                .get();
-
-            if (!userQuery.empty) {
-                // Login successful
-                localStorage.setItem('userLoggedIn', 'true');
-                window.location.href = 'dashboard.html';
-            } else {
-                // Login failed
-                saida.textContent = 'Usuário ou senha inválidos';
-                saida.classList.remove('hidden');
+document.addEventListener('DOMContentLoaded', () => {
+    const loginForm = document.getElementById('loginForm');
+    
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const usuario = document.getElementById('usuario').value;
+            const senha = document.getElementById('senha').value;
+            
+            console.log('Tentativa de login:', { usuario });
+            
+            try {
+                const userRef = db.collection('usuarios');
+                const query = await userRef
+                    .where('usuario', '==', usuario)
+                    .where('senha', '==', senha)
+                    .get();
+                
+                if (!query.empty) {
+                    console.log('Login bem-sucedido');
+                    window.location.href = './dashboard.html';
+                } else {
+                    console.log('Usuário ou senha inválidos');
+                    alert('Usuário ou senha inválidos');
+                }
+            } catch (error) {
+                console.error('Erro no login:', error);
+                alert('Erro ao fazer login');
             }
-        } catch (error) {
-            console.error('Error during login:', error);
-            saida.textContent = 'Erro ao tentar fazer login';
-            saida.classList.remove('hidden');
-        }
-    });
+        });
+    }
 });
