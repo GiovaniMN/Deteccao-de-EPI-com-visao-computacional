@@ -34,7 +34,7 @@ jobs:
           const db = getFirestore(app);
           const auth = getAuth(app);
           
-          export { db, auth };" > config/firebaseConfig.js
+          export { db, auth };" > sistema_de_monitoramento/config/firebaseConfig.js
 
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
