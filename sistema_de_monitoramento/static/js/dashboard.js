@@ -1,8 +1,9 @@
 // sistema_de_monitoramento/static/js/dashboard.js
-import { db } from '../config/firebaseConfig.js';
-import { collection, query, where, getDocs, Timestamp, addDoc, getCountFromServer } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { db, rtdb } from '../config/firebaseConfig.js';
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
     console.log("Dashboard script loaded.");
 
     // Elementos do DOM
@@ -19,88 +20,57 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let ocorrenciasChart, infracoesChart;
 
-    // --- Lógica de Status do Sistema (Simplificada) ---
-    function updateStatus(isOnline) {
-        if (isOnline) {
-            kpiStatus.textContent = "Online";
-            statusCard.classList.remove('border-red-500/50');
-            statusCard.classList.add('border-green-500/50');
-            statusIconContainer.classList.remove('bg-red-500/20');
-            statusIconContainer.classList.add('bg-green-500/20');
-            kpiStatus.classList.remove('text-red-400');
-            kpiStatus.classList.add('text-green-400');
-        } else {
-            kpiStatus.textContent = "Offline";
-            statusCard.classList.remove('border-green-500/50');
-            statusCard.classList.add('border-red-500/50');
-            statusIconContainer.classList.remove('bg-green-500/20');
-            statusIconContainer.classList.add('bg-red-500/20');
-            kpiStatus.classList.remove('text-green-400');
-            kpiStatus.classList.add('text-red-400');
-        }
-    }
-    updateStatus(true);
-
-    // --- Lógica para criar dados de exemplo ---
-    async function criarDadosDeExemplo() {
-        const ocorrenciasRef = collection(db, "ocorrencias");
-        const snapshot = await getCountFromServer(ocorrenciasRef);
-        
-        if (snapshot.data().count > 0) {
-            console.log("Dados de ocorrências já existem. Pulando a criação de exemplos.");
+    // --- Lógica de Status do Sistema (Heartbeat) ---
+    const heartbeatRef = ref(rtdb, 'status/last_beat');
+    onValue(heartbeatRef, (snapshot) => {
+        const lastBeat = snapshot.val();
+        if (!lastBeat) {
+            updateStatus(false);
             return;
         }
+        const now = Date.now();
+        const diffSeconds = (now - lastBeat) / 1000;
+        updateStatus(diffSeconds < 120); // Offline se o último sinal foi há mais de 2 minutos
+    });
 
-        console.log("Criando dados de exemplo para o dashboard...");
-        const tiposDeAlerta = ["sem_capacete", "sem_colete", "sem_luvas"];
-        const promessas = [];
-
-        for (let i = 0; i < 25; i++) {
-            const diasAtras = Math.floor(Math.random() * 7);
-            const data = new Date();
-            data.setDate(data.getDate() - diasAtras);
-            
-            const novaOcorrencia = {
-                timestamp: Timestamp.fromDate(data),
-                tipo_alerta: tiposDeAlerta[Math.floor(Math.random() * tiposDeAlerta.length)],
-                camera: `Camera_${Math.ceil(Math.random() * 3)}`,
-                imagem_url: "https://via.placeholder.com/150" // URL de exemplo
-            };
-            promessas.push(addDoc(ocorrenciasRef, novaOcorrencia));
-        }
-        await Promise.all(promessas);
-        console.log("Dados de exemplo criados com sucesso.");
+    function updateStatus(isOnline) {
+        kpiStatus.textContent = isOnline ? "Online" : "Offline";
+        const baseClass = 'bg-opacity-20 rounded-xl flex items-center justify-center';
+        statusIconContainer.className = isOnline ? `bg-green-500 ${baseClass}` : `bg-red-500 ${baseClass}`;
+        kpiStatus.className = isOnline ? 'text-green-400' : 'text-red-400';
     }
 
     // --- Lógica Principal para buscar e processar dados ---
     async function fetchDataAndRender() {
-        console.log("Buscando dados dos últimos 7 dias...");
+        console.log("Buscando dados dos últimos 7 dias da coleção 'alertas_epi'...");
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        const sevenDaysAgoTimestamp = Timestamp.fromDate(sevenDaysAgo);
+        const sevenDaysAgoISO = sevenDaysAgo.toISOString();
 
-        const ocorrenciasRef = collection(db, "ocorrencias");
-        const q = query(ocorrenciasRef, where("timestamp", ">=", sevenDaysAgoTimestamp));
+        const alertasRef = collection(db, "alertas_epi");
+        const q = query(alertasRef, where("data_hora", ">=", sevenDaysAgoISO));
 
         try {
             const querySnapshot = await getDocs(q);
-            const ocorrencias = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            console.log(`Encontradas ${ocorrencias.length} ocorrências.`);
+            const alertas = querySnapshot.docs.map(doc => {
+                const data = doc.data();
+                data.timestamp = new Date(data.data_hora);
+                const match = data.mensagem.match(/sem os seguintes EPIs: (.*?)\./);
+                data.tipo_alerta = match ? match[1].replace(/, /g, '_') : 'desconhecido';
+                return { id: doc.id, ...data };
+            });
+            console.log(`Encontrados ${alertas.length} alertas.`);
 
-            if (ocorrencias.length === 0) {
+            if (alertas.length === 0) {
                 displayNoData();
                 return;
             }
 
-            processAndRenderKPIs(ocorrencias);
-            processAndRenderCharts(ocorrencias);
+            processAndRenderKPIs(alertas);
+            processAndRenderCharts(alertas);
 
         } catch (error) {
-            console.error("Erro ao buscar ocorrências: ", error);
-            kpiTotalOcorrencias.textContent = "Erro";
+            console.error("Erro ao buscar alertas: ", error);
             displayNoData();
         }
     }
@@ -115,15 +85,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         ctxInfracoes.canvas.parentElement.innerHTML = '<p class="text-center text-gray-400 py-10">Sem dados de infrações para exibir.</p>';
     }
 
-    function processAndRenderKPIs(ocorrencias) {
-        kpiTotalOcorrencias.textContent = ocorrencias.length;
+    function processAndRenderKPIs(alertas) {
+        kpiTotalOcorrencias.textContent = alertas.length;
 
         const diasDaSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
         const contagemPorDia = new Array(7).fill(0);
-        ocorrencias.forEach(o => {
-            if (o.timestamp) {
-                const dia = o.timestamp.toDate().getDay();
-                contagemPorDia[dia]++;
+        alertas.forEach(alerta => {
+            if (alerta.timestamp) {
+                contagemPorDia[alerta.timestamp.getDay()]++;
             }
         });
         const maxOcorrenciasDia = Math.max(...contagemPorDia);
@@ -131,23 +100,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         kpiDiaCritico.textContent = diasDaSemana[indiceDiaCritico];
 
         const contagemInfracoes = {};
-        ocorrencias.forEach(o => {
-            const tipo = o.tipo_alerta || 'Desconhecido';
-            contagemInfracoes[tipo] = (contagemInfracoes[tipo] || 0) + 1;
+        alertas.forEach(alerta => {
+            contagemInfracoes[alerta.tipo_alerta] = (contagemInfracoes[alerta.tipo_alerta] || 0) + 1;
         });
         const principalInfracao = Object.keys(contagemInfracoes).reduce((a, b) => contagemInfracoes[a] > contagemInfracoes[b] ? a : b, 'Nenhuma');
         kpiPrincipalInfracao.textContent = principalInfracao.replace(/_/g, ' ').replace(/sem /g, '');
     }
 
-    function processAndRenderCharts(ocorrencias) {
+    function processAndRenderCharts(alertas) {
         const diasDaSemanaLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
         const hoje = new Date().getDay();
         const labelsOrdenados = [...diasDaSemanaLabels.slice(hoje + 1), ...diasDaSemanaLabels.slice(0, hoje + 1)];
 
         const dadosGraficoDiario = new Array(7).fill(0);
-        ocorrencias.forEach(o => {
-            if (o.timestamp) {
-                const diaOcorrencia = o.timestamp.toDate().getDay();
+        alertas.forEach(alerta => {
+            if (alerta.timestamp) {
+                const diaOcorrencia = alerta.timestamp.getDay();
                 const diff = (hoje - diaOcorrencia + 7) % 7;
                 dadosGraficoDiario[6 - diff]++;
             }
@@ -179,9 +147,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         const contagemInfracoes = {};
-        ocorrencias.forEach(o => {
-            const tipo = o.tipo_alerta || 'Desconhecido';
-            contagemInfracoes[tipo] = (contagemInfracoes[tipo] || 0) + 1;
+        alertas.forEach(alerta => {
+            contagemInfracoes[alerta.tipo_alerta] = (contagemInfracoes[alerta.tipo_alerta] || 0) + 1;
         });
 
         const labelsInfracoes = Object.keys(contagemInfracoes).map(k => k.replace(/_/g, ' ').replace(/sem /g, ''));
@@ -207,11 +174,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Iniciar a aplicação
-    async function init() {
-        await criarDadosDeExemplo();
-        await fetchDataAndRender();
-    }
-
-    init();
+    fetchDataAndRender();
 });
