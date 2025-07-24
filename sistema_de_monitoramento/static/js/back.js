@@ -1,45 +1,64 @@
-import { auth } from '../../config/firebaseConfig.js';
-import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+import { db } from './firebaseConfig.js';
+import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const saida = document.getElementById('saida');
+document.addEventListener('DOMContentLoaded', function () {
+    const btnLogin = document.getElementById('btnLogin');
+    const usuarioInput = document.getElementById('usuario');
+    const senhaInput = document.getElementById('senha');
+    const saidaElement = document.getElementById('saida');
 
-    if (loginForm) {
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('usuario').value;
-            const senha = document.getElementById('senha').value;
-            
-            console.log('Tentativa de login com email:', { email });
+    btnLogin.addEventListener('click', async function (e) {
+        e.preventDefault();
 
-            try {
-                await signInWithEmailAndPassword(auth, email, senha);
-                console.log('Login bem-sucedido');
-                // Exibe mensagem de sucesso e redireciona
-                saida.textContent = 'Login bem-sucedido! Redirecionando...';
-                saida.className = 'text-green-400 text-sm text-center';
-                saida.classList.remove('hidden');
-                setTimeout(() => {
-                    window.location.href = './dashboard.html';
-                }, 1000);
+        const usuario = usuarioInput.value.trim();
+        const senha = senhaInput.value.trim();
 
-            } catch (error) {
-                console.error('Erro no login:', error.code, error.message);
-                let mensagemErro = 'Ocorreu um erro ao tentar fazer login.';
-                
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                    mensagemErro = 'Email ou senha inválidos.';
-                } else if (error.code === 'auth/invalid-email') {
-                    mensagemErro = 'O formato do email é inválido.';
-                }
-                
-                // Exibe a mensagem de erro no elemento 'saida'
-                saida.textContent = mensagemErro;
-                saida.className = 'text-red-400 text-sm text-center';
-                saida.classList.remove('hidden');
+        if (!usuario || !senha) {
+            mostrarMensagem('Por favor, preencha todos os campos.', true);
+            return;
+        }
+
+        try {
+            const usersCollection = collection(db, 'senha_login');
+            const q = query(usersCollection, where('user', '==', usuario));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                mostrarMensagem(`O usuário "${usuario}" não existe.`, true);
+                return;
             }
-        });
+
+            const userDoc = querySnapshot.docs[0];
+            const userData = userDoc.data();
+
+            if (userData.pass !== senha) {
+                mostrarMensagem("Senha incorreta.", true);
+                return;
+            }
+
+            // Login correto
+            sessionStorage.setItem('currentUser', JSON.stringify({
+                id: userDoc.id,
+                username: userData.user
+            }));
+
+            mostrarMensagem("Login realizado com sucesso!", false);
+
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1000);
+
+        } catch (error) {
+            console.error("Erro durante login:", error);
+            mostrarMensagem("Erro ao realizar login. Tente novamente.", true);
+        }
+    });
+
+    function mostrarMensagem(texto, isErro = true) {
+        if (saidaElement) {
+            saidaElement.textContent = texto;
+            saidaElement.classList.remove('hidden');
+            saidaElement.style.color = isErro ? 'red' : 'green';
+        }
     }
 });
