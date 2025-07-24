@@ -1,5 +1,5 @@
 // carregarTabela.js
-import { db } from '../config/firebaseConfig.js';
+import { db } from './firebaseConfig.js';
 import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 // Assumindo que firebaseConfig.js está em sistema_de_monitoramento/firebaseConfig.js durante o deploy
 

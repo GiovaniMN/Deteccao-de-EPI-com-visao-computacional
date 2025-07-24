@@ -5,14 +5,17 @@ import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth
 
 // Configurações do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyCtej6q8PEyBxtzjXQiNIvNoeLGUZpp5VU",
-    authDomain: "testerasp1-fd9ce.firebaseapp.com",
-    projectId: "testerasp1-fd9ce",
-    storageBucket: "testerasp1-fd9ce.appspot.com",
-    messagingSenderId: "859378752124",
-    appId: "1:859378752124:web:8cf3eba575d121700a07f9",
-    databaseURL: "https://testerasp1-fd9ce-default-rtdb.firebaseio.com"
+
+  apiKey: "AIzaSyBkgN9tJxWc3jVPSQ6DpQpOhNhFZyi5W3Y",
+  authDomain: "jupiter-supervision.firebaseapp.com",
+  projectId: "jupiter-supervision",
+  storageBucket: "jupiter-supervision.appspot.com", // Corrigido para o formato padrão
+  messagingSenderId: "118412161335",
+  appId: "1:118412161335:web:13aa2d9bc240935db56ab2",
+  measurementId: "G-GNL7NRGM1S",
+  databaseURL: "https://jupiter-supervision-default-rtdb.firebaseio.com/" // Adicionado
 };
+
 
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
