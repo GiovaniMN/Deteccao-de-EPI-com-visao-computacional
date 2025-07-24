@@ -17,6 +17,10 @@ async function carregarDados() {
   const colecao = collection(db, "alertas_epi");
   try {
     const snapshot = await getDocs(colecao);
+    const totalRegistrosEl = document.getElementById('total-registros');
+    if (totalRegistrosEl) {
+        totalRegistrosEl.textContent = snapshot.size;
+    }
 
     if (snapshot.empty) {
       if (tabelaBody) tabelaBody.innerHTML = "<tr><td colspan='3'>Nenhuma ocorrência encontrada.</td></tr>";
