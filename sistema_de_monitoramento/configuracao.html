@@ -17,7 +17,37 @@
         body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
         #image-container { position: relative; width: 100%; max-width: 800px; user-select: none; }
-        #zone-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: crosshair; }
+        #zone-canvas { position: absolute; top: 0; left: 0; cursor: crosshair; }
+        .zone-info-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 69, 193, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        .coordinate-display {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(75, 85, 99, 0.3);
+        }
+        .action-button {
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.6);
+        }
+        .secondary-button {
+            background: rgba(107, 114, 128, 0.2);
+            border: 1px solid rgba(107, 114, 128, 0.3);
+            backdrop-filter: blur(8px);
+        }
+        .secondary-button:hover {
+            background: rgba(107, 114, 128, 0.3);
+            transform: translateY(-1px);
+        }
+        .status-indicator {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -86,27 +116,100 @@
                 <!-- Zone Configuration Area -->
                 <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-gray-700/50">
                     <div class="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-                        <h2 class="text-xl font-semibold text-white">Área de Detecção</h2>
+                        <div class="flex items-center space-x-3">
+                            <h2 class="text-xl font-semibold text-white">Área de Detecção</h2>
+                            <div id="status-indicator" class="w-3 h-3 bg-yellow-500 rounded-full status-indicator"></div>
+                        </div>
                         <div class="flex flex-col sm:flex-row items-stretch w-full sm:w-auto gap-3">
-                            <button id="captureImageButton" class="flex items-center justify-center space-x-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-5 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                <span>Atualizar Imagem</span>
+                            <button id="clearButton" class="secondary-button flex items-center justify-center space-x-2 font-semibold py-3 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                <span>Limpar Zona</span>
                             </button>
-                            <button id="saveButton" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-5 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-                                Salvar Zona
+                            <button id="saveButton" class="action-button text-white font-semibold py-3 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                                <div class="flex items-center space-x-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    <span>Salvar Zona</span>
+                                </div>
                             </button>
                         </div>
                     </div>
 
                     <!-- Image and Canvas Container -->
-                    <div id="image-container" class="mx-auto bg-gray-900 rounded-lg overflow-hidden">
-                        <!-- A imagem de referência da câmera será carregada aqui -->
+                    <div id="image-container" class="mx-auto bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50">
                         <img id="reference-image" src="img/img1.avif" alt="Imagem da Câmera" class="w-full h-auto">
-                        <!-- O canvas para desenhar a zona ficará sobre a imagem -->
                         <canvas id="zone-canvas"></canvas>
                     </div>
                     
-                    <div id="feedback" class="mt-4 text-center text-sm"></div>
+                    <!-- Zone Information Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <!-- Coordinates Display -->
+                        <div class="coordinate-display rounded-xl p-4">
+                            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                Coordenadas da Zona
+                            </h3>
+                            <div id="coordinates" class="text-sm text-gray-300 space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Status:</span>
+                                    <span id="zone-status" class="text-yellow-400">Nenhuma zona definida</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">X:</span>
+                                    <span id="coord-x" class="text-white">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Y:</span>
+                                    <span id="coord-y" class="text-white">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Largura:</span>
+                                    <span id="coord-width" class="text-white">-</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Altura:</span>
+                                    <span id="coord-height" class="text-white">-</span>
+                                </div>
+                                <div class="flex justify-between pt-2 border-t border-gray-700">
+                                    <span class="text-gray-500">Área:</span>
+                                    <span id="zone-area" class="text-blue-400 font-medium">- px²</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instructions Card -->
+                        <div class="zone-info-card rounded-xl p-4">
+                            <h3 class="text-lg font-semibold text-white mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                Como usar
+                            </h3>
+                            <div class="text-sm text-gray-300 space-y-2">
+                                <div class="flex items-start space-x-2">
+                                    <div class="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                                    <span>Clique e arraste na imagem para desenhar a zona</span>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
+                                    <span>A área azul indica onde os objetos serão detectados</span>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                                    <span>Use "Limpar Zona" para remover a seleção atual</span>
+                                </div>
+                                <div class="flex items-start space-x-2">
+                                    <div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
+                                    <span>Clique em "Salvar Zona" para confirmar a configuração</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Message -->
+                    <div id="feedback" class="mt-6 text-center text-sm transition-all duration-300"></div>
                 </div>
             </div>
         </main>
@@ -115,19 +218,328 @@
     <!-- Sidebar Overlay for Mobile -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
-    <script type="module" src="./static/js/firebaseConfig.js"></script>
-    <script type="module" src="./static/js/zoneManagement.js"></script>
-    <script>
+    <!-- Firebase SDK direto na página para evitar problemas de importação -->
+    <script type="module">
+        // Import Firebase SDK
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBkgN9tJxWc3jVPSQ6DpQpOhNhFZyi5W3Y",
+            authDomain: "jupiter-supervision.firebaseapp.com",
+            projectId: "jupiter-supervision",
+            storageBucket: "jupiter-supervision.appspot.com",
+            messagingSenderId: "118412161335",
+            appId: "1:118412161335:web:13aa2d9bc240935db56ab2",
+            measurementId: "G-GNL7NRGM1S",
+            databaseURL: "https://jupiter-supervision-default-rtdb.firebaseio.com/"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        console.log('🚀 Firebase inicializado com sucesso!');
+
+        const canvas = document.getElementById('zone-canvas');
+        const img = document.getElementById('reference-image');
+        const ctx = canvas.getContext('2d');
+        const statusIndicator = document.getElementById('status-indicator');
+        let startX, startY, endX, endY;
+        let drawing = false;
+        let zone = null;
+
+        function resizeCanvas() {
+            canvas.width = img.clientWidth;
+            canvas.height = img.clientHeight;
+            
+            if (zone) {
+                drawZone();
+            }
+        }
+
+        function drawZone() {
+            if (!zone) return;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Desenha zona com estilo moderno
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+            ctx.fillRect(zone.x, zone.y, zone.width, zone.height);
+            
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([]);
+            ctx.strokeRect(zone.x, zone.y, zone.width, zone.height);
+            
+            // Desenha bordas dos cantos
+            const cornerSize = 20;
+            ctx.strokeStyle = '#60a5fa';
+            ctx.lineWidth = 4;
+            
+            // Canto superior esquerdo
+            ctx.beginPath();
+            ctx.moveTo(zone.x, zone.y + cornerSize);
+            ctx.lineTo(zone.x, zone.y);
+            ctx.lineTo(zone.x + cornerSize, zone.y);
+            ctx.stroke();
+            
+            // Canto superior direito
+            ctx.beginPath();
+            ctx.moveTo(zone.x + zone.width - cornerSize, zone.y);
+            ctx.lineTo(zone.x + zone.width, zone.y);
+            ctx.lineTo(zone.x + zone.width, zone.y + cornerSize);
+            ctx.stroke();
+            
+            // Canto inferior esquerdo
+            ctx.beginPath();
+            ctx.moveTo(zone.x, zone.y + zone.height - cornerSize);
+            ctx.lineTo(zone.x, zone.y + zone.height);
+            ctx.lineTo(zone.x + cornerSize, zone.y + zone.height);
+            ctx.stroke();
+            
+            // Canto inferior direito
+            ctx.beginPath();
+            ctx.moveTo(zone.x + zone.width - cornerSize, zone.y + zone.height);
+            ctx.lineTo(zone.x + zone.width, zone.y + zone.height);
+            ctx.lineTo(zone.x + zone.width, zone.y + zone.height - cornerSize);
+            ctx.stroke();
+            
+            // Adiciona texto centralizado
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('ZONA DE DETECÇÃO', 
+                        zone.x + zone.width/2, 
+                        zone.y + zone.height/2);
+        }
+
+        function updateCoordinatesDisplay() {
+            const coordX = document.getElementById('coord-x');
+            const coordY = document.getElementById('coord-y');
+            const coordWidth = document.getElementById('coord-width');
+            const coordHeight = document.getElementById('coord-height');
+            const zoneArea = document.getElementById('zone-area');
+            const zoneStatus = document.getElementById('zone-status');
+            
+            if (zone) {
+                coordX.textContent = `${zone.x}px`;
+                coordY.textContent = `${zone.y}px`;
+                coordWidth.textContent = `${zone.width}px`;
+                coordHeight.textContent = `${zone.height}px`;
+                zoneArea.textContent = `${(zone.width * zone.height).toLocaleString()} px²`;
+                zoneStatus.textContent = 'Zona definida';
+                zoneStatus.className = 'text-green-400';
+                statusIndicator.className = 'w-3 h-3 bg-green-500 rounded-full';
+            } else {
+                coordX.textContent = '-';
+                coordY.textContent = '-';
+                coordWidth.textContent = '-';
+                coordHeight.textContent = '-';
+                zoneArea.textContent = '- px²';
+                zoneStatus.textContent = 'Nenhuma zona definida';
+                zoneStatus.className = 'text-yellow-400';
+                statusIndicator.className = 'w-3 h-3 bg-yellow-500 rounded-full status-indicator';
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        img.onload = () => {
+            resizeCanvas();
+            loadExistingZone();
+        };
+        
+        async function loadExistingZone() {
+            try {
+                console.log('🔍 Carregando zona existente...');
+                const docRef = doc(db, 'configuracoes', 'zones');
+                const docSnap = await getDoc(docRef);
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    console.log('📄 Dados encontrados:', data);
+                    
+                    if (data.zones && data.zones.length > 0) {
+                        const existingZone = data.zones[0];
+                        
+                        const scaleX = canvas.width / 640;
+                        const scaleY = canvas.height / 480;
+                        
+                        zone = {
+                            nome: existingZone.nome || 'zona1',
+                            x: Math.round((existingZone.x || 0) * scaleX),
+                            y: Math.round((existingZone.y || 0) * scaleY),
+                            width: Math.round((existingZone.width || existingZone.w || 0) * scaleX),
+                            height: Math.round((existingZone.height || existingZone.h || 0) * scaleY)
+                        };
+                        
+                        console.log('✅ Zona carregada:', zone);
+                        drawZone();
+                        updateCoordinatesDisplay();
+                    }
+                } else {
+                    console.log('📝 Nenhuma zona encontrada no Firebase');
+                }
+            } catch (error) {
+                console.error('❌ Erro ao carregar zona existente:', error);
+                showFeedback('Erro ao carregar zona existente: ' + error.message, 'error');
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            drawing = true;
+            console.log('🖱️ Início do desenho:', startX, startY);
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!drawing) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            endX = e.clientX - rect.left;
+            endY = e.clientY - rect.top;
+            
+            const width = endX - startX;
+            const height = endY - startY;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Desenha zona temporária
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.2)';
+            ctx.fillRect(startX, startY, width, height);
+            
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.strokeRect(startX, startY, width, height);
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            if (!drawing) return;
+            
+            drawing = false;
+            const width = endX - startX;
+            const height = endY - startY;
+            
+            console.log('🏁 Fim do desenho:', endX, endY);
+            
+            if (Math.abs(width) < 10 || Math.abs(height) < 10) {
+                console.log('⚠️ Zona muito pequena, ignorando');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                return;
+            }
+            
+            zone = {
+                nome: 'zona1',
+                x: Math.round(Math.min(startX, endX)),
+                y: Math.round(Math.min(startY, endY)),
+                width: Math.round(Math.abs(width)),
+                height: Math.round(Math.abs(height))
+            };
+            
+            console.log('✅ Nova zona criada:', zone);
+            drawZone();
+            updateCoordinatesDisplay();
+        });
+
+        document.getElementById('saveButton').addEventListener('click', async () => {
+            if (!zone) {
+                showFeedback('Nenhuma zona definida.', 'error');
+                return;
+            }
+            
+            try {
+                console.log('💾 Salvando zona...', zone);
+                
+                const scaleX = 640 / canvas.width;
+                const scaleY = 480 / canvas.height;
+                
+                const normalizedZone = {
+                    nome: zone.nome,
+                    x: Math.round(zone.x * scaleX),
+                    y: Math.round(zone.y * scaleY),
+                    width: Math.round(zone.width * scaleX),
+                    height: Math.round(zone.height * scaleY),
+                    original_x: zone.x,
+                    original_y: zone.y,
+                    original_width: zone.width,
+                    original_height: zone.height,
+                    canvas_width: canvas.width,
+                    canvas_height: canvas.height
+                };
+                
+                console.log('📊 Zona normalizada:', normalizedZone);
+                
+                const docRef = doc(db, 'configuracoes', 'zones');
+                
+                await setDoc(docRef, {
+                    zones: [normalizedZone],
+                    lastUpdated: new Date().toISOString(),
+                    imageResolution: {
+                        width: canvas.width,
+                        height: canvas.height
+                    }
+                });
+                
+                console.log('✅ Zona salva com sucesso no Firebase!');
+                statusIndicator.className = 'w-3 h-3 bg-green-500 rounded-full';
+                showFeedback('Zona salva com sucesso!', 'success');
+                
+            } catch (err) {
+                console.error('❌ Erro ao salvar zona:', err);
+                showFeedback('Erro ao salvar: ' + err.message, 'error');
+            }
+        });
+
+        document.getElementById('clearButton').addEventListener('click', () => {
+            console.log('🗑️ Limpando zona...');
+            zone = null;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateCoordinatesDisplay();
+            showFeedback('Zona limpa. Desenhe uma nova zona.', 'warning');
+        });
+
+        function showFeedback(message, type) {
+            const feedback = document.getElementById('feedback');
+            const colors = {
+                success: 'text-green-400 bg-green-500/10 border border-green-500/20',
+                error: 'text-red-400 bg-red-500/10 border border-red-500/20',
+                warning: 'text-yellow-400 bg-yellow-500/10 border border-yellow-500/20',
+                info: 'text-blue-400 bg-blue-500/10 border border-blue-500/20'
+            };
+            
+            console.log(`📢 Feedback (${type}):`, message);
+            
+            feedback.textContent = message;
+            feedback.className = `mt-6 text-center text-sm p-3 rounded-lg transition-all duration-300 ${colors[type] || colors.info}`;
+            
+            setTimeout(() => {
+                feedback.className = 'mt-6 text-center text-sm transition-all duration-300';
+                feedback.textContent = '';
+            }, 5000);
+        }
+
         // Sidebar toggle
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
         function toggleSidebar() {
             sidebar.classList.toggle('-translate-x-full');
             sidebarOverlay.classList.toggle('hidden');
         }
+        
         if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
         if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Inicialização
+        resizeCanvas();
+        updateCoordinatesDisplay();
+        
+        console.log('🎬 Sistema de configuração de zona inicializado!');
     </script>
 </body>
 </html>

@@ -1,145 +1,203 @@
-// sistema_de_monitoramento/static/js/zoneManagement.js
-import { db, storage, rtdb } from '../config/firebaseConfig.js';
-import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-import { ref as storageRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
-import { ref as dbRef, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { db } from './firebaseConfig.js';
+import { doc, updateDoc, getDoc, setDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const imageContainer = document.getElementById('image-container');
-    const image = document.getElementById('reference-image');
-    const canvas = document.getElementById('zone-canvas');
-    const saveButton = document.getElementById('saveButton');
-    const captureImageButton = document.getElementById('captureImageButton');
-    const feedback = document.getElementById('feedback');
-    const ctx = canvas.getContext('2d');
+// Função para salvar zona
+export async function saveZone(zoneData) {
+  try {
+    const docRef = doc(db, 'configuracoes', 'zones');
+    const docSnap = await getDoc(docRef);
 
-    const clearAllButton = document.createElement('button');
-    clearAllButton.textContent = 'Limpar Zona';
-    clearAllButton.className = 'bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-5 rounded-xl transition-all';
-    saveButton.parentElement.insertBefore(clearAllButton, saveButton);
+    const newZone = {
+      nome: zoneData.nome || 'zona1',
+      x: parseInt(zoneData.x),
+      y: parseInt(zoneData.y),
+      width: parseInt(zoneData.width),
+      height: parseInt(zoneData.height),
+      created_at: new Date().toISOString()
+    };
 
-    const imageStorageRef = storageRef(storage, 'reference_image/camera_frame.jpg');
-    const zoneDocRef = doc(db, 'configuracoes', 'zona_deteccao');
-    const captureRequestRef = dbRef(rtdb, 'configuracoes/tirar_foto_request');
+    if (docSnap.exists()) {
+      const existingData = docSnap.data();
+      const existingZones = Array.isArray(existingData.zones) ? existingData.zones : [];
+      
+      // Substitui a primeira zona ou adiciona nova
+      if (existingZones.length > 0) {
+        existingZones[0] = newZone;
+      } else {
+        existingZones.push(newZone);
+      }
 
-    let rect = {};
-    let isDrawing = false;
-
-    function setCanvasSize() {
-        canvas.width = image.clientWidth;
-        canvas.height = image.clientHeight;
-        loadZone();
+      await updateDoc(docRef, {
+        zones: existingZones,
+        lastUpdated: new Date().toISOString()
+      });
+    } else {
+      // Caso o documento ainda não exista
+      await setDoc(docRef, {
+        zones: [newZone],
+        lastUpdated: new Date().toISOString()
+      });
     }
 
-    function showFeedback(message, isError = false) {
-        feedback.textContent = message;
-        feedback.className = isError ? 'mt-4 text-center text-sm text-red-400' : 'mt-4 text-center text-sm text-green-400';
-        setTimeout(() => feedback.textContent = '', 4000);
-    }
+    return { success: true, message: 'Zona salva com sucesso!' };
+  } catch (error) {
+    console.error("Erro ao salvar zona:", error);
+    return { success: false, message: "Erro ao salvar: " + error.message };
+  }
+}
 
-    async function loadReferenceImage() {
-        try {
-            const url = await getDownloadURL(imageStorageRef);
-            image.src = url;
-            image.onload = setCanvasSize;
-        } catch (error) {
-            console.error("Erro ao carregar imagem de referência:", error);
-            image.onload = setCanvasSize;
-        }
-    }
+// Função para carregar zonas existentes
+export async function loadZones() {
+  try {
+    const docRef = doc(db, 'configuracoes', 'zones');
+    const docSnap = await getDoc(docRef);
 
-    async function loadZone() {
-        try {
-            const docSnap = await getDoc(zoneDocRef);
-            if (docSnap.exists()) {
-                const zone = docSnap.data();
-                rect = {
-                    x: zone.x1 * canvas.width,
-                    y: zone.y1 * canvas.height,
-                    w: (zone.x2 - zone.x1) * canvas.width,
-                    h: (zone.y2 - zone.y1) * canvas.height
-                };
-            } else {
-                rect = {};
-            }
-            draw();
-        } catch (error) {
-            console.error("Erro ao carregar zona:", error);
-        }
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      return {
+        success: true,
+        zones: data.zones || [],
+        lastUpdated: data.lastUpdated
+      };
+    } else {
+      return {
+        success: true,
+        zones: [],
+        lastUpdated: null
+      };
     }
+  } catch (error) {
+    console.error("Erro ao carregar zonas:", error);
+    return {
+      success: false,
+      message: "Erro ao carregar zonas: " + error.message,
+      zones: []
+    };
+  }
+}
 
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        if (rect.w && rect.h) {
-            ctx.strokeStyle = '#00FFFF';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(rect.x, rect.y, rect.w, rect.h);
-        }
-    }
-
-    function getMousePos(e) {
-        const canvasRect = canvas.getBoundingClientRect();
-        return { x: e.clientX - canvasRect.left, y: e.clientY - canvasRect.top };
-    }
-
-    canvas.addEventListener('mousedown', (e) => {
-        isDrawing = true;
-        const pos = getMousePos(e);
-        rect = { x: pos.x, y: pos.y, w: 0, h: 0 };
+// Função para deletar todas as zonas
+export async function clearAllZones() {
+  try {
+    const docRef = doc(db, 'configuracoes', 'zones');
+    
+    await setDoc(docRef, {
+      zones: [],
+      lastUpdated: new Date().toISOString()
     });
 
-    canvas.addEventListener('mousemove', (e) => {
-        if (!isDrawing) return;
-        const pos = getMousePos(e);
-        rect.w = pos.x - rect.x;
-        rect.h = pos.y - rect.y;
-        draw();
-    });
+    return { success: true, message: 'Todas as zonas foram removidas!' };
+  } catch (error) {
+    console.error("Erro ao limpar zonas:", error);
+    return { success: false, message: "Erro ao limpar zonas: " + error.message };
+  }
+}
 
-    canvas.addEventListener('mouseup', () => {
-        isDrawing = false;
-        if (rect.w < 0) { rect.x += rect.w; rect.w *= -1; }
-        if (rect.h < 0) { rect.y += rect.h; rect.h *= -1; }
-        draw();
-    });
+// Função para validar dados da zona
+export function validateZoneData(zoneData) {
+  const errors = [];
 
-    saveButton.addEventListener('click', async () => {
-        if (!rect.w || !rect.h) {
-            showFeedback('Desenhe uma zona antes de salvar.', true);
-            return;
+  if (!zoneData.x || isNaN(zoneData.x) || zoneData.x < 0) {
+    errors.push("Coordenada X deve ser um número válido maior ou igual a 0");
+  }
+
+  if (!zoneData.y || isNaN(zoneData.y) || zoneData.y < 0) {
+    errors.push("Coordenada Y deve ser um número válido maior ou igual a 0");
+  }
+
+  if (!zoneData.width || isNaN(zoneData.width) || zoneData.width <= 0) {
+    errors.push("Largura deve ser um número válido maior que 0");
+  }
+
+  if (!zoneData.height || isNaN(zoneData.height) || zoneData.height <= 0) {
+    errors.push("Altura deve ser um número válido maior que 0");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors: errors
+  };
+}
+
+// Event listener para formulário manual (se existir)
+document.addEventListener('DOMContentLoaded', function() {
+  const saveZoneBtn = document.getElementById('saveZone');
+  
+  if (saveZoneBtn) {
+    saveZoneBtn.addEventListener('click', async () => {
+      const zoneData = {
+        x: document.getElementById('xInput')?.value,
+        y: document.getElementById('yInput')?.value,
+        width: document.getElementById('widthInput')?.value,
+        height: document.getElementById('heightInput')?.value,
+        nome: document.getElementById('nomeInput')?.value || 'zona1'
+      };
+
+      // Validar dados
+      const validation = validateZoneData(zoneData);
+      if (!validation.isValid) {
+        alert('Erro de validação:\n' + validation.errors.join('\n'));
+        return;
+      }
+
+      // Salvar zona
+      const result = await saveZone(zoneData);
+      
+      if (result.success) {
+        alert(result.message);
+        // Limpar formulário se existir
+        ['xInput', 'yInput', 'widthInput', 'heightInput', 'nomeInput'].forEach(id => {
+          const element = document.getElementById(id);
+          if (element) element.value = '';
+        });
+      } else {
+        alert(result.message);
+      }
+    });
+  }
+
+  // Event listener para botão de limpar zonas (se existir)
+  const clearZonesBtn = document.getElementById('clearZones');
+  if (clearZonesBtn) {
+    clearZonesBtn.addEventListener('click', async () => {
+      if (confirm('Tem certeza que deseja remover todas as zonas? Esta ação não pode ser desfeita.')) {
+        const result = await clearAllZones();
+        alert(result.message);
+      }
+    });
+  }
+
+  // Event listener para carregar zonas (se existir)
+  const loadZonesBtn = document.getElementById('loadZones');
+  if (loadZonesBtn) {
+    loadZonesBtn.addEventListener('click', async () => {
+      const result = await loadZones();
+      
+      if (result.success) {
+        console.log('Zonas carregadas:', result.zones);
+        
+        // Exibir zonas no console ou em uma div
+        const zonesDisplay = document.getElementById('zonesDisplay');
+        if (zonesDisplay) {
+          if (result.zones.length === 0) {
+            zonesDisplay.innerHTML = '<p>Nenhuma zona configurada.</p>';
+          } else {
+            const zonesHtml = result.zones.map((zone, index) => `
+              <div class="zone-item">
+                <h4>Zona ${index + 1}: ${zone.nome}</h4>
+                <p>X: ${zone.x}, Y: ${zone.y}</p>
+                <p>Largura: ${zone.width}, Altura: ${zone.height}</p>
+                <p>Criada em: ${new Date(zone.created_at).toLocaleString()}</p>
+              </div>
+            `).join('');
+            zonesDisplay.innerHTML = zonesHtml;
+          }
         }
-        const zoneToSave = {
-            x1: rect.x / canvas.width,
-            y1: rect.y / canvas.height,
-            x2: (rect.x + rect.w) / canvas.width,
-            y2: (rect.y + rect.h) / canvas.height
-        };
-        try {
-            await setDoc(zoneDocRef, zoneToSave);
-            showFeedback('Zona de detecção salva com sucesso!');
-        } catch (error) {
-            showFeedback('Falha ao salvar a configuração da zona.', true);
-        }
+        
+        alert(`${result.zones.length} zona(s) carregada(s) com sucesso!`);
+      } else {
+        alert(result.message);
+      }
     });
-
-    clearAllButton.addEventListener('click', () => {
-        rect = {};
-        draw();
-    });
-
-    captureImageButton.addEventListener('click', async () => {
-        try {
-            await set(captureRequestRef, true);
-            showFeedback('Solicitando nova imagem da câmera...');
-        } catch (error) {
-            showFeedback('Falha ao solicitar imagem da câmera.', true);
-        }
-    });
-
-    async function init() {
-        await loadReferenceImage();
-        window.addEventListener('resize', setCanvasSize);
-    }
-
-    init();
+  }
 });
