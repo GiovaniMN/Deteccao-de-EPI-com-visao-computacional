@@ -295,14 +295,27 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <p class="text-gray-400 mb-4">Para mais informações, entre em contato pelo e-mail abaixo:</p>
-            <div class="relative bg-gray-900 rounded-lg p-4 flex items-center justify-between">
-                <span id="emailText" class="text-blue-400 font-mono">epirasp@gmail.com</span>
-                <button id="copyEmailButton" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all">
-                    Copiar
-                </button>
-            </div>
-            <p id="copyFeedback" class="text-green-400 text-sm mt-3 text-center hidden">E-mail copiado para a área de transferência!</p>
+    <form id="contactForm" class="space-y-4">
+  <div>
+    <label for="email" class="block text-sm font-medium text-gray-300">E-mail</label>
+    <input type="email" id="email" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="seuemail@exemplo.com" required>
+  </div>
+  <div>
+    <label for="telefone" class="block text-sm font-medium text-gray-300">Telefone</label>
+    <input type="tel" id="telefone" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="(11) 91234-5678">
+  </div>
+  <div>
+    <label for="mensagem" class="block text-sm font-medium text-gray-300">Mensagem</label>
+    <textarea id="mensagem" rows="4" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Escreva sua mensagem aqui..." required></textarea>
+  </div>
+  <div class="text-right">
+    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all">
+      Enviar
+    </button>
+  </div>
+  <p id="formFeedback" class="hidden text-green-400 mt-4 text-center">Mensagem enviada com sucesso!</p>
+</form>
+
         </div>
     </div>
 
@@ -355,5 +368,35 @@
             });
         });
     </script>
+
+    <script type="module">
+  import { db } from './static/js/firebaseConfig.js';
+  import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+  const form = document.getElementById("contactForm");
+  const feedback = document.getElementById("formFeedback");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const mensagem = document.getElementById("mensagem").value.trim();
+
+    try {
+      await addDoc(collection(db, "contato"), {
+        email,
+        telefone,
+        mensagem
+      });
+
+      feedback.classList.remove("hidden");
+      form.reset();
+    } catch (error) {
+      alert("Erro ao enviar: " + error.message);
+    }
+  });
+</script>
+
 </body>
 </html>
