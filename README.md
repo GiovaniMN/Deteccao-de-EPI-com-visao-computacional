@@ -167,6 +167,8 @@ python src/deteccao_example.py
 ```
 Pressione `ESC` para sair.
 
+Para uma explicação detalhada sobre a arquitetura do script, a lógica de detecção e todas as opções de configuração, consulte o nosso **[Guia Detalhado do Script de Detecção](docs/script_guide.md)**.
+
 ---
 
 ## 🌐 Recursos do Projeto
