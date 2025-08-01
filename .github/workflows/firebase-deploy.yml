@@ -16,7 +16,7 @@ jobs:
 
       - name: Create firebaseConfig.js
         run: |
-          mkdir -p sistema_de_monitoramento/config
+          mkdir -p sistema_de_monitoramento/static/js
           echo "import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js';
           import { getFirestore } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
           import { getAuth } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js';
@@ -35,7 +35,7 @@ jobs:
           const db = getFirestore(app);
           const auth = getAuth(app);
           
-          export { db, auth };" > sistema_de_monitoramento/config/firebaseConfig.js
+          export { db, auth, app };" > sistema_de_monitoramento/static/js/firebaseConfig.js
 
       - name: Deploy to Firebase
         uses: FirebaseExtended/action-hosting-deploy@v0
