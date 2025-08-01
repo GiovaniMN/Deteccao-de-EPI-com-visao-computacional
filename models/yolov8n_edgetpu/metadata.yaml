@@ -1,0 +1,19 @@
+description: Ultralytics YOLO_last model trained on /content/data.yaml
+author: Ultralytics
+date: '2025-07-24T22:54:16.203648'
+version: 8.3.169
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: bota
+  1: capacete
+  2: oculos
+  3: pessoa
+args: {}
+channels: 3

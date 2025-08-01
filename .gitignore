@@ -54,5 +54,3 @@ Thumbs.db
 # Python script generated from template
 src/deteccao.py
 
-# Model files (PyTorch .pt files can be large)
-models/*.pt
