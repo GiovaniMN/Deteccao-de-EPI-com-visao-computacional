@@ -171,6 +171,14 @@ Para uma explicação detalhada sobre a arquitetura do script, a lógica de dete
 
 ---
 
+## 📚 Documentação Detalhada
+
+Para uma compreensão mais aprofundada da arquitetura e funcionamento do projeto, consulte os seguintes guias:
+
+- **[Guia do Script de Detecção](docs/script_guide.md)**: Uma análise completa do script Python (`deteccao_example.py`), sua lógica de estados e opções de configuração.
+- **[Guia do Frontend (Painel Web)](docs/frontend_guide.md)**: Detalhes sobre a estrutura do painel web, suas páginas e a integração com o Firebase.
+- **[Guia de Deploy (CI/CD)](docs/deployment_guide.md)**: Explicação sobre o processo de deploy automatizado com GitHub Actions.
+
 ## 🌐 Recursos do Projeto
 
 - **Notebook de Treinamento:** [Google Colab](https://colab.research.google.com/drive/1BYr0z8BnVe3F1YGCx2pwszZ-OZauiF_r)
