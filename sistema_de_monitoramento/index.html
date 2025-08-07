@@ -1,34 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
-    <link
-      rel="stylesheet"
-      as="style"
-      onload="this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600"
-    />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600" />
     <title>Jupiter Supervision - Supervisão Inteligente de EPIs</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.1); }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-20px); } }
-        .tech-grid { background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0); background-size: 20px 20px; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
+        .tech-grid {
+            background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+        }
     </style>
 </head>
+
 <body class="bg-gray-900 text-white overflow-x-hidden">
     <header class="relative z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10">
-                        <img width="48" height="48" src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" alt="external-Jupiter-space-topaz-kerismaker"/>
+                        <img width="48" height="48" src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" alt="external-Jupiter-space-topaz-kerismaker" />
                     </div>
                     <div>
                         <h1 class="text-xl font-bold bg-gradient-to-r from-orange-400 to-blue-900 bg-clip-text text-transparent">Jupiter Supervision</h1>
@@ -74,7 +96,7 @@
         </div>
         <div class="absolute inset-0 tech-grid opacity-20"></div>
         <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900/40"></div>
-        
+
         <!-- Floating Elements -->
         <div class="absolute top-20 left-10 w-20 h-20 bg-blue-500/20 rounded-full animate-float"></div>
         <div class="absolute top-40 right-20 w-16 h-16 bg-purple-500/20 rounded-full animate-float" style="animation-delay: -2s;"></div>
@@ -138,8 +160,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Detecção em Tempo Real</h3>
-                    <p class="text-gray-400 text-sm">Identifica instantaneamente a presença ou ausência de EPIs usando algoritmos de visão computacional avançados.</p>
+                    <h3 class="text-xl font-semibold text-white mb-3">Detecção Rápida</h3>
+                    <p class="text-gray-400 text-sm">Identifica em minutos a presença ou ausência de EPIs usando algoritmos de visão computacional avançados.</p>
                 </div>
 
                 <!-- Feature 2 -->
@@ -150,7 +172,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-3">Alertas Inteligentes</h3>
-                    <p class="text-gray-400 text-sm">Notificações automáticas via Telegram e Firebase quando EPIs não são detectados por período configurável.</p>
+                    <p class="text-gray-400 text-sm">Notificações automáticas via Telegram, quando EPIs não são detectados por período configurável.</p>
                 </div>
 
                 <!-- Feature 3 -->
@@ -182,8 +204,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Armazenamento Seguro</h3>
-                    <p class="text-gray-400 text-sm">Dados criptografados e armazenados com segurança no Firebase, com backup automático e alta disponibilidade.</p>
+                    <h3 class="text-xl font-semibold text-white mb-3">Criptografia de Dados</h3>
+                    <p class="text-gray-400 text-sm">Dados criptografados e armazenados no Firebase, com backup automático e alta disponibilidade.</p>
                 </div>
 
                 <!-- Feature 6 -->
@@ -206,7 +228,7 @@
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-white mb-3">Tecnologia de Ponta</h2>
                 <p class="text-lg text-gray-400 max-w-3xl mx-auto">
-                    Construído com as mais avançadas tecnologias de IA e visão computacional
+                    Construído com avançadas tecnologias de IA e visão computacional
                 </p>
             </div>
 
@@ -253,7 +275,7 @@
                 Pronto para Revolucionar a Segurança?
             </h2>
             <p class="text-lg text-blue-100 mb-6 max-w-2xl mx-auto">
-                Implemente o SafeWatch AI em sua empresa e garanta 100% de conformidade com as normas de segurança.
+                Implemente o Jupiter Supervision em sua empresa e garanta 100% de conformidade com as normas de segurança.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                 <button onclick="location.href='login.html'" class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105">
@@ -295,26 +317,26 @@
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-    <form id="contactForm" class="space-y-4">
-  <div>
-    <label for="email" class="block text-sm font-medium text-gray-300">E-mail</label>
-    <input type="email" id="email" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="seuemail@exemplo.com" required>
-  </div>
-  <div>
-    <label for="telefone" class="block text-sm font-medium text-gray-300">Telefone</label>
-    <input type="tel" id="telefone" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="(11) 91234-5678">
-  </div>
-  <div>
-    <label for="mensagem" class="block text-sm font-medium text-gray-300">Mensagem</label>
-    <textarea id="mensagem" rows="4" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Escreva sua mensagem aqui..." required></textarea>
-  </div>
-  <div class="text-right">
-    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all">
+            <form id="contactForm" class="space-y-4">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-300">E-mail</label>
+                    <input type="email" id="email" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="seuemail@exemplo.com" required>
+                </div>
+                <div>
+                    <label for="telefone" class="block text-sm font-medium text-gray-300">Telefone</label>
+                    <input type="tel" id="telefone" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="(11) 91234-5678">
+                </div>
+                <div>
+                    <label for="mensagem" class="block text-sm font-medium text-gray-300">Mensagem</label>
+                    <textarea id="mensagem" rows="4" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Escreva sua mensagem aqui..." required></textarea>
+                </div>
+                <div class="text-right">
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all">
       Enviar
     </button>
-  </div>
-  <p id="formFeedback" class="hidden text-green-400 mt-4 text-center">Mensagem enviada com sucesso!</p>
-</form>
+                </div>
+                <p id="formFeedback" class="hidden text-green-400 mt-4 text-center">Mensagem enviada com sucesso!</p>
+            </form>
 
         </div>
     </div>
@@ -370,33 +392,11 @@
     </script>
 
     <script type="module">
-  import { db } from './static/js/firebaseConfig.js';
-  import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
-  const form = document.getElementById("contactForm");
-  const feedback = document.getElementById("formFeedback");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById("email").value.trim();
-    const telefone = document.getElementById("telefone").value.trim();
-    const mensagem = document.getElementById("mensagem").value.trim();
-
-    try {
-      await addDoc(collection(db, "contato"), {
-        email,
-        telefone,
-        mensagem
-      });
-
-      feedback.classList.remove("hidden");
-      form.reset();
-    } catch (error) {
-      alert("Erro ao enviar: " + error.message);
-    }
-  });
-</script>
+        import { db } from './static/js/firebaseConfig.js'; import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"; const form = document.getElementById("contactForm"); const feedback = document.getElementById("formFeedback");
+        form.addEventListener("submit", async (e) => { e.preventDefault(); const email = document.getElementById("email").value.trim(); const telefone = document.getElementById("telefone").value.trim(); const mensagem = document.getElementById("mensagem").value.trim();
+        try { await addDoc(collection(db, "contato"), { email, telefone, mensagem }); feedback.classList.remove("hidden"); form.reset(); } catch (error) { alert("Erro ao enviar: " + error.message); } });
+    </script>
 
 </body>
+
 </html>
