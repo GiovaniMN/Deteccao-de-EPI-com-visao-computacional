@@ -13,6 +13,7 @@
     <title>Usuários - Jupiter Supervision</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script type="module" src="./static/js/authGuard.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
@@ -245,6 +246,8 @@
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
     <script type="module" src="./static/js/userManagement.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
     <script>
         // Sidebar toggle functionality
         const sidebar = document.getElementById('sidebar');
@@ -266,5 +269,6 @@
     </script>
     
      <script type="module" src="./static/js/userManagement.js"></script>
+     <script type="module" src="./static/js/logout.js"></script>
 </body>
 </html>

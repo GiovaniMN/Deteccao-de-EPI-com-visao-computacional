@@ -1,6 +1,9 @@
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
+// Chave AES para criptografia simétrica (use algo mais seguro em produção)
+const AES_KEY = "chaveSuperSecreta123!";
+
 document.addEventListener('DOMContentLoaded', async () => {
     const addUserForm = document.getElementById('addUserForm');
     const newUsernameInput = document.getElementById('newUsername');
@@ -9,35 +12,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userListUL = document.getElementById('userList');
     const feedbackP = document.getElementById('userManagementFeedback');
 
-    const DEFAULT_ADMIN_USER = 'adm'; // Define admin username
-    const DEFAULT_ADMIN_PASSWORD = '123'; // Define admin password
+    const DEFAULT_ADMIN_USER = 'adm';
+    const DEFAULT_ADMIN_PASSWORD = '123';
+
+    // 🔐 Criptografa senha com AES
+    function criptografarSenhaAES(senha) {
+        return CryptoJS.AES.encrypt(senha, AES_KEY).toString();
+    }
 
     async function initializeAdminUser() {
         try {
-            console.log('Checking for admin user...');
             const usersCollection = collection(db, 'senha_login');
             const q = query(usersCollection, where('user', '==', DEFAULT_ADMIN_USER));
             const querySnapshot = await getDocs(q);
 
             if (querySnapshot.empty) {
-                console.log('Admin user not found, creating...');
-                const docRef = await addDoc(usersCollection, {
+                const senhaCriptografada = criptografarSenhaAES(DEFAULT_ADMIN_PASSWORD);
+                await addDoc(usersCollection, {
                     user: DEFAULT_ADMIN_USER,
-                    pass: DEFAULT_ADMIN_PASSWORD
+                    pass: senhaCriptografada
                 });
-                console.log('Admin user created successfully with ID:', docRef.id);
+                console.log('Admin user criado com sucesso.');
             } else {
-                console.log('Admin user already exists');
-                querySnapshot.forEach((doc) => {
-                    console.log('Admin user data:', doc.id, doc.data());
-                });
+                console.log('Admin user já existe.');
             }
         } catch (error) {
-            console.error("Error initializing admin user:", error);
+            console.error("Erro ao inicializar admin:", error);
         }
     }
 
-    // Initialize admin user when the page loads
     await initializeAdminUser();
 
     async function getUsersFromFirebase() {
@@ -50,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             return users;
         } catch (error) {
-            console.error("Error getting users from Firebase:", error);
+            console.error("Erro ao buscar usuários:", error);
             return [];
         }
     }
@@ -61,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await addDoc(usersCollection, userData);
             return true;
         } catch (error) {
-            console.error("Error saving user to Firebase:", error);
+            console.error("Erro ao salvar usuário:", error);
             return false;
         }
     }
@@ -71,7 +74,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             await deleteDoc(doc(db, 'senha_login', userId));
             return true;
         } catch (error) {
-            console.error("Error deleting user from Firebase:", error);
+            console.error("Erro ao deletar usuário:", error);
             return false;
         }
     }
@@ -79,18 +82,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     function displayFeedback(message, isError = false) {
         if (feedbackP) {
             feedbackP.textContent = message;
-            feedbackP.className = isError ? 'mt-4 text-center text-sm text-red-400' : 'mt-4 text-center text-sm text-green-400';
+            feedbackP.className = isError
+                ? 'mt-4 text-center text-sm text-red-400'
+                : 'mt-4 text-center text-sm text-green-400';
         }
     }
 
     async function renderUserList() {
-        if (!userListUL) {
-            console.error("Element userListUL not found for rendering.");
-            return;
-        }
-        userListUL.innerHTML = ''; // Clear existing list
+        if (!userListUL) return;
 
+        userListUL.innerHTML = '';
         const users = await getUsersFromFirebase();
+
         if (users.length === 0) {
             const li = document.createElement('li');
             li.textContent = 'Nenhum usuário cadastrado.';
@@ -102,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         users.forEach(user => {
             const li = document.createElement('li');
             li.className = 'flex items-center justify-between bg-[#303030] p-3 rounded-md shadow';
-            
+
             const usernameSpan = document.createElement('span');
             usernameSpan.className = 'text-gray-200';
             usernameSpan.textContent = user.user;
@@ -120,25 +123,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 adminLabel.className = 'text-xs text-gray-500 ml-2';
                 li.appendChild(adminLabel);
             }
+
             userListUL.appendChild(li);
         });
     }
 
     async function handleAddUserFormSubmit(event) {
         event.preventDefault();
-        if (!newUsernameInput || !newPasswordInput || !confirmPasswordInput) {
-            displayFeedback("Erro: Elementos do formulário não encontrados.", true);
-            return;
-        }
 
-        const username = newUsernameInput.value.trim();
-        const password = newPasswordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
+        const username = newUsernameInput?.value.trim();
+        const password = newPasswordInput?.value;
+        const confirmPassword = confirmPasswordInput?.value;
 
         if (!username || !password) {
             displayFeedback("Usuário e senha são obrigatórios.", true);
             return;
         }
+
         if (password !== confirmPassword) {
             displayFeedback("As senhas não coincidem.", true);
             return;
@@ -150,10 +151,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const success = await saveUserToFirebase({ user: username, pass: password });
+        const senhaCriptografada = criptografarSenhaAES(password);
+
+        const success = await saveUserToFirebase({
+            user: username,
+            pass: senhaCriptografada
+        });
+
         if (success) {
-            displayFeedback("Usuário adicionado com sucesso!", false);
-            if(addUserForm) addUserForm.reset();
+            displayFeedback("Usuário adicionado com sucesso!");
+            addUserForm?.reset();
             renderUserList();
         } else {
             displayFeedback("Erro ao adicionar usuário.", true);
@@ -169,10 +176,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const userToDelete = users.find(u => u.id === userId);
             if (!userToDelete) return;
 
-            if (!confirm(`Tem certeza que deseja excluir o usuário "${userToDelete.user}"?`)) {
-                return;
-            }
-            
+            if (!confirm(`Deseja excluir o usuário "${userToDelete.user}"?`)) return;
+
             if (userToDelete.user.toLowerCase() === DEFAULT_ADMIN_USER) {
                 displayFeedback("O usuário administrador padrão não pode ser excluído.", true);
                 return;
@@ -180,7 +185,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const success = await deleteUserFromFirebase(userId);
             if (success) {
-                displayFeedback(`Usuário "${userToDelete.user}" excluído com sucesso.`, false);
+                displayFeedback(`Usuário "${userToDelete.user}" excluído com sucesso.`);
                 renderUserList();
             } else {
                 displayFeedback("Erro ao excluir usuário.", true);
@@ -188,18 +193,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // Initial setup
+    // Setup inicial
     if (addUserForm) {
         addUserForm.addEventListener('submit', handleAddUserFormSubmit);
-    } else {
-        console.error("Formulário de adicionar usuário (addUserForm) não encontrado.");
     }
 
     if (userListUL) {
         userListUL.addEventListener('click', handleDeleteUserClick);
-    } else {
-        console.error("Lista de usuários (userListUL) não encontrada.");
     }
-    
+
     renderUserList();
 });

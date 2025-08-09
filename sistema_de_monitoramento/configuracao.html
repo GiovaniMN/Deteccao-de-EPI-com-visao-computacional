@@ -13,6 +13,7 @@
     <title>Configuração - Jupiter Supervision</title>
     <link rel="icon" type="image/png" href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script type="module" src="./static/js/authGuard.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
@@ -54,6 +55,36 @@
             font-family: 'Courier New', monospace;
             font-size: 12px;
         }
+        .loading-spinner {
+            border: 3px solid rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .image-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .refresh-button {
+            background: rgba(34, 197, 94, 0.2);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+        .refresh-button:hover {
+            background: rgba(34, 197, 94, 0.3);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
@@ -73,7 +104,7 @@
                         </div>
                         <div>
                             <h1 class="text-lg font-bold text-white">Jupiter Supervision</h1>
-                            <p class="text-xs text-gray-400">Configuração do Sistema - V2 CORRIGIDA</p>
+                            <p class="text-xs text-gray-400">Configuração do Sistema - Imagem Dinâmica</p>
                         </div>
                     </div>
                 </div>
@@ -116,10 +147,10 @@
                 <!-- Page Header -->
                 <div class="mb-8">
                     <h1 class="text-2xl sm:text-3xl font-bold text-white mb-2">Configuração da Zona de Detecção</h1>
-                    <p class="text-gray-400">Desenhe um retângulo na imagem para definir onde os objetos serão detectados.</p>
+                    <p class="text-gray-400">Desenhe um retângulo na imagem mais recente para definir onde os objetos serão detectados.</p>
                     <div class="mt-2 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
                         <p class="text-sm text-blue-300">
-                            ✅ <strong>CORREÇÃO V2:</strong> Sincronização automática de escalas entre interface web e aplicação da Raspberry Pi
+                            ✅ <strong>NOVA FUNCIONALIDADE:</strong> Imagem carregada automaticamente da última ocorrência registrada
                         </p>
                     </div>
                 </div>
@@ -132,6 +163,12 @@
                             <div id="status-indicator" class="w-3 h-3 bg-yellow-500 rounded-full status-indicator"></div>
                         </div>
                         <div class="flex flex-col sm:flex-row items-stretch w-full sm:w-auto gap-3">
+                            <button id="refreshImageButton" class="refresh-button flex items-center justify-center space-x-2 font-semibold py-3 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                <span>Atualizar Imagem</span>
+                            </button>
                             <button id="clearButton" class="secondary-button flex items-center justify-center space-x-2 font-semibold py-3 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-900">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                 <span>Limpar Zona</span>
@@ -145,10 +182,39 @@
                         </div>
                     </div>
 
+                    <!-- Image Status -->
+                    <div class="mb-4 p-3 bg-gray-700/30 rounded-lg border border-gray-600/50">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div id="image-loading" class="loading-spinner hidden"></div>
+                                <div>
+                                    <p class="text-sm text-gray-300">Status da Imagem:</p>
+                                    <p id="image-status-text" class="text-xs text-gray-400">Carregando última ocorrência...</p>
+                                </div>
+                            </div>
+                            <div id="image-timestamp" class="text-xs text-gray-500">-</div>
+                        </div>
+                    </div>
+
                     <!-- Image and Canvas Container -->
-                    <div id="image-container" class="mx-auto bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50">
-                        <img id="reference-image" src="img/img1.avif" alt="Imagem da Câmera" class="w-full h-auto">
+                    <div id="image-container" class="mx-auto bg-gray-900 rounded-xl overflow-hidden shadow-2xl border border-gray-700/50 relative">
+                        <div id="no-image-placeholder" class="flex flex-col items-center justify-center h-96 text-center">
+                            <div class="loading-spinner mb-4"></div>
+                            <h3 class="text-lg font-semibold text-gray-300 mb-2">Carregando imagem...</h3>
+                            <p class="text-sm text-gray-400">Buscando a imagem mais recente da base de dados</p>
+                        </div>
+                        <img id="reference-image" alt="Última imagem capturada" class="w-full h-auto hidden">
                         <canvas id="zone-canvas"></canvas>
+                        <div id="image-error" class="hidden flex flex-col items-center justify-center h-96 text-center">
+                            <svg class="w-16 h-16 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-red-300 mb-2">Erro ao carregar imagem</h3>
+                            <p class="text-sm text-gray-400 mb-4">Não foi possível carregar a imagem mais recente</p>
+                            <button id="retryLoadImage" class="action-button text-white font-semibold py-2 px-4 rounded-lg">
+                                Tentar Novamente
+                            </button>
+                        </div>
                     </div>
                     
                     <!-- Zone Information Cards -->
@@ -196,7 +262,7 @@
                                 <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                 </svg>
-                                Coordenadas Câmera (1920x1080)
+                                Coordenadas Câmera (1280x720)
                             </h3>
                             <div id="camera-coordinates" class="text-sm text-gray-300 space-y-2">
                                 <div class="flex justify-between">
@@ -217,7 +283,7 @@
                                 </div>
                                 <div class="flex justify-between pt-2 border-t border-gray-700">
                                     <span class="text-gray-500">Escala:</span>
-                                    <span id="scale-factor" class="text-green-400 font-medium">3.0x / 2.25x</span>
+                                    <span id="scale-factor" class="text-green-400 font-medium">2.0x / 1.5x</span>
                                 </div>
                             </div>
                         </div>
@@ -233,19 +299,19 @@
                             <div class="text-sm text-gray-300 space-y-2">
                                 <div class="flex items-start space-x-2">
                                     <div class="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                                    <span>Clique e arraste na imagem para desenhar a zona</span>
+                                    <span>A imagem mais recente é carregada automaticamente</span>
                                 </div>
                                 <div class="flex items-start space-x-2">
                                     <div class="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
-                                    <span>As coordenadas são automaticamente convertidas para a resolução da câmera</span>
+                                    <span>Clique e arraste na imagem para desenhar a zona</span>
                                 </div>
                                 <div class="flex items-start space-x-2">
                                     <div class="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
-                                    <span>Use "Limpar Zona" para remover a seleção atual</span>
+                                    <span>Use "Atualizar Imagem" para recarregar</span>
                                 </div>
                                 <div class="flex items-start space-x-2">
                                     <div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div>
-                                    <span>Clique em "Salvar Zona" para confirmar a configuração</span>
+                                    <span>Salve a zona para aplicar na detecção</span>
                                 </div>
                             </div>
                         </div>
@@ -262,10 +328,11 @@
                             </h3>
                             <div id="debug-info" class="text-xs text-gray-300 space-y-1">
                                 <div>Resolução Web de Referência: 640x480px</div>
-                                <div>Resolução da Câmera: 1920x1080px</div>
-                                <div>Fator de Escala X: 3.0 (1920/640)</div>
-                                <div>Fator de Escala Y: 2.25 (1080/480)</div>
+                                <div>Resolução da Câmera: 1280x720px</div>
+                                <div>Fator de Escala X: 2.0 (1280/640)</div>
+                                <div>Fator de Escala Y: 1.5 (720/480)</div>
                                 <div>Canvas Atual: <span id="canvas-size">-</span></div>
+                                <div>Imagem Carregada: <span id="image-loaded-status">Não</span></div>
                                 <div>Última Operação: <span id="last-operation">Aguardando...</span></div>
                             </div>
                         </div>
@@ -285,7 +352,7 @@
     <script type="module">
         // Import Firebase SDK
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -315,13 +382,125 @@
         const img = document.getElementById('reference-image');
         const ctx = canvas.getContext('2d');
         const statusIndicator = document.getElementById('status-indicator');
+        const noImagePlaceholder = document.getElementById('no-image-placeholder');
+        const imageError = document.getElementById('image-error');
+        const imageStatusText = document.getElementById('image-status-text');
+        const imageTimestamp = document.getElementById('image-timestamp');
+        const imageLoadingSpinner = document.getElementById('image-loading');
+        
         let startX, startY, endX, endY;
         let drawing = false;
         let zone = null;
+        let currentImageData = null;
 
         function updateDebugInfo(operation) {
             document.getElementById('canvas-size').textContent = `${canvas.width}x${canvas.height}px`;
             document.getElementById('last-operation').textContent = operation;
+            document.getElementById('image-loaded-status').textContent = currentImageData ? 'Sim' : 'Não';
+        }
+
+        function showImageLoading(show = true) {
+            if (show) {
+                imageLoadingSpinner.classList.remove('hidden');
+                imageStatusText.textContent = 'Carregando imagem...';
+                imageStatusText.className = 'text-xs text-yellow-400';
+            } else {
+                imageLoadingSpinner.classList.add('hidden');
+            }
+        }
+
+        function showImageError(message = 'Erro ao carregar imagem') {
+            noImagePlaceholder.classList.add('hidden');
+            img.classList.add('hidden');
+            imageError.classList.remove('hidden');
+            
+            imageStatusText.textContent = message;
+            imageStatusText.className = 'text-xs text-red-400';
+            imageTimestamp.textContent = '-';
+            
+            updateDebugInfo('Erro ao carregar imagem');
+        }
+
+        function showImageSuccess(timestamp) {
+            noImagePlaceholder.classList.add('hidden');
+            imageError.classList.add('hidden');
+            img.classList.remove('hidden');
+            
+            imageStatusText.textContent = 'Imagem carregada com sucesso';
+            imageStatusText.className = 'text-xs text-green-400';
+            
+            const date = new Date(timestamp);
+            imageTimestamp.textContent = date.toLocaleString('pt-BR');
+            
+            updateDebugInfo('Imagem carregada com sucesso');
+        }
+
+        async function loadLatestImage() {
+            try {
+                console.log('📸 Carregando imagem mais recente...');
+                showImageLoading(true);
+
+                const alertasCollection = collection(db, 'alertas_epi');
+                const q = query(alertasCollection, orderBy('data_hora', 'desc'), limit(1));
+                const snapshot = await getDocs(q);
+
+                showImageLoading(false);
+
+                if (snapshot.empty) {
+                    console.log('❌ Nenhuma imagem encontrada na coleção alertas_epi');
+                    showImageError('Nenhuma imagem encontrada na base de dados');
+                    showFeedback('Nenhuma imagem encontrada. Adicione ocorrências para poder configurar a zona.', 'warning');
+                    return;
+                }
+
+                const doc = snapshot.docs[0];
+                const data = doc.data();
+                currentImageData = data;
+
+                console.log('📄 Dados da imagem mais recente:', {
+                    id: doc.id,
+                    data_hora: data.data_hora,
+                    mensagem: data.mensagem,
+                    hasImage: !!data.imagem_base64
+                });
+
+                if (!data.imagem_base64) {
+                    console.log('❌ Imagem base64 não encontrada no documento');
+                    showImageError('Imagem não disponível no documento');
+                    showFeedback('A ocorrência mais recente não contém imagem.', 'error');
+                    return;
+                }
+
+                // Carrega a imagem
+                const imageDataUrl = `data:image/jpeg;base64,${data.imagem_base64}`;
+                
+                return new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        console.log('✅ Imagem carregada com sucesso!');
+                        showImageSuccess(data.data_hora);
+                        resizeCanvas();
+                        loadExistingZone();
+                        showFeedback('Imagem carregada com sucesso! Agora você pode definir a zona de detecção.', 'success');
+                        resolve();
+                    };
+                    
+                    img.onerror = () => {
+                        console.log('❌ Erro ao carregar a imagem');
+                        showImageError('Erro ao decodificar imagem');
+                        showFeedback('Erro ao carregar a imagem. Tente novamente.', 'error');
+                        reject(new Error('Erro ao carregar imagem'));
+                    };
+                    
+                    img.src = imageDataUrl;
+                });
+
+            } catch (error) {
+                console.error('❌ Erro ao buscar imagem mais recente:', error);
+                showImageLoading(false);
+                showImageError('Erro de conexão com a base de dados');
+                showFeedback('Erro ao carregar imagem: ' + error.message, 'error');
+                updateDebugInfo('Erro: ' + error.message);
+            }
         }
 
         function resizeCanvas() {
@@ -488,10 +667,6 @@
         }
 
         window.addEventListener('resize', resizeCanvas);
-        img.onload = () => {
-            resizeCanvas();
-            loadExistingZone();
-        };
         
         async function loadExistingZone() {
             try {
@@ -526,6 +701,11 @@
         }
 
         canvas.addEventListener('mousedown', (e) => {
+            if (!currentImageData) {
+                showFeedback('Carregue uma imagem antes de definir a zona.', 'warning');
+                return;
+            }
+            
             const rect = canvas.getBoundingClientRect();
             startX = e.clientX - rect.left;
             startY = e.clientY - rect.top;
@@ -535,7 +715,7 @@
         });
 
         canvas.addEventListener('mousemove', (e) => {
-            if (!drawing) return;
+            if (!drawing || !currentImageData) return;
             
             const rect = canvas.getBoundingClientRect();
             endX = e.clientX - rect.left;
@@ -557,7 +737,7 @@
         });
 
         canvas.addEventListener('mouseup', () => {
-            if (!drawing) return;
+            if (!drawing || !currentImageData) return;
             
             drawing = false;
             const width = endX - startX;
@@ -569,6 +749,7 @@
                 console.log('⚠️ Zona muito pequena, ignorando');
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 updateDebugInfo('Zona muito pequena - ignorada');
+                showFeedback('Zona muito pequena. Desenhe uma área maior.', 'warning');
                 return;
             }
             
@@ -583,11 +764,17 @@
             console.log('✅ Nova zona criada:', zone);
             drawZone();
             updateCoordinatesDisplay();
+            showFeedback('Zona definida! Clique em "Salvar Zona" para confirmar.', 'info');
         });
 
         document.getElementById('saveButton').addEventListener('click', async () => {
             if (!zone) {
                 showFeedback('Nenhuma zona definida.', 'error');
+                return;
+            }
+            
+            if (!currentImageData) {
+                showFeedback('Carregue uma imagem antes de salvar a zona.', 'warning');
                 return;
             }
             
@@ -609,6 +796,10 @@
                 await setDoc(docRef, {
                     zones: [webZone],
                     lastUpdated: new Date().toISOString(),
+                    baseImage: {
+                        timestamp: currentImageData.data_hora,
+                        message: currentImageData.mensagem
+                    },
                     debug_info: {
                         canvas_size: `${canvas.width}x${canvas.height}`,
                         web_reference: `${WEB_REFERENCE_RESOLUTION.width}x${WEB_REFERENCE_RESOLUTION.height}`,
@@ -638,6 +829,16 @@
             updateCoordinatesDisplay();
             showFeedback('Zona limpa. Desenhe uma nova zona.', 'warning');
             updateDebugInfo('Zona limpa pelo usuário');
+        });
+
+        document.getElementById('refreshImageButton').addEventListener('click', () => {
+            console.log('🔄 Recarregando imagem...');
+            loadLatestImage();
+        });
+
+        document.getElementById('retryLoadImage').addEventListener('click', () => {
+            console.log('🔄 Tentando carregar imagem novamente...');
+            loadLatestImage();
         });
 
         function showFeedback(message, type) {
@@ -674,12 +875,15 @@
         if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
         // Inicialização
-        resizeCanvas();
         updateCoordinatesDisplay();
         updateDebugInfo('Sistema inicializado');
         
-        console.log('🎬 Sistema de configuração de zona inicializado com sincronização corrigida!');
+        // Carrega a imagem mais recente automaticamente
+        loadLatestImage();
+        
+        console.log('🎬 Sistema de configuração de zona inicializado com imagem dinâmica!');
         console.log(`📐 Fatores de escala: X=${SCALE_X}, Y=${SCALE_Y}`);
     </script>
+    <script type="module" src="./static/js/logout.js"></script>
 </body>
 </html>
