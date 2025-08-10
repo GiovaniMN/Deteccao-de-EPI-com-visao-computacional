@@ -9,6 +9,8 @@
     <title>Jupiter Supervision - Supervisão Inteligente de EPIs</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- EmailJS -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="module" src="./static/js/authGuard.js"></script>
     <style>
         body {
@@ -41,6 +43,20 @@
         .tech-grid {
             background-image: radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.15) 1px, transparent 0);
             background-size: 20px 20px;
+        }
+        
+        .spinner {
+            border: 2px solid #374151;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
     <script type="module" src="./static/js/logout.js"></script>
@@ -312,91 +328,303 @@
 
     <!-- Contact Modal -->
     <div id="contactModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-sm w-full border border-gray-700">
+        <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-lg w-full border border-gray-700">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-semibold text-white">Contato</h3>
+                <h3 class="text-xl font-semibold text-white">Entre em Contato</h3>
                 <button id="closeModalButton" class="w-10 h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full flex items-center justify-center transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
+            
             <form id="contactForm" class="space-y-4">
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-300">E-mail</label>
-                    <input type="email" id="email" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="seuemail@exemplo.com" required>
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Nome Completo *</label>
+                    <input type="text" id="name" name="name" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Seu nome completo" required>
                 </div>
+                
                 <div>
-                    <label for="telefone" class="block text-sm font-medium text-gray-300">Telefone</label>
-                    <input type="tel" id="telefone" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="(11) 91234-5678">
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-1">E-mail *</label>
+                    <input type="email" id="email" name="email" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="seuemail@exemplo.com" required>
                 </div>
+                
                 <div>
-                    <label for="mensagem" class="block text-sm font-medium text-gray-300">Mensagem</label>
-                    <textarea id="mensagem" rows="4" class="mt-1 block w-full rounded-md bg-gray-900 border border-gray-700 text-white p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Escreva sua mensagem aqui..." required></textarea>
+                    <label for="telefone" class="block text-sm font-medium text-gray-300 mb-1">Telefone</label>
+                    <input type="tel" id="telefone" name="telefone" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="(11) 91234-5678">
                 </div>
-                <div class="text-right">
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-all">
-      Enviar
-    </button>
+                
+                <div>
+                    <label for="company" class="block text-sm font-medium text-gray-300 mb-1">Empresa</label>
+                    <input type="text" id="company" name="company" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Nome da sua empresa">
                 </div>
-                <p id="formFeedback" class="hidden text-green-400 mt-4 text-center">Mensagem enviada com sucesso!</p>
+                
+                <div>
+                    <label for="mensagem" class="block text-sm font-medium text-gray-300 mb-1">Mensagem *</label>
+                    <textarea id="mensagem" name="mensagem" rows="4" class="w-full rounded-lg bg-gray-900 border border-gray-700 text-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="Conte-nos sobre seu interesse no Jupiter Supervision..." required></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancelButton" class="px-6 py-2 border border-gray-600 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submitButton" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition-all flex items-center space-x-2">
+                        <span>Enviar</span>
+                        <div id="loadingSpinner" class="hidden spinner"></div>
+                    </button>
+                </div>
             </form>
-
+            
+            <!-- Success/Error Messages -->
+            <div id="successMessage" class="hidden mt-4 p-4 bg-green-900/50 border border-green-500/50 text-green-400 rounded-lg">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Mensagem enviada com sucesso! Entraremos em contato em breve.</span>
+                </div>
+            </div>
+            
+            <div id="errorMessage" class="hidden mt-4 p-4 bg-red-900/50 border border-red-500/50 text-red-400 rounded-lg">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6m0 0l-6-6m6 6l-6-6"></path>
+                    </svg>
+                    <span id="errorText">Erro ao enviar mensagem. Tente novamente.</span>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
+        // Initialize EmailJS with your configured keys
+        let emailjsReady = false;
+        
+        try {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init("_IMI1xksu8m22BH_b"); // Sua Public Key configurada
+                emailjsReady = true;
+                console.log('✅ EmailJS inicializado com sucesso');
+            }
+        } catch (error) {
+            console.warn('❌ Erro ao inicializar EmailJS:', error);
+            emailjsReady = false;
+        }
+        
+        // Modal controls
         const contactButton = document.getElementById('contactButton');
+        const contactButtonMobile = document.getElementById('contactButtonMobile');
         const contactModal = document.getElementById('contactModal');
         const closeModalButton = document.getElementById('closeModalButton');
-        const copyEmailButton = document.getElementById('copyEmailButton');
-        const emailText = document.getElementById('emailText');
-        const copyFeedback = document.getElementById('copyFeedback');
-
-        contactButton.addEventListener('click', () => {
-            contactModal.classList.remove('hidden');
-        });
-
-        // New: Mobile menu toggle
+        const cancelButton = document.getElementById('cancelButton');
         const mobileMenuButton = document.getElementById('mobileMenuButton');
         const mobileMenu = document.getElementById('mobileMenu');
-        const contactButtonMobile = document.getElementById('contactButtonMobile');
 
+        // Form elements
+        const form = document.getElementById('contactForm');
+        const submitButton = document.getElementById('submitButton');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+
+        // Open modal
+        function openModal() {
+            contactModal.classList.remove('hidden');
+            resetForm();
+        }
+
+        // Close modal
+        function closeModal() {
+            contactModal.classList.add('hidden');
+            resetForm();
+        }
+
+        // Reset form and messages
+        function resetForm() {
+            form.reset();
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
+            setLoadingState(false);
+        }
+
+        // Set loading state
+        function setLoadingState(loading) {
+            if (loading) {
+                submitButton.disabled = true;
+                submitButton.querySelector('span').textContent = 'Enviando...';
+                loadingSpinner.classList.remove('hidden');
+            } else {
+                submitButton.disabled = false;
+                submitButton.querySelector('span').textContent = 'Enviar';
+                loadingSpinner.classList.add('hidden');
+            }
+        }
+
+        // Show success message
+        function showSuccess() {
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+        }
+
+        // Show error message
+        function showError(message = 'Erro ao enviar mensagem. Tente novamente.') {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+        }
+
+        // Event listeners
+        contactButton.addEventListener('click', openModal);
+        
+        if (contactButtonMobile) {
+            contactButtonMobile.addEventListener('click', () => {
+                openModal();
+                mobileMenu.classList.add('hidden');
+            });
+        }
+
+        closeModalButton.addEventListener('click', closeModal);
+        cancelButton.addEventListener('click', closeModal);
+
+        // Close modal when clicking outside
+        contactModal.addEventListener('click', (e) => {
+            if (e.target === contactModal) {
+                closeModal();
+            }
+        });
+
+        // Mobile menu toggle
         if (mobileMenuButton) {
             mobileMenuButton.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
             });
         }
 
-        if (contactButtonMobile) {
-            contactButtonMobile.addEventListener('click', () => {
-                contactModal.classList.remove('hidden');
-                mobileMenu.classList.add('hidden'); // Close mobile menu when contact modal opens
-            });
-        }
+        // Form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            setLoadingState(true);
+            successMessage.classList.add('hidden');
+            errorMessage.classList.add('hidden');
 
-        closeModalButton.addEventListener('click', () => {
-            contactModal.classList.add('hidden');
-        });
+            // Get form data and ensure no undefined values
+            const formData = {
+                name: document.getElementById('name').value.trim() || '',
+                email: document.getElementById('email').value.trim() || '',
+                telefone: document.getElementById('telefone').value.trim() || '',
+                company: document.getElementById('company').value.trim() || '',
+                mensagem: document.getElementById('mensagem').value.trim() || ''
+            };
 
-        contactModal.addEventListener('click', (e) => {
-            if (e.target === contactModal) {
-                contactModal.classList.add('hidden');
+            // Validate required fields
+            if (!formData.name || !formData.email || !formData.mensagem) {
+                showError('Por favor, preencha todos os campos obrigatórios.');
+                setLoadingState(false);
+                return;
             }
-        });
 
-        copyEmailButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(emailText.textContent).then(() => {
-                copyFeedback.classList.remove('hidden');
-                setTimeout(() => {
-                    copyFeedback.classList.add('hidden');
-                }, 2000);
-            });
+            let emailSent = false;
+            let emailError = '';
+
+            try {
+                // Check if EmailJS is configured and ready
+                if (!emailjsReady || typeof emailjs === 'undefined') {
+                    throw new Error('EmailJS não está configurado corretamente');
+                }
+
+                console.log('📧 Enviando email via EmailJS...');
+
+                // Send email via EmailJS with your configured IDs
+                const emailResponse = await emailjs.send(
+                    'service_zndz5fl',    // Seu Service ID configurado
+                    'template_jr149ik',   // Seu Template ID configurado
+                    {
+                        to_email: formData.email,
+                        from_name: 'Jupiter Supervision',
+                        reply_to: 'contato@jupitersupervision.com', // Substitua pelo seu email real
+                        subject: 'Obrigado pelo seu interesse no Jupiter Supervision!',
+                        user_name: formData.name,
+                        user_email: formData.email,
+                        user_phone: formData.telefone || 'Não informado',
+                        user_company: formData.company || 'Não informada',
+                        user_message: formData.mensagem
+                    }
+                );
+
+                console.log('✅ Email enviado com sucesso:', emailResponse);
+                emailSent = true;
+
+            } catch (error) {
+                console.warn('Erro ao enviar email:', error);
+                emailSent = false;
+                emailError = error.message || String(error);
+            }
+
+            // Always try to save to Firebase
+            try {
+                if (window.firebaseLoaded) {
+                    const { db } = await import('./static/js/firebaseConfig.js');
+                    const { collection, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+                    
+                    // Prepare data for Firebase (no undefined values)
+                    const firebaseData = {
+                        name: formData.name,
+                        email: formData.email,
+                        telefone: formData.telefone,
+                        company: formData.company,
+                        mensagem: formData.mensagem,
+                        timestamp: serverTimestamp(),
+                        emailSent: emailSent
+                    };
+
+                    // Only add error field if there was an error and it's not empty
+                    if (!emailSent && emailError) {
+                        firebaseData.emailError = emailError;
+                    }
+
+                    await addDoc(collection(db, 'contato'), firebaseData);
+                    console.log('Dados salvos no Firebase com sucesso');
+                }
+
+                // Show appropriate success message
+                if (emailSent) {
+                    showSuccess();
+                    setTimeout(() => {
+                        closeModal();
+                    }, 3000);
+                } else {
+                    showError('Dados salvos com sucesso. Nossa equipe entrará em contato em breve.');
+                }
+
+                form.reset();
+
+            } catch (firebaseError) {
+                console.error('Erro ao salvar no Firebase:', firebaseError);
+                
+                if (emailSent) {
+                    showSuccess();
+                    setTimeout(() => {
+                        closeModal();
+                    }, 3000);
+                } else {
+                    showError('Erro ao processar solicitação. Tente novamente ou entre em contato diretamente.');
+                }
+            } finally {
+                setLoadingState(false);
+            }
         });
     </script>
 
+    <!-- Firebase Script (keep existing functionality) -->
     <script type="module">
-        import { db } from './static/js/firebaseConfig.js'; import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"; const form = document.getElementById("contactForm"); const feedback = document.getElementById("formFeedback");
-        form.addEventListener("submit", async (e) => { e.preventDefault(); const email = document.getElementById("email").value.trim(); const telefone = document.getElementById("telefone").value.trim(); const mensagem = document.getElementById("mensagem").value.trim();
-        try { await addDoc(collection(db, "contato"), { email, telefone, mensagem }); feedback.classList.remove("hidden"); form.reset(); } catch (error) { alert("Erro ao enviar: " + error.message); } });
+        try {
+            const { db } = await import('./static/js/firebaseConfig.js');
+            window.firebaseLoaded = true;
+            console.log('Firebase carregado com sucesso');
+        } catch (error) {
+            console.warn('Firebase não carregado:', error);
+            window.firebaseLoaded = false;
+        }
     </script>
 
 </body>
