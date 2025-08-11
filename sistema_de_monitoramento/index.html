@@ -293,15 +293,10 @@
                 Pronto para Revolucionar a Segurança?
             </h2>
             <p class="text-lg text-blue-100 mb-6 max-w-2xl mx-auto">
-                Implemente o Jupiter Supervision em sua empresa e garanta 100% de conformidade com as normas de segurança.
+                Implemente o Jupiter Supervision em sua empresa.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="location.href='login.html'" class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105">
-                    Começar Agora
-                </button>
-                <button class="border-2 border-white text-white px-6 py-3 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-200">
-                    Solicitar Demo
-                </button>
+                <button id="contactButton2" class="border-2 border-white text-white px-6 py-3 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-200">Solicite já</button>
             </div>
         </div>
     </section>
@@ -411,6 +406,7 @@
         
         // Modal controls
         const contactButton = document.getElementById('contactButton');
+        const contactButton2 = document.getElementById('contactButton2');
         const contactButtonMobile = document.getElementById('contactButtonMobile');
         const contactModal = document.getElementById('contactModal');
         const closeModalButton = document.getElementById('closeModalButton');
@@ -474,6 +470,7 @@
 
         // Event listeners
         contactButton.addEventListener('click', openModal);
+        contactButton2.addEventListener('click', openModal); // Adicionado o event listener para o botão "Solicite já"
         
         if (contactButtonMobile) {
             contactButtonMobile.addEventListener('click', () => {
