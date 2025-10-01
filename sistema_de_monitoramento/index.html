@@ -144,7 +144,7 @@
             <!-- Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
                 <div class="glass-effect rounded-2xl p-5 border border-white/10">
-                    <div class="text-2xl font-bold text-blue-400 mb-1">Detecção Flexível</div>
+                    <div class="text-2xl font-bold text-blue-400 mb-1">Detecção de EPI</div>
                     <div class="text-gray-300 text-sm">Capacetes, óculos e botas</div>
                 </div>
                 <div class="glass-effect rounded-2xl p-5 border border-white/10">
@@ -179,7 +179,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-3">Detecção Rápida</h3>
-                    <p class="text-gray-400 text-sm">Identifica em minutos a presença ou ausência de EPIs usando algoritmos de visão computacional avançados.</p>
+                    <p class="text-gray-400 text-sm">Identifica a presença ou ausência de EPIs em segundos utilizando ferramentas de visão computacional.</p>
                 </div>
 
                 <!-- Feature 2 -->
@@ -201,7 +201,7 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-semibold text-white mb-3">Dashboard Analítico</h3>
-                    <p class="text-gray-400 text-sm">Visualize estatísticas detalhadas, histórico de ocorrências e relatórios de conformidade em tempo real.</p>
+                    <p class="text-gray-400 text-sm">Visualize estatísticas e histórico de ocorrências.</p>
                 </div>
 
                 <!-- Feature 4 -->
@@ -253,9 +253,9 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div class="text-center group">
                     <div class="w-16 h-16 bg-gray-800/50 border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                        <span class="text-white font-bold text-base">YOLOv8</span>
+                        <img src="https://cdn.prod.website-files.com/680a070c3b99253410dd3dcf/680a070c3b99253410dd3e61_Ultralytics_mark_blue.svg" alt="Ultralytics Logo" class="w-full h-full">
                     </div>
-                    <h3 class="text-white font-semibold mb-1">YOLOv8</h3>
+                    <h3 class="text-white font-semibold mb-1">Yolov8n</h3>
                     <p class="text-gray-400 text-xs">Detecção de objetos em tempo real</p>
                 </div>
 
@@ -293,15 +293,10 @@
                 Pronto para Revolucionar a Segurança?
             </h2>
             <p class="text-lg text-blue-100 mb-6 max-w-2xl mx-auto">
-                Implemente o Jupiter Supervision em sua empresa e garanta 100% de conformidade com as normas de segurança.
+                Implemente o Jupiter Supervision em sua empresa.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="location.href='login.html'" class="bg-white text-blue-600 px-6 py-3 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-all duration-200 transform hover:scale-105">
-                    Começar Agora
-                </button>
-                <button class="border-2 border-white text-white px-6 py-3 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-200">
-                    Solicitar Demo
-                </button>
+                <button id="contactButton2" class="border-2 border-white text-white px-6 py-3 rounded-xl font-semibold text-lg hover:bg-white hover:text-blue-600 transition-all duration-200">Solicite já</button>
             </div>
         </div>
     </section>
@@ -411,6 +406,7 @@
         
         // Modal controls
         const contactButton = document.getElementById('contactButton');
+        const contactButton2 = document.getElementById('contactButton2');
         const contactButtonMobile = document.getElementById('contactButtonMobile');
         const contactModal = document.getElementById('contactModal');
         const closeModalButton = document.getElementById('closeModalButton');
@@ -474,6 +470,7 @@
 
         // Event listeners
         contactButton.addEventListener('click', openModal);
+        contactButton2.addEventListener('click', openModal); // Adicionado o event listener para o botão "Solicite já"
         
         if (contactButtonMobile) {
             contactButtonMobile.addEventListener('click', () => {
