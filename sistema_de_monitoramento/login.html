@@ -20,14 +20,45 @@
         body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
         .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .dev-info { 
+            position: fixed; 
+            bottom: 10px; 
+            right: 10px; 
+            opacity: 0; 
+            transition: opacity 0.3s; 
+            z-index: 1000;
+        }
+        .dev-info.show { opacity: 1; }
+        .dev-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s;
+        }
+        .dev-toggle:hover {
+            background: rgba(255,255,255,0.1);
+        }
     </style>
 
      <script type="module" src="static/js/authGuard.js"></script>
- 
-  <script type="module" src="static/js/loginHandler.js"></script>
+     <script type="module" src="static/js/loginHandler.js"></script>
   
 </head>
 <body class="bg-gray-900 min-h-screen flex items-center justify-center relative overflow-hidden">
+    <!-- Developer Mode Toggle (apenas visível em desenvolvimento) -->
+    <button class="dev-toggle" onclick="toggleDevInfo()" title="Toggle Developer Info">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+    </button>
+
     <!-- Background Effects -->
     <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900"></div>
     <div class="absolute top-0 left-0 w-full h-full">
@@ -79,7 +110,6 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                         </div>
-
                     </div>
                 </div>
 
@@ -136,30 +166,30 @@
                 </button>
             </form>
 
-            <!-- Additional Info -->
+            <!-- Security Info (sem credenciais expostas) -->
             <div class="mt-5 pt-5 border-t border-gray-700/50">
                 <div class="text-center">
                     <p class="text-xs text-gray-400 mb-2">
-                        Usuário padrão: <strong>adm</strong> | Senha: <strong>123</strong>
+                        Sistema protegido por autenticação segura
                     </p>
                     <div class="flex flex-wrap items-center justify-center gap-2 text-xs text-gray-500">
                         <span class="flex items-center">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                             </svg>
-                            Seguro
+                            Criptografia AES
                         </span>
                         <span class="flex items-center">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                             </svg>
-                            Rápido
+                            Acesso Rápido
                         </span>
                         <span class="flex items-center">
                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            24/7
+                            Disponível 24/7
                         </span>
                     </div>
                 </div>
@@ -177,6 +207,36 @@
         </div>
     </div>
 
+    <!-- Developer Info (oculta por padrão) -->
+    <div id="devInfo" class="dev-info">
+        <div class="bg-black/80 backdrop-blur-sm border border-gray-700 rounded-lg p-3 text-xs text-white max-w-sm">
+            <div class="flex items-center mb-2">
+                <svg class="w-4 h-4 mr-2 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.764 0L3.05 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <span class="font-semibold text-yellow-400">Modo Desenvolvedor</span>
+            </div>
+            <p class="text-gray-300 mb-2">Credenciais de teste:</p>
+            <div class="space-y-1">
+                <div>
+                    <span class="text-gray-400">Usuário:</span>
+                    <span class="ml-1 font-mono bg-gray-800 px-1 rounded">adm</span>
+                    <button onclick="copyToClipboard('adm')" class="ml-2 text-blue-400 hover:text-blue-300" title="Copiar">
+                        📋
+                    </button>
+                </div>
+                <div>
+                    <span class="text-gray-400">Senha:</span>
+                    <span class="ml-1 font-mono bg-gray-800 px-1 rounded">123</span>
+                    <button onclick="copyToClipboard('123')" class="ml-2 text-blue-400 hover:text-blue-300" title="Copiar">
+                        📋
+                    </button>
+                </div>
+            </div>
+            <p class="text-red-400 text-xs mt-2">⚠️ Remover em produção</p>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
     <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
@@ -185,6 +245,48 @@
     <!-- Your Scripts -->
     <script type="module" src="./static/js/firebaseConfig.js"></script>
     <script type="module" src="./static/js/loginHandler.js"></script>
+
+    <script>
+        let devInfoVisible = false;
+        
+        function toggleDevInfo() {
+            const devInfo = document.getElementById('devInfo');
+            devInfoVisible = !devInfoVisible;
+            
+            if (devInfoVisible) {
+                devInfo.classList.add('show');
+            } else {
+                devInfo.classList.remove('show');
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Feedback visual opcional
+                console.log('Copiado: ' + text);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
+        }
+
+        // Ocultar informações de desenvolvedor em produção
+        // Detecta se está em ambiente de desenvolvimento
+        const isDevelopment = window.location.hostname === 'localhost' || 
+                             window.location.hostname === '127.0.0.1' || 
+                             window.location.hostname.includes('dev');
+
+        // Se não estiver em desenvolvimento, oculta completamente o botão de dev
+        if (!isDevelopment) {
+            document.querySelector('.dev-toggle').style.display = 'none';
+        }
+
+        // Shortcut para desenvolvedores: Ctrl+Shift+D
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.shiftKey && event.key === 'D' && isDevelopment) {
+                toggleDevInfo();
+            }
+        });
+    </script>
 
 </body>
 </html>
