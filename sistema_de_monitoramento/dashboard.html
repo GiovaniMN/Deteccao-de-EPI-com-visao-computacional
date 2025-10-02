@@ -8,6 +8,7 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="./static/js/authGuard.js"></script>
+  <link rel="stylesheet" href="./static/css/dashboard.css">
 </head>
 <body class="bg-gray-900 text-white">
     <!-- Header -->
@@ -78,18 +79,37 @@
   <main class="flex-grow p-6">
     <h1 class="text-3xl font-bold mb-6 text-gray-200">Dashboard de Ocorrências</h1>
 
+    <!-- KPIs Melhorados -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <div class="bg-gray-800 p-4 rounded-xl">
-        <h3 class="text-lg font-semibold text-gray-400">Total de Ocorrências</h3>
-        <p id="kpi-total-ocorrencias" class="text-3xl mt-2 font-semibold">-</p>
+      <!-- Total de Ocorrências -->
+      <div class="kpi-card bg-gray-800/50 border-gray-700/50">
+        <div class="kpi-icon bg-blue-500/20 text-blue-400">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2a4 4 0 00-4-4H3V9a4 4 0 004-4h2a4 4 0 004-4v2m-6 16h12a2 2 0 002-2v-6a2 2 0 00-2-2h-1.333a4 4 0 01-3.16-1.5M9 17v-2a4 4 0 014-4h2m0 0V9a4 4 0 014-4h2a4 4 0 014 4v2" /></svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-gray-400">Total de Ocorrências (7d)</h3>
+          <p id="kpi-total-ocorrencias" class="text-3xl mt-1 font-semibold text-white">-</p>
+        </div>
       </div>
-      <div class="bg-gray-800 p-4 rounded-xl">
-        <h3 class="text-lg font-semibold text-gray-400">Dia Mais Crítico</h3>
-        <p id="kpi-dia-critico" class="text-3xl mt-2 font-semibold">-</p>
+      <!-- Dia Mais Crítico -->
+      <div class="kpi-card bg-gray-800/50 border-gray-700/50">
+        <div class="kpi-icon bg-yellow-500/20 text-yellow-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-gray-400">Dia Mais Crítico</h3>
+          <p id="kpi-dia-critico" class="text-2xl mt-1 font-semibold text-white">-</p>
+        </div>
       </div>
-      <div class="bg-gray-800 p-4 rounded-xl">
-        <h3 class="text-lg font-semibold text-gray-400">Principal Infração</h3>
-        <p id="kpi-principal-infracao" class="text-3xl mt-2 font-semibold">-</p>
+      <!-- Principal Infração -->
+      <div class="kpi-card bg-gray-800/50 border-gray-700/50">
+        <div class="kpi-icon bg-red-500/20 text-red-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        <div class="ml-4">
+          <h3 class="text-lg font-semibold text-gray-400">Principal Infração</h3>
+          <p id="kpi-principal-infracao" class="text-2xl mt-1 font-semibold text-white">-</p>
+        </div>
       </div>
     </div>
 
@@ -219,25 +239,7 @@
     });
   </script>
   <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
-  <script>
-    // Sidebar toggle functionality
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-    function toggleSidebar() {
-        sidebar.classList.toggle('-translate-x-full');
-        sidebarOverlay.classList.toggle('hidden');
-    }
-
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', toggleSidebar);
-    }
-
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', toggleSidebar);
-    }
-  </script>
+  <script type="module" src="./static/js/sidebar.js"></script>
   <script type="module" src="./static/js/logout.js"></script>
 </body>
 </html>
