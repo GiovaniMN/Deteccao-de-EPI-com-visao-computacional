@@ -1,0 +1,5 @@
+
+        body { font-family: 'Inter', sans-serif; }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
+        body.modal-open { overflow: hidden; }
+    
