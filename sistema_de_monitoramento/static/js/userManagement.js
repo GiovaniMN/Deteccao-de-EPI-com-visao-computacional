@@ -1,5 +1,5 @@
 import { db } from './firebaseConfig.js';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 // Chave AES para criptografia simétrica (use algo mais seguro em produção)
 const AES_KEY = "chaveSuperSecreta123!";
@@ -13,86 +13,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     const feedbackP = document.getElementById('userManagementFeedback');
 
     const DEFAULT_ADMIN_USER = 'adm';
-    const DEFAULT_ADMIN_PASSWORD = '123';
 
     // 🔐 Criptografa senha com AES
     function criptografarSenhaAES(senha) {
         return CryptoJS.AES.encrypt(senha, AES_KEY).toString();
     }
 
-    async function initializeAdminUser() {
-        try {
-            const usersCollection = collection(db, 'senha_login');
-            const q = query(usersCollection, where('user', '==', DEFAULT_ADMIN_USER));
-            const querySnapshot = await getDocs(q);
-
-            if (querySnapshot.empty) {
-                const senhaCriptografada = criptografarSenhaAES(DEFAULT_ADMIN_PASSWORD);
-                await addDoc(usersCollection, {
-                    user: DEFAULT_ADMIN_USER,
-                    pass: senhaCriptografada
-                });
-                console.log('Admin user criado com sucesso.');
-            } else {
-                console.log('Admin user já existe.');
-            }
-        } catch (error) {
-            console.error("Erro ao inicializar admin:", error);
-        }
+    // Função para buscar usuários uma única vez (para validação)
+    async function getUsersOnce() {
+        const usersCollection = collection(db, 'senha_login');
+        const querySnapshot = await getDocs(usersCollection);
+        const users = [];
+        querySnapshot.forEach((doc) => {
+            users.push({ id: doc.id, ...doc.data() });
+        });
+        return users;
     }
 
-    await initializeAdminUser();
-
-    async function getUsersFromFirebase() {
-        try {
-            const usersCollection = collection(db, 'senha_login');
-            const querySnapshot = await getDocs(usersCollection);
-            const users = [];
-            querySnapshot.forEach((doc) => {
-                users.push({ id: doc.id, ...doc.data() });
-            });
-            return users;
-        } catch (error) {
-            console.error("Erro ao buscar usuários:", error);
-            return [];
-        }
-    }
-
-    async function saveUserToFirebase(userData) {
-        try {
-            const usersCollection = collection(db, 'senha_login');
-            await addDoc(usersCollection, userData);
-            return true;
-        } catch (error) {
-            console.error("Erro ao salvar usuário:", error);
-            return false;
-        }
-    }
-
-    async function deleteUserFromFirebase(userId) {
-        try {
-            await deleteDoc(doc(db, 'senha_login', userId));
-            return true;
-        } catch (error) {
-            console.error("Erro ao deletar usuário:", error);
-            return false;
-        }
-    }
-
-    function displayFeedback(message, isError = false) {
-        if (feedbackP) {
-            feedbackP.textContent = message;
-            feedbackP.className = isError
-                ? 'mt-4 text-center text-sm text-red-400'
-                : 'mt-4 text-center text-sm text-green-400';
-        }
-    }
-
-    async function renderUserList() {
+    function renderUserList(users) {
         if (!userListUL) return;
 
-        userListUL.innerHTML = '';
-        const users = await getUsersFromFirebase();
+        userListUL.innerHTML = ''; // Limpa a lista antes de renderizar
 
         if (users.length === 0) {
             const li = document.createElement('li');
@@ -104,10 +45,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         users.forEach(user => {
             const li = document.createElement('li');
-            li.className = 'flex items-center justify-between bg-[#303030] p-3 rounded-md shadow';
+            li.className = 'flex items-center justify-between bg-gray-700/50 p-3 rounded-xl shadow';
 
             const usernameSpan = document.createElement('span');
-            usernameSpan.className = 'text-gray-200';
+            usernameSpan.className = 'text-gray-200 font-medium';
             usernameSpan.textContent = user.user;
             li.appendChild(usernameSpan);
 
@@ -115,16 +56,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Excluir';
                 deleteButton.dataset.userId = user.id;
-                deleteButton.className = 'deleteUserButton text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1 rounded-md bg-transparent border border-red-400 hover:bg-red-400 hover:text-gray-900 transition-colors';
+                deleteButton.dataset.userName = user.user; // Adiciona para a mensagem de confirmação
+                deleteButton.className = 'deleteUserButton text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1 rounded-lg border border-red-500/50 hover:bg-red-500/20 transition-colors';
                 li.appendChild(deleteButton);
             } else {
                 const adminLabel = document.createElement('span');
-                adminLabel.textContent = '(Admin)';
-                adminLabel.className = 'text-xs text-gray-500 ml-2';
+                adminLabel.textContent = 'Admin';
+                adminLabel.className = 'text-xs font-semibold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-full';
                 li.appendChild(adminLabel);
             }
 
             userListUL.appendChild(li);
+        });
+    }
+
+    // Listener em tempo real para a lista de usuários
+    function listenForUserChanges() {
+        const usersCollection = collection(db, 'senha_login');
+        onSnapshot(query(usersCollection), (snapshot) => {
+            console.log("🔥 Lista de usuários atualizada em tempo real!");
+            const users = [];
+            snapshot.forEach((doc) => {
+                users.push({ id: doc.id, ...doc.data() });
+            });
+            renderUserList(users);
+        }, (error) => {
+            console.error("Erro ao escutar por usuários: ", error);
+            displayFeedback("Erro ao carregar a lista de usuários.", true);
         });
     }
 
@@ -136,33 +94,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         const confirmPassword = confirmPasswordInput?.value;
 
         if (!username || !password) {
-            displayFeedback("Usuário e senha são obrigatórios.", true);
-            return;
+            return displayFeedback("Usuário e senha são obrigatórios.", true);
         }
-
         if (password !== confirmPassword) {
-            displayFeedback("As senhas não coincidem.", true);
-            return;
+            return displayFeedback("As senhas não coincidem.", true);
         }
 
-        const users = await getUsersFromFirebase();
-        if (users.find(u => u.user.toLowerCase() === username.toLowerCase())) {
-            displayFeedback("Este nome de usuário já existe.", true);
-            return;
+        // Valida se o usuário já existe antes de adicionar
+        const existingUsers = await getUsersOnce();
+        if (existingUsers.find(u => u.user.toLowerCase() === username.toLowerCase())) {
+            return displayFeedback("Este nome de usuário já existe.", true);
         }
 
         const senhaCriptografada = criptografarSenhaAES(password);
-
-        const success = await saveUserToFirebase({
-            user: username,
-            pass: senhaCriptografada
-        });
-
-        if (success) {
+        try {
+            await addDoc(collection(db, 'senha_login'), { user: username, pass: senhaCriptografada });
             displayFeedback("Usuário adicionado com sucesso!");
             addUserForm?.reset();
-            renderUserList();
-        } else {
+        } catch (error) {
+            console.error("Erro ao salvar usuário:", error);
             displayFeedback("Erro ao adicionar usuário.", true);
         }
     }
@@ -170,37 +120,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function handleDeleteUserClick(event) {
         if (event.target.classList.contains('deleteUserButton')) {
             const userId = event.target.dataset.userId;
-            if (!userId) return;
+            const userName = event.target.dataset.userName;
 
-            const users = await getUsersFromFirebase();
-            const userToDelete = users.find(u => u.id === userId);
-            if (!userToDelete) return;
-
-            if (!confirm(`Deseja excluir o usuário "${userToDelete.user}"?`)) return;
-
-            if (userToDelete.user.toLowerCase() === DEFAULT_ADMIN_USER) {
-                displayFeedback("O usuário administrador padrão não pode ser excluído.", true);
-                return;
+            if (!userId || !userName) return;
+            if (userName.toLowerCase() === DEFAULT_ADMIN_USER) {
+                return displayFeedback("O usuário administrador padrão não pode ser excluído.", true);
             }
+            if (!confirm(`Deseja excluir o usuário "${userName}"?`)) return;
 
-            const success = await deleteUserFromFirebase(userId);
-            if (success) {
-                displayFeedback(`Usuário "${userToDelete.user}" excluído com sucesso.`);
-                renderUserList();
-            } else {
+            try {
+                await deleteDoc(doc(db, 'senha_login', userId));
+                displayFeedback(`Usuário "${userName}" excluído com sucesso.`);
+            } catch (error) {
+                console.error("Erro ao excluir usuário:", error);
                 displayFeedback("Erro ao excluir usuário.", true);
             }
         }
     }
 
-    // Setup inicial
+    function displayFeedback(message, isError = false) {
+        if (!feedbackP) return;
+        feedbackP.textContent = message;
+        feedbackP.className = `mt-4 text-center text-sm ${isError ? 'text-red-400' : 'text-green-400'}`;
+        setTimeout(() => { feedbackP.textContent = ''; }, 4000);
+    }
+
+    // --- Setup Inicial ---
     if (addUserForm) {
         addUserForm.addEventListener('submit', handleAddUserFormSubmit);
     }
-
     if (userListUL) {
         userListUL.addEventListener('click', handleDeleteUserClick);
     }
 
-    renderUserList();
+    listenForUserChanges(); // Inicia o listener em tempo real
 });

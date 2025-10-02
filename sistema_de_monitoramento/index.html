@@ -49,15 +49,18 @@
         </div>
 
         <!-- Mobile menu -->
-        <div class="md:hidden hidden" id="mobileMenu">
-            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#features" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Recursos</a>
-                <a href="#technology" class="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Tecnologia</a>
-                <button id="contactButtonMobile" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700">Contato</button>
-                <button onclick="location.href='login.html'" class="w-full text-left bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-3 py-2 rounded-md font-medium transition-all duration-200 transform hover:scale-105">
-                    Acesso Sistema
-                </button>
-            </div>
+        <div class="md:hidden hidden mobile-menu" id="mobileMenu">
+            <button id="closeMobileMenuButton" class="absolute top-5 right-5 p-2 text-gray-400 rounded-md hover:text-white hover:bg-gray-700">
+                <svg class="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <a href="#features" class="text-2xl text-gray-300 hover:text-white">Recursos</a>
+            <a href="#technology" class="text-2xl text-gray-300 hover:text-white">Tecnologia</a>
+            <button id="contactButtonMobile" class="text-2xl text-gray-300 hover:text-white">Contato</button>
+            <button onclick="location.href='login.html'" class="mt-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-3 rounded-lg text-lg font-medium">
+                Acesso Sistema
+            </button>
         </div>
     </header>
 
@@ -444,11 +447,26 @@
         });
 
         // Mobile menu toggle
+        const closeMobileMenuButton = document.getElementById('closeMobileMenuButton');
         if (mobileMenuButton) {
             mobileMenuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
+                mobileMenu.classList.remove('hidden');
             });
         }
+        if (closeMobileMenuButton) {
+            closeMobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        }
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('#mobileMenu a, #mobileMenu button').forEach(item => {
+            item.addEventListener('click', () => {
+                if (!item.onclick) { // Do not hide if it's a button with its own navigation
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
 
         // Form submission
         form.addEventListener('submit', async (e) => {

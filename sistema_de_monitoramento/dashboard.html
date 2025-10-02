@@ -111,136 +111,132 @@
 
   <script type="module">
     import { db } from './static/js/firebaseConfig.js';
-    import { collection, getDocs } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+    import { collection, query, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
+    // Elementos do DOM para KPIs
     const totalEl = document.getElementById('kpi-total-ocorrencias');
     const criticoEl = document.getElementById('kpi-dia-critico');
     const infracaoEl = document.getElementById('kpi-principal-infracao');
 
-    const dias = {};
-    const infracoes = {};
-    const hoje = new Date();
-    const seteDiasAtras = new Date();
-    seteDiasAtras.setDate(hoje.getDate() - 7);
+    // Variáveis para armazenar as instâncias dos gráficos
+    let ocorrenciasChartInstance = null;
+    let infracoesChartInstance = null;
 
-    const snap = await getDocs(collection(db, 'alertas_epi'));
-    let total = 0;
-
-    snap.forEach(doc => {
-      const d = doc.data();
-      const data = new Date(d.data_hora);
-      if (data >= seteDiasAtras) {
-        total++;
-
-        const dia = data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-        dias[dia] = (dias[dia] || 0) + 1;
-
-        const msg = d.mensagem;
-        infracoes[msg] = (infracoes[msg] || 0) + 1;
-      }
-    });
-
-    // Total de ocorrências
-    totalEl.textContent = total;
-
-    // Dia mais crítico
-    const diaCritico = Object.entries(dias).sort((a,b)=>b[1]-a[1])[0];
-    criticoEl.textContent = diaCritico ? `${diaCritico[0]} (${diaCritico[1]})` : '-';
-
-    // Principal infração
-    const principalInfracao = Object.entries(infracoes).sort((a,b)=>b[1]-a[1])[0];
-    infracaoEl.textContent = principalInfracao ? `${principalInfracao[0]} (${principalInfracao[1]})` : '-';
-
-    // Charts
+    // Constantes para os gráficos
     const textColor = '#e5e7eb';
     const gridColor = 'rgba(255, 255, 255, 0.1)';
 
-    new Chart(document.getElementById('ocorrenciasSemanaChart'), {
-      type: 'bar',
-      data: {
-        labels: Object.keys(dias),
-        datasets: [{
-          label: 'Ocorrências',
-          data: Object.values(dias),
-          backgroundColor: 'rgba(59,130,246,0.5)',
-          borderColor: 'rgba(59,130,246,1)',
-          borderWidth: 1,
-          borderRadius: 5
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: {
-              color: textColor
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            titleColor: textColor,
-            bodyColor: textColor,
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: gridColor
-            },
-            ticks: {
-              color: textColor
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            },
-            ticks: {
-              color: textColor
-            }
-          }
-        }
-      }
-    });
+    // Query para a coleção de alertas
+    const alertasQuery = query(collection(db, 'alertas_epi'));
 
-    new Chart(document.getElementById('infracoesChart'), {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(infracoes),
-        datasets: [{
-          label: 'Infrações',
-          data: Object.values(infracoes),
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.8)',
-            'rgba(54, 162, 235, 0.8)',
-            'rgba(255, 206, 86, 0.8)',
-            'rgba(75, 192, 192, 0.8)',
-            'rgba(153, 102, 255, 0.8)',
-            'rgba(255, 159, 64, 0.8)'
-          ],
-          borderColor: '#1f2937',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              color: textColor
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            titleColor: textColor,
-            bodyColor: textColor,
-          }
+    // Listener em tempo real
+    onSnapshot(alertasQuery, (snapshot) => {
+        console.log("🔥 Dados atualizados em tempo real!");
+
+        let total = 0;
+        const dias = {};
+        const infracoes = {};
+        const hoje = new Date();
+        const seteDiasAtras = new Date();
+        seteDiasAtras.setDate(hoje.getDate() - 7);
+
+        if (snapshot.empty) {
+            console.log("Nenhuma ocorrência encontrada.");
+            totalEl.textContent = '0';
+            criticoEl.textContent = '-';
+            infracaoEl.textContent = '-';
+            // Limpa os gráficos se não houver dados
+            if(ocorrenciasChartInstance) ocorrenciasChartInstance.destroy();
+            if(infracoesChartInstance) infracoesChartInstance.destroy();
+            return;
         }
-      }
+
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const data = new Date(d.data_hora);
+            // Filtra ocorrências dos últimos 7 dias
+            if (data >= seteDiasAtras) {
+                total++;
+
+                const dia = data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                dias[dia] = (dias[dia] || 0) + 1;
+
+                const msg = d.mensagem;
+                infracoes[msg] = (infracoes[msg] || 0) + 1;
+            }
+        });
+
+        // --- Atualiza KPIs ---
+        totalEl.textContent = total;
+
+        const diaCritico = Object.entries(dias).sort((a, b) => b[1] - a[1])[0];
+        criticoEl.textContent = diaCritico ? `${diaCritico[0]} (${diaCritico[1]})` : '-';
+
+        const principalInfracao = Object.entries(infracoes).sort((a, b) => b[1] - a[1])[0];
+        infracaoEl.textContent = principalInfracao ? `${principalInfracao[0]} (${principalInfracao[1]})` : '-';
+
+        // --- Atualiza Gráficos ---
+
+        // Destrói instâncias antigas dos gráficos para evitar sobreposição
+        if (ocorrenciasChartInstance) {
+            ocorrenciasChartInstance.destroy();
+        }
+        if (infracoesChartInstance) {
+            infracoesChartInstance.destroy();
+        }
+
+        // Cria novo gráfico de ocorrências por semana
+        ocorrenciasChartInstance = new Chart(document.getElementById('ocorrenciasSemanaChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(dias),
+                datasets: [{
+                    label: 'Ocorrências',
+                    data: Object.values(dias),
+                    backgroundColor: 'rgba(59,130,246,0.5)',
+                    borderColor: 'rgba(59,130,246,1)',
+                    borderWidth: 1,
+                    borderRadius: 5
+                }]
+            },
+            options: { /* ... opções do gráfico ... */ }
+        });
+
+        // Cria novo gráfico de tipos de infração
+        infracoesChartInstance = new Chart(document.getElementById('infracoesChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(infracoes),
+                datasets: [{
+                    label: 'Infrações',
+                    data: Object.values(infracoes),
+                    backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)'],
+                    borderColor: '#1f2937',
+                }]
+            },
+            options: { /* ... opções do gráfico ... */ }
+        });
     });
+  </script>
+  <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
+  <script>
+    // Sidebar toggle functionality
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('-translate-x-full');
+        sidebarOverlay.classList.toggle('hidden');
+    }
+
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
+
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+    }
   </script>
   <script type="module" src="./static/js/logout.js"></script>
 </body>

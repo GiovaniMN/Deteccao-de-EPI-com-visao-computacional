@@ -1,31 +1,39 @@
 // carregarTabela.js
 import { db } from './firebaseConfig.js';
-import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-// Assumindo que firebaseConfig.js está em sistema_de_monitoramento/firebaseConfig.js durante o deploy
+import { collection, query, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 const tabelaBody = document.querySelector("tbody");
 const selectOrdenar = document.getElementById("ordenarPor");
+const emptyState = document.getElementById("emptyState");
+const totalRegistrosEl = document.getElementById('total-registros');
 
-let dadosOcorrencias = []; // This will store all data, including imagem_base64
+let dadosOcorrencias = []; // Armazena todos os dados para modais e ordenação
 
-async function carregarDados() {
+function listenForData() {
   if (!db) {
-    console.error("Firestore database instance (db) is not available from firebaseConfig.js");
+    console.error("Instância do Firestore (db) não está disponível.");
     if (tabelaBody) tabelaBody.innerHTML = "<tr><td colspan='3'>Erro de configuração do Firebase.</td></tr>";
     return;
   }
+
   const colecao = collection(db, "alertas_epi");
-  try {
-    const snapshot = await getDocs(colecao);
-    const totalRegistrosEl = document.getElementById('total-registros');
+  const q = query(colecao); // Pode adicionar orderBy aqui se quiser uma ordem padrão do DB
+
+  onSnapshot(q, (snapshot) => {
+    console.log("🔥 Histórico atualizado em tempo real!");
+
     if (totalRegistrosEl) {
         totalRegistrosEl.textContent = snapshot.size;
     }
 
     if (snapshot.empty) {
-      if (tabelaBody) tabelaBody.innerHTML = "<tr><td colspan='3'>Nenhuma ocorrência encontrada.</td></tr>";
+      if (tabelaBody) tabelaBody.innerHTML = "";
+      if (emptyState) emptyState.classList.remove('hidden');
+      dadosOcorrencias = [];
       return;
     }
+
+    if (emptyState) emptyState.classList.add('hidden');
 
     dadosOcorrencias = snapshot.docs.map(doc => {
         const data = doc.data();
@@ -36,21 +44,25 @@ async function carregarDados() {
         };
     });
 
-    ordenarEDesenharTabela(); 
-  } catch (error) {
-    console.error("Erro ao carregar dados do Firestore:", error);
+    ordenarEDesenharTabela(); // Redesenha a tabela com os novos dados
+
+  }, (error) => {
+    console.error("Erro ao escutar por atualizações do Firestore:", error);
     if (tabelaBody) tabelaBody.innerHTML = "<tr><td colspan='3'>Erro ao carregar ocorrências.</td></tr>";
-  }
+  });
 }
 
 function ordenarEDesenharTabela() {
   if (!selectOrdenar || !tabelaBody) {
-    console.error("Required elements (selectOrdenar or tabelaBody) not found in DOM.");
+    console.error("Elementos necessários (selectOrdenar ou tabelaBody) não encontrados no DOM.");
     return;
   }
   const criterio = selectOrdenar.value;
 
-  dadosOcorrencias.sort((a, b) => {
+  // Cria uma cópia antes de ordenar para não modificar a ordem original se necessário
+  const dadosOrdenados = [...dadosOcorrencias];
+
+  dadosOrdenados.sort((a, b) => {
     const dateA = new Date(a.data_hora);
     const dateB = new Date(b.data_hora);
     return criterio === "data_asc" ? dateA - dateB : dateB - dateA;
@@ -58,25 +70,31 @@ function ordenarEDesenharTabela() {
 
   tabelaBody.innerHTML = ""; 
 
-  dadosOcorrencias.forEach((doc, index) => {
+  dadosOrdenados.forEach((doc, index) => {
     const linha = document.createElement("tr");
     linha.className = "border-t border-t-[#474747]";
 
     const tdMensagem = document.createElement("td");
-    tdMensagem.textContent = doc.mensagem;
-    tdMensagem.className = "h-[72px] px-4 py-2 text-[#ababab] text-sm font-normal leading-normal";
+    tdMensagem.setAttribute('data-label', 'Ocorrência');
+    tdMensagem.className = "px-4 py-2 text-[#ababab] text-sm font-normal leading-normal";
+    const spanMensagem = document.createElement('span');
+    spanMensagem.textContent = doc.mensagem;
+    spanMensagem.className = 'min-w-0 break-words';
+    tdMensagem.appendChild(spanMensagem);
 
     const tdDataHora = document.createElement("td");
-    const dataFormatada = new Date(doc.data_hora).toLocaleString();
-    tdDataHora.textContent = dataFormatada;
-    tdDataHora.className = "h-[72px] px-4 py-2 text-[#ababab] text-sm font-normal leading-normal";
+    tdDataHora.setAttribute('data-label', 'Data e Hora');
+    tdDataHora.className = "px-4 py-2 text-[#ababab] text-sm font-normal leading-normal";
+    const spanDataHora = document.createElement('span');
+    const dataFormatada = new Date(doc.data_hora).toLocaleString('pt-BR');
+    spanDataHora.textContent = dataFormatada;
+    tdDataHora.appendChild(spanDataHora);
 
-    const tdButton = document.createElement("td"); // Changed variable name for clarity
-    tdButton.className = "h-[72px] px-4 py-2 text-sm font-bold leading-normal tracking-[0.015em]"; 
-
+    const tdButton = document.createElement("td");
+    tdButton.setAttribute('data-label', 'Ação');
+    tdButton.className = "px-4 py-2 text-sm font-bold leading-normal tracking-[0.015em]"; 
     const viewButton = document.createElement("button");
     viewButton.textContent = "Ver Imagem";
-    // Tailwind classes for button/link appearance, matching history page's new aesthetic
     viewButton.className = "view-image-btn text-blue-400 hover:text-blue-300 underline cursor-pointer bg-transparent border-none p-0"; 
     viewButton.dataset.index = index; 
     tdButton.appendChild(viewButton);
@@ -89,24 +107,20 @@ function ordenarEDesenharTabela() {
   });
 }
 
-// Function to display image in modal
 function displayImageInModal(index) {
-  if (dadosOcorrencias[index] && dadosOcorrencias[index].imagem_base64) {
-    console.log("Attempting to display image in modal for index:", index);
+  const doc = dadosOcorrencias.find((d, i) => i === index);
+  if (doc && doc.imagem_base64) {
     const modalImageElement = document.getElementById('modalImage'); 
     const imageModal = document.getElementById('imageModal'); 
     
     if (modalImageElement && imageModal) {
-        modalImageElement.src = `data:image/jpeg;base64,${dadosOcorrencias[index].imagem_base64}`;
-        imageModal.classList.remove('hidden'); // Show the modal
-        // Add a class to body to prevent scrolling when modal is open, if desired
+        modalImageElement.src = `data:image/jpeg;base64,${doc.imagem_base64}`;
+        imageModal.classList.remove('hidden');
         document.body.classList.add('modal-open'); 
     } else {
-        console.error("Modal elements ('modalImage' or 'imageModal') not found. Cannot display image.");
-        alert("Erro ao tentar exibir a imagem: elementos do modal não encontrados. Verifique o HTML da página.");
+        alert("Erro ao tentar exibir a imagem: elementos do modal não encontrados.");
     }
   } else {
-    console.error("Image data (imagem_base64) not found for index:", index, dadosOcorrencias[index]);
     alert("Dados da imagem não encontrados para esta ocorrência.");
   }
 }
@@ -122,12 +136,23 @@ if (tabelaBody) {
       event.preventDefault(); 
       const index = parseInt(targetButton.dataset.index, 10);
       if (!isNaN(index)) {
-        displayImageInModal(index);
+        // Encontra o documento correto nos dados ordenados na tela
+        const criterio = selectOrdenar.value;
+        const dadosOrdenados = [...dadosOcorrencias].sort((a, b) => {
+            const dateA = new Date(a.data_hora);
+            const dateB = new Date(b.data_hora);
+            return criterio === "data_asc" ? dateA - dateB : dateB - dateA;
+        });
+        const docParaMostrar = dadosOrdenados[index];
+        // Encontra o índice original para passar para a função do modal
+        const originalIndex = dadosOcorrencias.findIndex(d => d.data_hora === docParaMostrar.data_hora && d.mensagem === docParaMostrar.mensagem);
+        displayImageInModal(originalIndex);
       } else {
-        console.error("Invalid index obtained from button:", targetButton.dataset.index);
+        console.error("Índice inválido obtido do botão:", targetButton.dataset.index);
       }
     }
   });
 }
 
-window.addEventListener("DOMContentLoaded", carregarDados);
+// Inicia o listener quando o DOM estiver pronto
+window.addEventListener("DOMContentLoaded", listenForData);

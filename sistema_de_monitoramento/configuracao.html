@@ -86,7 +86,7 @@
                             <h2 class="text-xl font-semibold text-white">Área de Detecção</h2>
                             <div id="status-indicator" class="w-3 h-3 bg-yellow-500 rounded-full status-indicator"></div>
                         </div>
-                        <div class="flex flex-col sm:flex-row items-stretch w-full sm:w-auto gap-3">
+                        <div class="flex flex-col items-stretch w-full sm:w-auto gap-3">
                             <button id="refreshImageButton" class="refresh-button flex items-center justify-center space-x-2 font-semibold py-3 px-5 rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
@@ -269,14 +269,13 @@
         </main>
     </div>
 
-    <!-- Sidebar Overlay for Mobile -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
     <!-- Firebase SDK e Script Principal -->
     <script type="module">
         // Import Firebase SDK
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+        import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
         // Configuração do Firebase
         const firebaseConfig = {
@@ -403,7 +402,7 @@
                         console.log('✅ Imagem carregada com sucesso!');
                         showImageSuccess(data.data_hora);
                         resizeCanvas();
-                        loadExistingZone();
+                        listenForZoneChanges(); // Inicia o listener para a zona
                         showFeedback('Imagem carregada com sucesso! Agora você pode definir a zona de detecção.', 'success');
                         resolve();
                     };
@@ -592,35 +591,39 @@
 
         window.addEventListener('resize', resizeCanvas);
         
-        async function loadExistingZone() {
+        function listenForZoneChanges() {
             try {
-                console.log('🔍 Carregando zona existente...');
                 const docRef = doc(db, 'configuracoes', 'zones');
-                const docSnap = await getDoc(docRef);
                 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
-                    console.log('📄 Dados encontrados:', data);
-                    
-                    if (data.zones && data.zones.length > 0) {
-                        const existingWebZone = data.zones[0];
-                        
-                        // Converte as coordenadas web para coordenadas do canvas
-                        zone = webToCanvasCoords(existingWebZone);
-                        
-                        console.log('✅ Zona carregada e convertida:', existingWebZone, '=>', zone);
-                        drawZone();
+                onSnapshot(docRef, (docSnap) => {
+                    console.log("🔥 Zona de detecção atualizada em tempo real!");
+                    if (docSnap.exists()) {
+                        const data = docSnap.data();
+                        if (data.zones && data.zones.length > 0) {
+                            const existingWebZone = data.zones[0];
+                            zone = webToCanvasCoords(existingWebZone);
+                            console.log('✅ Zona carregada e convertida:', existingWebZone, '=>', zone);
+                            drawZone();
+                            updateCoordinatesDisplay();
+                            showFeedback('Zona de detecção foi atualizada!', 'info');
+                        } else {
+                            // Se as zonas foram removidas, limpa o canvas
+                            zone = null;
+                            ctx.clearRect(0, 0, canvas.width, canvas.height);
+                            updateCoordinatesDisplay();
+                            console.log('📝 Nenhuma zona encontrada no Firebase');
+                        }
+                    } else {
+                        zone = null;
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
                         updateCoordinatesDisplay();
-                        showFeedback('Zona existente carregada com sucesso!', 'success');
+                        console.log('📝 Documento de zonas não existe.');
                     }
-                } else {
-                    console.log('📝 Nenhuma zona encontrada no Firebase');
-                    updateDebugInfo('Nenhuma zona encontrada no Firebase');
-                }
+                });
+
             } catch (error) {
-                console.error('❌ Erro ao carregar zona existente:', error);
-                showFeedback('Erro ao carregar zona existente: ' + error.message, 'error');
-                updateDebugInfo('Erro ao carregar zona: ' + error.message);
+                console.error('❌ Erro ao escutar por zonas:', error);
+                showFeedback('Erro ao carregar zona: ' + error.message, 'error');
             }
         }
 

@@ -44,4 +44,21 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Estilos para o menu móvel */
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 24, 39, 0.95); /* bg-gray-900 com opacidade */
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            padding-top: 4rem; /* 64px */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem; /* 24px */
+        }
     

@@ -2,4 +2,62 @@
         body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
         body.modal-open { overflow: hidden; }
+
+/* Estilos para transformar a tabela em cards em telas pequenas */
+@media (max-width: 768px) {
+    /* Esconde o cabeçalho da tabela */
+    table thead {
+        display: none;
+    }
+    /* Transforma a tabela, tbody, tr e td em blocos */
+    table, tbody, tr, td {
+        display: block;
+        width: 100%;
+    }
+    /* Estiliza as linhas como cards */
+    tr {
+        margin-bottom: 1.5rem; /* Aumenta a margem para 24px */
+        border: 1px solid rgba(75, 85, 99, 0.5); /* border-gray-700/50 */
+        border-radius: 0.75rem; /* rounded-xl */
+        overflow: hidden;
+        background-color: rgba(31, 41, 55, 0.3); /* Adiciona um fundo sutil (bg-gray-800/30) */
+    }
+    /* Usa CSS Grid para um layout de coluna robusto */
+    td {
+        display: grid;
+        grid-template-columns: max-content 1fr; /* Coluna do label se ajusta ao conteúdo, valor ocupa o resto */
+        gap: 1rem; /* Espaço entre label e valor */
+        align-items: start; /* Alinha os itens ao topo */
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+    }
+
+    /* Estilo do label (pseudo-elemento) */
+    td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #9CA3AF;
+        text-align: left;
+    }
+
+    /* Alinha o texto do valor (dentro do span) à direita */
+    td > span {
+        text-align: right;
+        word-break: break-all; /* Força a quebra de linha para evitar overflow */
+    }
+
+    /* Alinha o botão à direita */
+    td > button {
+        margin-left: auto;
+    }
+
+    /* Remove a borda do último item e ajusta padding */
+    tr td:first-child {
+        padding-top: 1rem;
+    }
+    tr td:last-child {
+        border-bottom: none;
+        padding-bottom: 1rem;
+    }
+}
     
