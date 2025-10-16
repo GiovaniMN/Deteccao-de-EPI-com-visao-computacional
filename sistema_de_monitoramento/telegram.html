@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro Automático de Alertas EPI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .telegram-login-container {
+            text-align: center;
+            padding: 30px 0;
+            background: #f8f9ff;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .telegram-login-container h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .telegram-login-container p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .alert.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-info {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .user-info img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .user-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .subscribers-count {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .subscribers-count span {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🔔 Alertas EPI</h1>
+            <p>Receba notificações de violações em tempo real</p>
+        </div>
+
+        <div id="alertBox" class="alert"></div>
+
+        <!-- PASSO 1: Login com Telegram -->
+        <div id="step1" class="step active">
+            <div class="telegram-login-container">
+                <h3>📱 Login com Telegram</h3>
+                <p>Clique no botão abaixo para fazer login com sua conta do Telegram.<br>
+                <strong>Não precisa copiar nenhum ID!</strong></p>
+                
+                <!-- TELEGRAM LOGIN WIDGET -->
+                <script async src="https://telegram.org/js/telegram-widget.js?22" 
+                        data-telegram-login="SEU_BOT_USERNAME" 
+                        data-size="large" 
+                        data-onauth="onTelegramAuth(user)" 
+                        data-request-access="write">
+                </script>
+            </div>
+        </div>
+
+        <!-- PASSO 2: Completar cadastro -->
+        <div id="step2" class="step">
+            <div id="userInfo" class="user-info"></div>
+
+            <form id="completeForm">
+                <div class="form-group">
+                    <label for="email">E-mail *</label>
+                    <input type="email" id="email" name="email" required placeholder="seu@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Telefone (opcional)</label>
+                    <input type="tel" id="phone" name="phone" placeholder="(00) 00000-0000">
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">
+                    Finalizar Cadastro
+                </button>
+            </form>
+        </div>
+
+        <div class="subscribers-count">
+            <span id="subscriberCount">0</span> pessoas cadastradas
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // **CONFIGURAÇÃO FIREBASE** (substitua pelos seus dados)
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJECT.firebaseapp.com",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_PROJECT.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Dados temporários do usuário do Telegram
+        let telegramUser = null;
+
+        // Elementos do DOM
+        const alertBox = document.getElementById('alertBox');
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const userInfo = document.getElementById('userInfo');
+        const completeForm = document.getElementById('completeForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const subscriberCount = document.getElementById('subscriberCount');
+
+        // Função chamada pelo Telegram Widget
+        window.onTelegramAuth = function(user) {
+            console.log('Telegram Auth:', user);
+            telegramUser = user;
+            
+            // Mostrar informações do usuário
+            userInfo.innerHTML = `
+                ${user.photo_url ? `<img src="${user.photo_url}" alt="Avatar">` : ''}
+                <h3>${user.first_name} ${user.last_name || ''}</h3>
+                <p>@${user.username || 'sem_username'}</p>
+                <p style="color: #999; font-size: 12px;">ID: ${user.id}</p>
+            `;
+            
+            // Mudar para passo 2
+            step1.classList.remove('active');
+            step2.classList.add('active');
+        };
+
+        // Função para mostrar alertas
+        function showAlert(message, type) {
+            alertBox.textContent = message;
+            alertBox.className = `alert ${type} show`;
+            
+            setTimeout(() => {
+                alertBox.classList.remove('show');
+            }, 5000);
+        }
+
+        // Função para contar inscritos
+        async function updateSubscriberCount() {
+            try {
+                const q = query(collection(db, 'telegram_subscribers'), 
+                               where('active', '==', true));
+                const snapshot = await getDocs(q);
+                subscriberCount.textContent = snapshot.size;
+            } catch (error) {
+                console.error('Erro ao contar:', error);
+            }
+        }
+
+        // Verificar se já está cadastrado
+        async function checkUserExists(chatId) {
+            const q = query(collection(db, 'telegram_subscribers'), 
+                           where('chat_id', '==', String(chatId)));
+            const snapshot = await getDocs(q);
+            return !snapshot.empty;
+        }
+
+        // Submeter formulário final
+        completeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!telegramUser) {
+                showAlert('❌ Erro: Dados do Telegram não encontrados', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Cadastrando...';
+
+            const formData = {
+                chat_id: String(telegramUser.id),
+                name: `${telegramUser.first_name} ${telegramUser.last_name || ''}`.trim(),
+                username: telegramUser.username || null,
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim() || null,
+                photo_url: telegramUser.photo_url || null,
+                active: true,
+                created_at: serverTimestamp(),
+                last_alert_sent: null
+            };
+
+            try {
+                // Verificar se já existe
+                const exists = await checkUserExists(telegramUser.id);
+                if (exists) {
+                    throw new Error('Você já está cadastrado para receber alertas!');
+                }
+
+                // Adicionar ao Firestore
+                await addDoc(collection(db, 'telegram_subscribers'), formData);
+
+                // Sucesso!
+                showAlert('✅ Cadastro concluído! Você receberá os alertas no Telegram.', 'success');
+                
+                // Resetar
+                completeForm.reset();
+                telegramUser = null;
+                
+                // Voltar para passo 1 após 3 segundos
+                setTimeout(() => {
+                    step2.classList.remove('active');
+                    step1.classList.add('active');
+                }, 3000);
+                
+                updateSubscriberCount();
+
+            } catch (error) {
+                console.error('Erro:', error);
+                showAlert('❌ Erro: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Finalizar Cadastro';
+            }
+        });
+
+        // Atualizar contador ao carregar
+        updateSubscriberCount();
+    </script>
+</body>
+</html>
