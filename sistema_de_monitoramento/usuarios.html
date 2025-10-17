@@ -15,17 +15,9 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script type="module" src="./static/js/authGuard.js"></script>
     <link rel="stylesheet" href="./static/css/usuarios.css">
-    
-    <!-- **NOVO**: Telegram Widget -->
-    <script async src="https://telegram.org/js/telegram-widget.js?22" 
-            data-telegram-login="AlertaEpiBot" 
-            data-size="medium" 
-            data-onauth="onTelegramAuth(user)" 
-            data-request-access="write">
-    </script>
 </head>
 <body class="bg-gray-900 text-white">
-    <!-- Header (MANTIDO IGUAL) -->
+    <!-- Header -->
     <header class="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700/50 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -58,7 +50,7 @@
     </header>
 
     <div class="flex h-screen">
-        <!-- Sidebar (MANTIDO IGUAL) -->
+        <!-- Sidebar -->
         <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full">
             <div class="p-6">
                 <nav class="space-y-2">
@@ -110,7 +102,7 @@
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- **MODIFICADO**: Add User Form -->
+                    <!-- Add User Form -->
                     <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
                         <div class="flex items-center space-x-3 mb-6">
                             <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
@@ -125,23 +117,6 @@
                         </div>
 
                         <form id="addUserForm" class="space-y-6">
-                            <!-- **NOVO**: Nome completo -->
-                            <div>
-                                <label for="fullName" class="block text-sm font-medium text-gray-300 mb-2">
-                                    <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                    </svg>
-                                    Nome Completo
-                                </label>
-                                <input
-                                    type="text"
-                                    id="fullName"
-                                    name="fullName"
-                                    class="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                                    placeholder="Nome da pessoa"
-                                />
-                            </div>
-
                             <div>
                                 <label for="newUsername" class="block text-sm font-medium text-gray-300 mb-2">
                                     <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -193,55 +168,6 @@
                                 />
                             </div>
 
-                            <!-- **NOVO**: Seção Alertas Telegram -->
-                            <div class="border-t border-gray-600/50 pt-6">
-                                <div class="flex items-center space-x-3 mb-4">
-                                    <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 3h11l2 2v10l-2 2H4l-2-2V5l2-2z"></path>
-                                        </svg>
-                                    </div>
-                                    <h3 class="text-lg font-semibold text-white">Alertas Telegram</h3>
-                                </div>
-
-                                <div class="flex items-center space-x-3 mb-4">
-                                    <input
-                                        type="checkbox"
-                                        id="receiveAlerts"
-                                        name="receiveAlerts"
-                                        class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500 focus:ring-2"
-                                    />
-                                    <label for="receiveAlerts" class="text-sm font-medium text-gray-300">
-                                        Este usuário receberá alertas de EPI via Telegram
-                                    </label>
-                                </div>
-
-                                <div id="telegramConfigSection" class="hidden bg-blue-500/10 border border-blue-500/20 rounded-xl p-4">
-                                    <p class="text-sm text-blue-400 mb-4">Vincule o Chat ID:</p>
-
-                                    <div class="text-center py-2 mb-4" id="telegramWidgetContainer"></div>
-
-                                    <div class="border-t border-blue-500/20 pt-4">
-                                        <button type="button" id="toggleManualChatId" class="text-xs text-blue-400 hover:text-blue-300 mb-2">
-                                            Ou inserir Chat ID manualmente
-                                        </button>
-                                        
-                                        <div id="manualChatIdDiv" class="hidden">
-                                            <input
-                                                type="text"
-                                                id="manualChatId"
-                                                placeholder="Chat ID do Telegram"
-                                                class="w-full px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white text-sm"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div id="currentChatIdDisplay" class="hidden mt-4 p-3 bg-green-500/20 rounded-lg">
-                                        <span class="text-sm text-green-400">✅ Chat ID: <span id="chatIdValue"></span></span>
-                                    </div>
-                                </div>
-                            </div>
-
                             <button
                                 type="submit"
                                 class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900"
@@ -258,25 +184,18 @@
                         <div id="userManagementFeedback" class="mt-4 text-center text-sm"></div>
                     </div>
 
-                    <!-- User List (MANTIDO IGUAL) -->
+                    <!-- User List -->
                     <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-                                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h2 class="text-xl font-semibold text-white">Usuários Cadastrados</h2>
-                                    <p class="text-gray-400 text-sm">Lista de contas ativas</p>
-                                </div>
+                        <div class="flex items-center space-x-3 mb-6">
+                            <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                                </svg>
                             </div>
-                            
-                            <!-- **NOVO**: Botão teste -->
-                            <button id="testTelegramAlertsBtn" class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded-lg transition-all text-sm">
-                                🔔 Teste
-                            </button>
+                            <div>
+                                <h2 class="text-xl font-semibold text-white">Usuários Cadastrados</h2>
+                                <p class="text-gray-400 text-sm">Lista de contas ativas</p>
+                            </div>
                         </div>
 
                         <div class="space-y-3 max-h-96 overflow-y-auto">
@@ -296,6 +215,80 @@
                     </div>
                 </div>
 
+                <!-- Alertas Telegram -->
+                <div class="mt-8 bg-gradient-to-r from-blue-500/10 to-green-500/10 border border-blue-500/20 rounded-2xl p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-2 0v1m0-1h-1m-9-7h.01M12 8a3 3 0 100 6 3 3 0 000-6zm-7 1a7 7 0 1114 0 7 7 0 01-14 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-blue-400 mb-1">Alertas EPI - Grupo Telegram</h3>
+                            <p class="text-blue-200 text-sm mb-4">
+                                Entre no grupo para receber alertas de segurança automaticamente
+                            </p>
+                            
+                            <div class="flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
+                                <div class="relative">
+                                    <div class="bg-white p-6 rounded-xl shadow-xl">
+                                        <!-- QR Code corrigido -->
+                                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=tg://join?invite=YEEomXPFVFsxYWVh" 
+                                            alt="QR Code Grupo Alertas EPI" 
+                                            class="w-44 h-44" />
+                                    </div>
+                                </div>
+                                
+                                <div class="flex-1">
+                                    <div class="space-y-3">
+                                        <div class="bg-blue-500/20 p-4 rounded-lg border border-blue-400/30">
+                                            <p class="text-white font-medium mb-2">Como usar:</p>
+                                            <ol class="text-blue-300 text-sm space-y-1 list-decimal list-inside">
+                                                <li>Escanear QR Code</li>
+                                                <li>Tocar no link se necessário</li>
+                                                <li>Entrar no grupo "Alertas Epi"</li>
+                                            </ol>
+                                        </div>
+                                        
+                                        <div class="space-y-2">
+                                            <p class="text-white text-sm font-medium">Link do grupo:</p>
+                                            <div class="flex items-center space-x-2">
+                                                <input 
+                                                    type="text" 
+                                                    id="groupInviteLink"
+                                                    value="https://t.me/+YEEomXPFVFsxYWVh"
+                                                    readonly
+                                                    class="flex-1 px-3 py-2 bg-gray-700/50 border border-gray-600 rounded-lg text-white text-sm font-mono"
+                                                />
+                                                <button 
+                                                    id="copyGroupLinkBtn"
+                                                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all flex items-center space-x-1"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                                    </svg>
+                                                    <span>Copiar</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="text-center">
+                                            <a href="https://t.me/+YEEomXPFVFsxYWVh" 
+                                               target="_blank"
+                                               class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition-all space-x-2">
+                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm5.568 8.16c-.169 1.858-.896 6.728-.896 6.728-.896 6.728-1.264 1.277-2.896.642-3.594.832-1.846 1.136-3.346.896-1.067l.054-2.896c.054-.578.166-1.208.166-2.235 0-1.92.166-3.84.332-5.76zM8.16 12c0-2.133 1.731-3.864 3.864-3.864S15.888 9.867 15.888 12c0 2.133-1.731 3.864-3.864 3.864S8.16 14.133 8.16 12z"/>
+                                                </svg>
+                                                <span>Testar Link</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Security Notice -->
                 <div class="mt-8 bg-yellow-500/10 border border-yellow-500/20 rounded-2xl p-6">
                     <div class="flex items-start space-x-4">
@@ -305,12 +298,12 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-yellow-400 mb-2">Aviso de Segurança</h3>
+                            <h3 class="text-lg font-semibold text-yellow-400 mb-2">Informações do Sistema</h3>
                             <div class="text-yellow-200 text-sm space-y-2">
-                                <p>• Mantenha as senhas seguras e não as compartilhe</p>
-                                <p>• O usuário administrador padrão não pode ser removido</p>
-                                <p>• Remova contas de usuários que não precisam mais de acesso</p>
-                                <p>• **Usuários com alertas ativos recebem notificações via Telegram**</p>
+                                <p>• Usuários Web: Para acesso completo ao sistema de controle</p>
+                                <p>• Alertas Telegram: Qualquer pessoa pode entrar no grupo e receber</p>
+                                <p>• QR Code: Funcionários escaneiam e automaticamente recebem alertas</p>
+                                <p>• Zero configuração: Admin não precisa cadastrar cada pessoa</p>
                             </div>
                         </div>
                     </div>
@@ -322,69 +315,44 @@
     <!-- Sidebar Overlay for Mobile -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
-    <!-- **FUNCIONALIDADE TELEGRAM** (Callback Global) -->
-    <script>
-        let selectedChatId = null;
-        
-        // **Callback do Telegram Widget**
-        window.onTelegramAuth = function(user) {
-            selectedChatId = user.id;
-            document.getElementById('chatIdValue').textContent = user.id;
-            document.getElementById('currentChatIdDisplay').classList.remove('hidden');
-            
-            // Auto-preencher nome
-            const nameField = document.getElementById('fullName');
-            if (!nameField.value && user.first_name) {
-                nameField.value = `${user.first_name} ${user.last_name || ''}`.trim();
-            }
-        };
-
-        // **Controles de UI**
-        document.getElementById('receiveAlerts').addEventListener('change', (e) => {
-            const section = document.getElementById('telegramConfigSection');
-            if (e.target.checked) {
-                section.classList.remove('hidden');
-                createTelegramWidget();
-            } else {
-                section.classList.add('hidden');
-                selectedChatId = null;
-                document.getElementById('currentChatIdDisplay').classList.add('hidden');
-            }
-        });
-
-        document.getElementById('toggleManualChatId').addEventListener('click', () => {
-            document.getElementById('manualChatIdDiv').classList.toggle('hidden');
-        });
-
-        function createTelegramWidget() {
-            const container = document.getElementById('telegramWidgetContainer');
-            if (container.querySelector('iframe')) return;
-            
-            const script = document.createElement('script');
-            script.async = true;
-            script.src = 'https://telegram.org/js/telegram-widget.js?22';
-            script.setAttribute('data-telegram-login', 'AlertaEpiBot');
-            script.setAttribute('data-size', 'medium');
-            script.setAttribute('data-onauth', 'onTelegramAuth(user)');
-            script.setAttribute('data-request-access', 'write');
-            container.appendChild(script);
-        }
-
-        // **Expor dados do Telegram para o userManagement.js**
-        window.telegramData = {
-            getChatId: () => selectedChatId || document.getElementById('manualChatId').value || null,
-            reset: () => {
-                selectedChatId = null;
-                document.getElementById('currentChatIdDisplay').classList.add('hidden');
-                document.getElementById('manualChatId').value = '';
-            }
-        };
-    </script>
-
     <script type="module" src="./static/js/userManagement.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const copyBtn = document.getElementById('copyGroupLinkBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', async () => {
+                    const linkField = document.getElementById('groupInviteLink');
+                    const originalHTML = copyBtn.innerHTML;
+                    
+                    try {
+                        await navigator.clipboard.writeText(linkField.value);
+                        copyBtn.innerHTML = `
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span>Copiado</span>
+                        `;
+                        copyBtn.className = copyBtn.className.replace('bg-blue-600', 'bg-green-600');
+                        
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalHTML;
+                            copyBtn.className = copyBtn.className.replace('bg-green-600', 'bg-blue-600');
+                        }, 2000);
+                        
+                    } catch (err) {
+                        linkField.select();
+                        document.execCommand('copy');
+                        copyBtn.innerHTML = '<span>Copiado</span>';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = originalHTML;
+                        }, 2000);
+                    }
+                });
+            }
+        });
+
         // Sidebar toggle functionality
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
