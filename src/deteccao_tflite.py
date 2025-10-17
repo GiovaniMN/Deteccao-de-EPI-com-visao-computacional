@@ -14,12 +14,12 @@ import base64
 from datetime import datetime
 
 
-# === LOGGING MINIMALISTA ===
+#LOGGIN
 logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
-# === ESTADOS ===
+#ESTADOS
 class EntryState(Enum):
     EMPTY = "VAZIO"
     ENTERING = "ENTRANDO"
@@ -29,12 +29,12 @@ class EntryState(Enum):
     EXITING = "SAINDO"
 
 
-# === WEBCAM ORIGINAL ===
+#WEBCAM
 class FixedWebcamStream:
     def __init__(self, src=0):
         self.stream = cv2.VideoCapture(src)
         if not self.stream.isOpened(): 
-            raise IOError("Camera indisponível")
+            raise IOError("Camera indisponivel")
         
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
@@ -45,8 +45,6 @@ class FixedWebcamStream:
         if ret:
             actual_w = int(self.stream.get(cv2.CAP_PROP_FRAME_WIDTH))
             actual_h = int(self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT))
-            print(f"📹 Resolução configurada: {actual_w}x{actual_h}")
-            print(f"📹 Frame real: {test_frame.shape[1]}x{test_frame.shape[0]}")
         
         self.frame = test_frame
         self.frame_lock = Lock()
@@ -76,12 +74,12 @@ class FixedWebcamStream:
             self.stream.release()
 
 
-# === CONFIGURAÇÕES ===
+#CONFIGURACOES
 class CleanConfig:
     TELEGRAM_TOKEN = '7683594838:AAFNpr3hQuKIlWK7MGg0kFnoxeZiA4k94OQ'
-    TELEGRAM_CHAT_ID = '5481967834'
+    TELEGRAM_CHAT_ID = '-4842024226'
     
-    MODEL_PATH = '/home/epirasp/Desktop/coral_epi/modelos/yolo_last_full_integer_quant_edgetpu.tflite'
+    MODEL_PATH = '/home/epirasp/Desktop/coral_epi/modelos/epi_full_integer_quant_edgetpu.tflite'
     CLASSES_PATH = '/home/epirasp/Desktop/coral_epi/modelos/classes.txt'
     FIREBASE_KEY_PATH = '/home/epirasp/Desktop/coral_epi/firebase_key.json'
     
@@ -91,7 +89,7 @@ class CleanConfig:
     DETECTION_CONFIDENCE = {
         'pessoa': 0.30,
         'capacete': 0.58,
-        'bota': 0.25,
+        'bota': 0.5,
         'oculos': 0.40
     }
     
@@ -103,7 +101,7 @@ class CleanConfig:
     }
     
     MAX_DETECTION_AREA = {
-        'pessoa': 110000,
+        'pessoa': 150000,
         'capacete': 15000,
         'bota': 10000,
         'oculos': 8000
@@ -114,12 +112,12 @@ class CleanConfig:
     EPI_RATIO = 0.30
     EXIT_FRAMES = 10
     
-    # Thresholds para mostrar na imagem Firebase
+    #Thresholds para mostrar na imagem Firebase
     ALERT_MIN_PRESENCE_RATE = {
         'pessoa': 0.50,
         'capacete': 0.40,
-        'bota': 0.35,
-        'oculos': 0.30
+        'bota': 0.5,
+        'oculos': 0.4
     }
     
     COLORS = {
@@ -144,7 +142,7 @@ class CleanConfig:
 config = CleanConfig()
 
 
-# === TRACKER DE DETECÇÕES FILTRADAS ===
+#TRACKER DE DETECCOES FILTRADAS
 class FilteredDetectionTracker:
     def __init__(self):
         self.reset()
@@ -244,7 +242,7 @@ class FilteredDetectionTracker:
         return summary
 
 
-# === MONITOR FPS ===
+#FPS
 class SimpleFPSMonitor:
     def __init__(self):
         self.times = deque(maxlen=30)
@@ -263,7 +261,7 @@ class SimpleFPSMonitor:
         return self.cached_fps
 
 
-# === PREPROCESSADOR ===
+#PREPROCESSAMENTO
 class FixedPreprocessor:
     def __init__(self):
         self.target_size = config.INFERENCE_SIZE
@@ -286,125 +284,11 @@ class FixedPreprocessor:
         return padded, scale, top, left
 
 
-# === FIREBASE (APENAS get_alert_users ADICIONADO) ===
-class CompatibleFirebaseManager:
-    def __init__(self):
-        self.db = None
-        self.connected = False
-        self._initialize()
-    
-    def _initialize(self):
-        try:
-            if not firebase_admin._apps:
-                if not os.path.exists(config.FIREBASE_KEY_PATH):
-                    print("⚠️ Arquivo Firebase não encontrado")
-                    return
-                    
-                cred = credentials.Certificate(config.FIREBASE_KEY_PATH)
-                firebase_admin.initialize_app(cred)
-                
-            self.db = firestore.client()
-            self.connected = True
-            print("🔥 Firebase conectado")
-            
-        except Exception as e:
-            print(f"❌ Erro Firebase: {e}")
-            self.connected = False
-    
-    def is_connected(self):
-        return self.connected and self.db is not None
-    
-    def get_zones(self):
-        if not self.is_connected():
-            return []
-        try:
-            doc = self.db.collection('configuracoes').document('zones').get()
-            return doc.to_dict().get('zones', []) if doc.exists else []
-        except Exception as e:
-            print(f"❌ Erro zonas: {e}")
-            return []
-    
-    # **ÚNICO MÉTODO NOVO**
-    def get_alert_users(self):
-        """Buscar usuários com alertas da collection senha_login"""
-        if not self.is_connected():
-            return []
-        
-        try:
-            usuarios_ref = self.db.collection('senha_login')
-            docs = usuarios_ref.where('receber_alertas', '==', True)\
-                              .where('telegram_chat_id', '!=', None)\
-                              .stream()
-            
-            alert_users = []
-            for doc in docs:
-                data = doc.to_dict()
-                chat_id = data.get('telegram_chat_id')
-                
-                if chat_id:
-                    alert_users.append({
-                        'chat_id': str(chat_id),
-                        'nome': data.get('nome', data.get('user', 'Usuário'))
-                    })
-            
-            return alert_users
-            
-        except Exception as e:
-            print(f"❌ Erro ao buscar usuários: {e}")
-            return []
-    
-    def save_alert(self, alert_data):
-        if not self.is_connected():
-            print("⚠️ Firebase indisponível - alerta não salvo")
-            return
-            
-        try:
-            self.db.collection('alertas_epi').add(alert_data)
-            print("✅ Alerta salvo no Firebase")
-            
-        except Exception as e:
-            print(f"❌ Erro ao salvar alerta: {e}")
-
-
-# === TELEGRAM (APENAS MODIFICADO PARA USAR USUÁRIOS DO FIREBASE) ===
-class FastTelegramManager:
-    def __init__(self, firebase_manager):  # **ÚNICA MUDANÇA**
-        self.session = requests.Session()
-        self.session.timeout = 5
-        self.firebase_manager = firebase_manager  # **ÚNICA MUDANÇA**
-        
-    def send(self, message):
-        if not config.TELEGRAM_TOKEN:
-            return False
-        
-        # **ÚNICA MODIFICAÇÃO**: Buscar usuários do Firebase
-        alert_users = self.firebase_manager.get_alert_users()
-        
-        if not alert_users:
-            # **Fallback para chat fixo**
-            try:
-                url = f"https://api.telegram.org/bot{config.TELEGRAM_TOKEN}/sendMessage"
-                self.session.post(url, data={'chat_id': config.TELEGRAM_CHAT_ID, 'text': message})
-                return True
-            except:
-                return False
-        
-        # **Enviar para usuários cadastrados**
-        for user in alert_users:
-            try:
-                url = f"https://api.telegram.org/bot{config.TELEGRAM_TOKEN}/sendMessage"
-                self.session.post(url, data={'chat_id': user['chat_id'], 'text': message})
-            except:
-                pass
-        
-        return True
-
-
-# === CONTROLADOR LIMPO ===
+#CONTROLADOR
 class CleanEPIController:
     def __init__(self):
         self.firebase_manager = CompatibleFirebaseManager()
-        self.telegram_manager = FastTelegramManager(self.firebase_manager)  # **ÚNICA MUDANÇA**
+        self.telegram_manager = FastTelegramManager()
         self.preprocessor = FixedPreprocessor()
         self.fps_monitor = SimpleFPSMonitor()
         
@@ -430,9 +314,7 @@ class CleanEPIController:
         self.last_zone_update = 0
         self.camera_resolution = None
         
-        self.frame_counter = 0
-        
-        print("Sistema Clean EPI inicializado")
+        self.frame_counter = 0      
 
     def should_skip_frame(self):
         self.frame_counter += 1
@@ -488,7 +370,7 @@ class CleanEPIController:
             return detections, counts
             
         except Exception as e:
-            print(f"Erro detecção: {e}")
+            print(f"Erro deteccao: {e}")
             return self.detection_cache, self.counts_cache
 
     def _process_detection_balanced(self, data, scale, pad_top, pad_left, frame_shape):
@@ -639,32 +521,38 @@ class CleanEPIController:
             self.last_alert = time.time()
 
     def _create_clean_alert_image(self):
-        """Imagem limpa com nomes completos e backgrounds"""
-        
         if self.clean_analysis_frame is None:
             h, w = self.camera_resolution[1], self.camera_resolution[0]
             alert_frame = np.zeros((h, w, 3), dtype=np.uint8)
         else:
             alert_frame = self.clean_analysis_frame.copy()
         
+        #FILTRO DE CONF
         reliable_detections = self.detection_tracker.get_filtered_representative_detections()
         
+        #EXIBICAO DAS CAIXAS
         for detection in reliable_detections:
             x1, y1, x2, y2 = detection['bbox']
             class_name = detection['class_name']
             presence_rate = detection['presence_rate']
             
             color = config.CLASS_COLORS.get(class_name, (255, 255, 255))
+
             thickness = 2
             
+            #BOUNDING BOX
             cv2.rectangle(alert_frame, (x1, y1), (x2, y2), color, thickness)
             
+            #NOME + PORCENTAGEM
             label = f"{class_name.upper()}: {presence_rate:.0%}"
+            
+            #FONTE
             font_scale = 0.6
             font_thickness = 2
             
+            #BACKGROUND DO TEXTO
             label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
-            
+
             bg_padding = 4
             bg_x1 = x1
             bg_y1 = y1 - 28
@@ -679,6 +567,7 @@ class CleanEPIController:
             cv2.putText(alert_frame, label, (text_x, text_y), 
                        cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), font_thickness)
     
+        #TIMESTAMP LIMPO
         timestamp = datetime.now().strftime("%d/%m/%Y %H:%M")
         cv2.putText(alert_frame, timestamp, (10, alert_frame.shape[0] - 15), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
@@ -686,7 +575,6 @@ class CleanEPIController:
         return alert_frame
 
     def _send_clean_firebase_alert(self, missing_epis, message):
-        """Enviar alerta com imagem limpa"""
         try:
             clean_image = self._create_clean_alert_image()
             
@@ -702,13 +590,23 @@ class CleanEPIController:
             }
             
             self.firebase_manager.save_alert(alert_data)
-            print("✅ Alerta limpo salvo no Firebase")
+            print("Alerta limpo salvo no Firebase")
+            
+            #LOG DAS DETECCOES
+            reliable_detections = self.detection_tracker.get_filtered_representative_detections()
+            if reliable_detections:
+                print("Mostrado na imagem:")
+                for det in reliable_detections:
+                    print(f"   {det['class_name']}: {det['presence_rate']:.0%}")
+            else:
+                print("Imagem enviada sem deteccoes (apenas frame limpo)")
             
         except Exception as e:
-            print(f"❌ Erro ao enviar alerta: {e}")
+            print(f"Erro ao enviar alerta: {e}")
 
+    #METODOS
     def draw_fixed_ui(self, frame, detections, counts):
-        """Interface original (mantida igual)"""
+
         self._current_frame = frame.copy()
         
         display_frame = frame.copy()
@@ -728,11 +626,6 @@ class CleanEPIController:
                         (zone['x'] + zone['width'], zone['y'] + zone['height']), 
                         state_color, -1)
             cv2.addWeighted(overlay, 0.25, display_frame, 0.75, 0, display_frame)
-            
-            status = self._get_status_text()
-            cv2.putText(display_frame, status, 
-                       (zone['x'] + 10, zone['y'] - 15), 
-                       cv2.FONT_HERSHEY_SIMPLEX, 1.0, (255, 255, 255), 3)
         
         for det in detections:
             if not det['in_zone']:
@@ -771,12 +664,6 @@ class CleanEPIController:
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
         y += 25
         
-        firebase_status = "🔥 ON" if self.firebase_manager.is_connected() else "🔥 OFF"
-        firebase_color = (0, 255, 0) if self.firebase_manager.is_connected() else (0, 0, 255)
-        cv2.putText(display_frame, firebase_status, (panel_x + 10, y), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, firebase_color, 1)
-        y += 25
-        
         cv2.circle(display_frame, (panel_x + 15, y + 5), 6, state_color, -1)
         cv2.putText(display_frame, self.state.value, (panel_x + 30, y + 8), 
                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, state_color, 1)
@@ -792,17 +679,6 @@ class CleanEPIController:
             y += 18
         
         return display_frame
-
-    def _get_status_text(self):
-        status_texts = {
-            EntryState.EMPTY: "AGUARDANDO",
-            EntryState.ENTERING: "PESSOA DETECTADA", 
-            EntryState.ANALYZING: "ANALISANDO EPIs...",
-            EntryState.APPROVED: "ACESSO LIBERADO",
-            EntryState.REJECTED: "ACESSO NEGADO",
-            EntryState.EXITING: "SAINDO..."
-        }
-        return status_texts.get(self.state, "DESCONHECIDO")
 
     def update_zones(self):
         if time.time() - self.last_zone_update > 25:
@@ -824,13 +700,13 @@ class CleanEPIController:
                         self.zones.append(zone)
                     
                     if self.zones:
-                        print(f"Zona corrigida: {self.zones[0]['width']}x{self.zones[0]['height']}")
+                        print(f"Zona configurada: {self.zones[0]['width']}x{self.zones[0]['height']}")
             except:
                 pass
             self.last_zone_update = time.time()
 
     def run(self):
-        print("Sistema Clean EPI iniciado")
+        print("Sistema de deteccao de EPI iniciado")
         
         camera = None
         try:
@@ -879,8 +755,7 @@ class CleanEPIController:
                 if frame_count % 500 == 0:
                     fps = self.fps_monitor.get_fps()
                     uptime = (time.time() - start_time) / 60
-                    firebase_status = "🔥" if self.firebase_manager.is_connected() else "❌"
-                    print(f"FPS: {fps:.1f} | Estado: {self.state.value} | Firebase: {firebase_status} | {uptime:.1f}min")
+                    print(f"FPS: {fps:.1f} | Estado: {self.state.value} | {uptime:.1f}min")
                 
                 key = cv2.waitKey(1) & 0xFF
                 if key == 27:
@@ -903,25 +778,92 @@ class CleanEPIController:
             if frame_count > 0:
                 total_time = time.time() - start_time
                 avg_fps = frame_count / total_time
-                print(f"FPS médio final: {avg_fps:.2f}")
+                print(f"FPS medio final: {avg_fps:.2f}")
             
             if camera:
                 camera.stop()
             cv2.destroyAllWindows()
 
 
-# === MAIN ===
+#FIREBASE E TELEGRAM
+class CompatibleFirebaseManager:
+    def __init__(self):
+        self.db = None
+        self.connected = False
+        self._initialize()
+    
+    def _initialize(self):
+        try:
+            if not firebase_admin._apps:
+                if not os.path.exists(config.FIREBASE_KEY_PATH):
+                    print("Arquivo Firebase nao encontrado")
+                    return
+                    
+                cred = credentials.Certificate(config.FIREBASE_KEY_PATH)
+                firebase_admin.initialize_app(cred)
+                
+            self.db = firestore.client()
+            self.connected = True
+            print("Firebase conectado")
+            
+        except Exception as e:
+            print(f"Erro Firebase: {e}")
+            self.connected = False
+    
+    def is_connected(self):
+        return self.connected and self.db is not None
+    
+    def get_zones(self):
+        if not self.is_connected():
+            return []
+        try:
+            doc = self.db.collection('configuracoes').document('zones').get()
+            return doc.to_dict().get('zones', []) if doc.exists else []
+        except Exception as e:
+            print(f"Erro zonas: {e}")
+            return []
+    
+    def save_alert(self, alert_data):
+        if not self.is_connected():
+            print("Firebase indisponvel - alerta nao salvo")
+            return
+            
+        try:
+            self.db.collection('alertas_epi').add(alert_data)
+            print("Alerta salvo no Firebase")
+            
+        except Exception as e:
+            print(f"Erro ao salvar alerta: {e}")
+
+
+class FastTelegramManager:
+    def __init__(self):
+        self.session = requests.Session()
+        self.session.timeout = 5
+        
+    def send(self, message):
+        if not config.TELEGRAM_TOKEN:
+            return False
+        try:
+            url = f"https://api.telegram.org/bot{config.TELEGRAM_TOKEN}/sendMessage" 
+            self.session.post(url, data={'chat_id': config.TELEGRAM_CHAT_ID, 'text': message})
+            return True
+        except:
+            return False
+
+
+#MAIN
 def main():
     required_files = [config.MODEL_PATH, config.CLASSES_PATH]
     if not all(os.path.exists(f) for f in required_files):
-        print("Arquivos não encontrados")
+        print("Arquivos nao encontrados")
         return
     
     try:
         controller = CleanEPIController()
         controller.run()
     except Exception as e:
-        print(f"Erro crítico: {e}")
+        print(f"Erro critico: {e}")
 
 
 if __name__ == "__main__":
