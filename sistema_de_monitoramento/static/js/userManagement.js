@@ -1,5 +1,5 @@
 import { db } from './firebaseConfig.js';
-import { collection, addDoc, getDocs, deleteDoc, doc, query, where, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+import { collection, addDoc, getDocs, deleteDoc, doc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 // Chave AES para criptografia simétrica (use algo mais seguro em produção)
 const AES_KEY = "chaveSuperSecreta123!";
@@ -13,97 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const feedbackP = document.getElementById('userManagementFeedback');
 
     const DEFAULT_ADMIN_USER = 'adm';
-
-    // **VARIÁVEIS TELEGRAM**
-    let selectedChatId = null;
-    let widgetCreated = false;
-
-    // **CALLBACK GLOBAL TELEGRAM**
-    window.onTelegramAuth = function(user) {
-        console.log('🎯 Telegram Auth:', user);
-        selectedChatId = user.id;
-        
-        document.getElementById('chatIdValue').textContent = user.id;
-        document.getElementById('currentChatIdDisplay').classList.remove('hidden');
-        
-        // Auto-preencher nome
-        const nameField = document.getElementById('fullName');
-        if (!nameField.value && user.first_name) {
-            nameField.value = `${user.first_name} ${user.last_name || ''}`.trim();
-        }
-        
-        displayFeedback(`✅ Chat ID ${user.id} vinculado automaticamente!`);
-    };
-
-    // **CONTROLE CHECKBOX ALERTAS**
-    const receiveAlertsCheckbox = document.getElementById('receiveAlerts');
-    if (receiveAlertsCheckbox) {
-        receiveAlertsCheckbox.addEventListener('change', (e) => {
-            const section = document.getElementById('telegramConfigSection');
-            
-            if (e.target.checked) {
-                section.classList.remove('hidden');
-                createTelegramWidget();
-                console.log('🔔 Seção Telegram ativada');
-            } else {
-                section.classList.add('hidden');
-                selectedChatId = null;
-                document.getElementById('currentChatIdDisplay').classList.add('hidden');
-                console.log('📵 Seção Telegram desativada');
-            }
-        });
-    }
-
-    // **CRIAR WIDGET DINAMICAMENTE** (SOLUÇÃO PRINCIPAL)
-    function createTelegramWidget() {
-        if (widgetCreated) {
-            console.log('🔄 Widget já criado');
-            return;
-        }
-        
-        console.log('🚀 Criando widget Telegram...');
-        const container = document.getElementById('telegramWidgetContainer');
-        
-        if (!container) {
-            console.log('❌ Container não encontrado');
-            return;
-        }
-        
-        // **CRIAR SCRIPT DINAMICAMENTE**
-        const script = document.createElement('script');
-        script.async = true;
-        script.src = 'https://telegram.org/js/telegram-widget.js?22';
-        script.setAttribute('data-telegram-login', 'AlertaEpiBot');
-        script.setAttribute('data-size', 'large');
-        script.setAttribute('data-onauth', 'onTelegramAuth(user)');
-        script.setAttribute('data-request-access', 'write');
-        
-        // **ADICIONAR AO CONTAINER**
-        container.appendChild(script);
-        widgetCreated = true;
-        
-        console.log('✅ Script do widget adicionado');
-        
-        // **AGUARDAR CARREGAMENTO**
-        setTimeout(() => {
-            const iframe = container.querySelector('iframe');
-            if (iframe) {
-                console.log('✅ Widget Telegram carregado');
-            } else {
-                console.log('❌ Widget não carregou - verificar BotFather');
-                container.innerHTML = '<p class="text-red-400 text-xs">❌ Erro: Verificar configuração BotFather</p>';
-            }
-        }, 3000);
-    }
-
-    // **TOGGLE MÉTODO MANUAL**
-    const toggleBtn = document.getElementById('toggleManualChatId');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', () => {
-            const manualDiv = document.getElementById('manualChatIdDiv');
-            manualDiv.classList.toggle('hidden');
-        });
-    }
 
     // 🔐 Criptografa senha com AES
     function criptografarSenhaAES(senha) {
@@ -121,11 +30,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return users;
     }
 
-    // **RENDERIZAR LISTA COM STATUS TELEGRAM**
     function renderUserList(users) {
         if (!userListUL) return;
 
-        userListUL.innerHTML = '';
+        userListUL.innerHTML = ''; // Limpa a lista antes de renderizar
 
         if (users.length === 0) {
             const li = document.createElement('li');
@@ -135,46 +43,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        let telegramActiveCount = 0;
-
         users.forEach(user => {
-            // **Verificar campos Telegram**
-            const receiveAlerts = user.receber_alertas || false;
-            const chatId = user.telegram_chat_id || null;
-            
-            if (receiveAlerts && chatId) telegramActiveCount++;
-
             const li = document.createElement('li');
             li.className = 'flex items-center justify-between bg-gray-700/50 p-3 rounded-xl shadow';
 
-            const userInfo = document.createElement('div');
-            userInfo.className = 'flex-1';
+            const usernameSpan = document.createElement('span');
+            usernameSpan.className = 'text-gray-200 font-medium';
+            usernameSpan.textContent = user.user;
+            li.appendChild(usernameSpan);
 
-            // **Nome e status Telegram**
-            let telegramStatusHtml = '';
-            if (receiveAlerts && chatId) {
-                telegramStatusHtml = '<div class="text-green-400 text-xs">🔔 Telegram Ativo</div>';
-            } else if (receiveAlerts && !chatId) {
-                telegramStatusHtml = '<div class="text-yellow-400 text-xs">⏳ Telegram Pendente</div>';
-            } else {
-                telegramStatusHtml = '<div class="text-gray-400 text-xs">📵 Sem alertas</div>';
-            }
-
-            userInfo.innerHTML = `
-                <span class="text-gray-200 font-medium block">${user.nome || user.user}</span>
-                <span class="text-gray-400 text-xs block">${user.user}</span>
-                ${telegramStatusHtml}
-                ${chatId ? `<div class="text-blue-400 text-xs">ID: ${chatId}</div>` : ''}
-            `;
-
-            li.appendChild(userInfo);
-
-            // **Botões**
             if (user.user.toLowerCase() !== DEFAULT_ADMIN_USER) {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Excluir';
                 deleteButton.dataset.userId = user.id;
-                deleteButton.dataset.userName = user.user;
+                deleteButton.dataset.userName = user.user; // Adiciona para a mensagem de confirmação
                 deleteButton.className = 'deleteUserButton text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1 rounded-lg border border-red-500/50 hover:bg-red-500/20 transition-colors';
                 li.appendChild(deleteButton);
             } else {
@@ -186,12 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             userListUL.appendChild(li);
         });
-
-        // **Atualizar botão teste**
-        const testBtn = document.getElementById('testTelegramAlertsBtn');
-        if (testBtn) {
-            testBtn.textContent = `🔔 Teste (${telegramActiveCount})`;
-        }
     }
 
     // Listener em tempo real para a lista de usuários
@@ -210,18 +86,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // **FORMULÁRIO MODIFICADO COM CAMPOS TELEGRAM**
     async function handleAddUserFormSubmit(event) {
         event.preventDefault();
 
         const username = newUsernameInput?.value.trim();
         const password = newPasswordInput?.value;
         const confirmPassword = confirmPasswordInput?.value;
-        
-        // **CAMPOS TELEGRAM**
-        const fullName = document.getElementById('fullName')?.value.trim();
-        const receiveAlerts = document.getElementById('receiveAlerts')?.checked || false;
-        const finalChatId = selectedChatId || document.getElementById('manualChatId')?.value || null;
 
         if (!username || !password) {
             return displayFeedback("Usuário e senha são obrigatórios.", true);
@@ -230,44 +100,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             return displayFeedback("As senhas não coincidem.", true);
         }
 
-        // **Validar alertas**
-        if (receiveAlerts && !finalChatId) {
-            return displayFeedback("Para receber alertas, vincule o Chat ID do Telegram.", true);
-        }
-
-        // Valida se o usuário já existe
+        // Valida se o usuário já existe antes de adicionar
         const existingUsers = await getUsersOnce();
         if (existingUsers.find(u => u.user.toLowerCase() === username.toLowerCase())) {
             return displayFeedback("Este nome de usuário já existe.", true);
         }
 
         const senhaCriptografada = criptografarSenhaAES(password);
-        
-        // **ESTRUTURA EXPANDIDA COM CAMPOS TELEGRAM**
-        const userData = {
-            user: username,
-            pass: senhaCriptografada,
-            nome: fullName || username,
-            receber_alertas: receiveAlerts,
-            telegram_chat_id: finalChatId
-        };
-
         try {
-            await addDoc(collection(db, 'senha_login'), userData);
-            
-            const alertMsg = receiveAlerts ? 
-                (finalChatId ? '✅ Usuário criado e Chat ID vinculado!' : '✅ Usuário criado (Chat ID pendente)') :
-                '✅ Usuário criado!';
-            
-            displayFeedback(alertMsg);
+            await addDoc(collection(db, 'senha_login'), { user: username, pass: senhaCriptografada });
+            displayFeedback("Usuário adicionado com sucesso!");
             addUserForm?.reset();
-            
-            // **Reset Telegram**
-            selectedChatId = null;
-            document.getElementById('currentChatIdDisplay')?.classList.add('hidden');
-            document.getElementById('telegramConfigSection')?.classList.add('hidden');
-            document.getElementById('manualChatId').value = '';
-            
         } catch (error) {
             console.error("Erro ao salvar usuário:", error);
             displayFeedback("Erro ao adicionar usuário.", true);
@@ -311,6 +154,4 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     listenForUserChanges(); // Inicia o listener em tempo real
-    
-    console.log('✅ UserManagement carregado com funcionalidade Telegram');
 });
