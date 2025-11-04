@@ -1,5 +1,10 @@
 /* Estilos personalizados para o dashboard */
 
+header h1, header h2, header span {
+  font-family: 'Inter', sans-serif !important;
+}
+
+
 .kpi-card {
     display: flex;
     align-items: center;
