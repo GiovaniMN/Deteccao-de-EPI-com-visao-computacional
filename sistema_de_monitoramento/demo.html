@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link rel="stylesheet" as="style" onload="this.rel='stylesheet'" href="https://fonts.googleapis.com/css2?display=swap&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600" />
+    <title>Jupiter Supervision - Demonstração do Sistema</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link rel="stylesheet" href="./static/css/demo.css">
+</head>
+
+<body class="bg-gray-900 text-white overflow-x-hidden">
+    <header class="relative z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10">
+                        <img width="48" height="48" src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" alt="Jupiter Logo" />
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold bg-gradient-to-r from-orange-400 to-blue-900 bg-clip-text text-transparent">Jupiter Supervision</h1>
+                        <p class="text-xs text-gray-400">Supervisão Inteligente de EPIs</p>
+                    </div>
+                </div>
+                <nav class="flex items-center space-x-8">
+                    <a href="index.html" class="text-gray-300 hover:text-white transition-colors flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        <span class="hidden sm:inline">Voltar ao Início</span>
+                    </a>
+                    <button onclick="location.href='login.html'" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105">
+                        Acesso Sistema
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden py-16">
+        <div class="absolute inset-0 tech-grid opacity-20"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900/40"></div>
+
+        
+        <div class="absolute top-20 left-10 w-20 h-20 bg-blue-500/20 rounded-full animate-float"></div>
+        <div class="absolute top-40 right-20 w-16 h-16 bg-purple-500/20 rounded-full animate-float" style="animation-delay: -2s;"></div>
+        <div class="absolute bottom-40 left-20 w-12 h-12 bg-green-500/20 rounded-full animate-float" style="animation-delay: -4s;"></div>
+
+        <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    <span class="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                        Demonstração do Sistema
+                    </span>
+                </h1>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                    Veja como o Jupiter Supervision funciona na prática, detectando EPIs em tempo real
+                </p>
+            </div>
+
+            
+            <div class="glass-effect rounded-2xl p-6 border border-white/10">
+                <div class="video-container">
+                    <iframe 
+                        src="https://www.youtube.com/embed/YyrbH_th9kA" 
+                        title="Jupiter Supervision - Demonstração"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+                <div class="glass-effect rounded-2xl p-6 border border-white/10 text-center">
+                    <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Detecção Automática</h3>
+                    <p class="text-gray-400 text-sm">Identifica capacetes, óculos e botas instantaneamente</p>
+                </div>
+
+                <div class="glass-effect rounded-2xl p-6 border border-white/10 text-center">
+                    <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Tempo Real</h3>
+                    <p class="text-gray-400 text-sm">Monitoramento contínuo 24/7</p>
+                </div>
+
+                <div class="glass-effect rounded-2xl p-6 border border-white/10 text-center">
+                    <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Alertas Inteligentes</h3>
+                    <p class="text-gray-400 text-sm">Notificações instantâneas via Telegram</p>
+                </div>
+            </div>
+
+            
+        </div>
+    </section>
+
+   
+    <footer class="bg-gray-900 border-t border-gray-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10">
+                        <img src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" alt="Jupiter Logo" class="w-7 h-7" />
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">Jupiter Supervision</h3>
+                        <p class="text-gray-400 text-xs">Supervisão Inteligente de EPIs</p>
+                    </div>
+                </div>
+                <div class="text-center text-gray-400 text-sm">
+                    <p>&copy; 2025 Jupiter Supervision. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>
