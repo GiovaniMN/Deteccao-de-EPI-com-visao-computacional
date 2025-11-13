@@ -13,27 +13,24 @@ from enum import Enum
 import base64
 from datetime import datetime
 
-
-#LOGGIN
-logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(message)s')
+#configuracao de log para erros
+logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+#estados do controle de acesso
+class EstadoEntrada(Enum):
+    VAZIO = "VAZIO"
+    ENTRANDO = "ENTRANDO"
+    ANALISANDO = "ANALISANDO"
+    APROVADO = "APROVADO"
+    REJEITADO = "REJEITADO"
+    SAINDO = "SAINDO"
 
-#ESTADOS
-class EntryState(Enum):
-    EMPTY = "VAZIO"
-    ENTERING = "ENTRANDO"
-    ANALYZING = "ANALISANDO"
-    APPROVED = "APROVADO"
-    REJECTED = "REJEITADO"
-    EXITING = "SAINDO"
-
-
-#WEBCAM
-class FixedWebcamStream:
-    def __init__(self, src=0):
-        self.stream = cv2.VideoCapture(src)
-        if not self.stream.isOpened(): 
+#captura da camera
+class CapturaCamera:
+    def __init__(self, indice_camera=0):
+        self.stream = cv2.VideoCapture(indice_camera)
+        if not self.stream.isOpened():
             raise IOError("Camera indisponivel")
         
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
@@ -41,830 +38,788 @@ class FixedWebcamStream:
         self.stream.set(cv2.CAP_PROP_FPS, 30)
         self.stream.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         
-        ret, test_frame = self.stream.read()
+        ret, frame_teste = self.stream.read()
         if ret:
-            actual_w = int(self.stream.get(cv2.CAP_PROP_FRAME_WIDTH))
-            actual_h = int(self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            largura_real = int(self.stream.get(cv2.CAP_PROP_FRAME_WIDTH))
+            altura_real = int(self.stream.get(cv2.CAP_PROP_FRAME_HEIGHT))
         
-        self.frame = test_frame
-        self.frame_lock = Lock()
-        self.stopped = False
+        self.frame_atual = frame_teste
+        self.lock_frame = Lock()
+        self.parado = False
         
-        self.thread = Thread(target=self._update, daemon=True)
-        self.thread.start()
+        self.thread_captura = Thread(target=self.atualizar_frames, daemon=True)
+        self.thread_captura.start()
 
-    def _update(self):
-        while not self.stopped:
+    def atualizar_frames(self):
+        while not self.parado:
             ret, frame = self.stream.read()
             if ret:
-                with self.frame_lock:
-                    self.frame = frame
+                with self.lock_frame:
+                    self.frame_atual = frame
             else:
                 time.sleep(0.001)
 
-    def read(self):
-        with self.frame_lock:
-            return self.frame.copy() if self.frame is not None else None
+    def obter_frame(self):
+        with self.lock_frame:
+            return self.frame_atual.copy() if self.frame_atual is not None else None
 
-    def stop(self):
-        self.stopped = True
-        if self.thread.is_alive():
-            self.thread.join(timeout=0.5)
+    def parar(self):
+        self.parado = True
+        if self.thread_captura.is_alive():
+            self.thread_captura.join(timeout=0.5)
         if self.stream.isOpened():
             self.stream.release()
 
-
-#CONFIGURACOES
-class CleanConfig:
-    TELEGRAM_TOKEN = '7683594838:AAFNpr3hQuKIlWK7MGg0kFnoxeZiA4k94OQ'
-    TELEGRAM_CHAT_ID = '-4842024226'
+#configuracoes do sistema
+class Config:
+    TOKEN_TELEGRAM = '7683594838:AAFNpr3hQuKIlWK7MGg0kFnoxeZiA4k94OQ'
+    ID_CHAT_TELEGRAM = '-4842024226'
     
-    MODEL_PATH = '/home/epirasp/Desktop/coral_epi/modelos/epi_full_integer_quant_edgetpu.tflite'
-    CLASSES_PATH = '/home/epirasp/Desktop/coral_epi/modelos/classes.txt'
-    FIREBASE_KEY_PATH = '/home/epirasp/Desktop/coral_epi/firebase_key.json'
+    CAMINHO_MODELO = '/home/epirasp/Desktop/coral_epi/modelos/epi_full_integer_quant_edgetpu.tflite'
+    CAMINHO_CLASSES = '/home/epirasp/Desktop/coral_epi/modelos/classes.txt'
+    CAMINHO_CHAVE_FIREBASE = '/home/epirasp/Desktop/coral_epi/firebase_key.json'
     
-    WEB_REFERENCE_RESOLUTION = (640, 480)
-    INFERENCE_SIZE = (640, 640)
+    RESOLUCAO_WEB = (640, 480)
+    TAMANHO_INFERENCIA = (640, 640)
     
-    DETECTION_CONFIDENCE = {
+    CONFIANCA_MINIMA = {
         'pessoa': 0.30,
         'capacete': 0.58,
         'bota': 0.5,
         'oculos': 0.40
     }
     
-    MIN_DETECTION_AREA = {
+    AREA_MINIMA = {
         'pessoa': 5500,
         'capacete': 500,
         'bota': 150,
         'oculos': 130
     }
     
-    MAX_DETECTION_AREA = {
+    AREA_MAXIMA = {
         'pessoa': 150000,
         'capacete': 15000,
         'bota': 10000,
         'oculos': 8000
     }
     
-    PERSON_FRAMES = 8
-    EPI_FRAMES = 20
-    EPI_RATIO = 0.30
-    EXIT_FRAMES = 10
+    FRAMES_PESSOA_ESTAVEL = 8
+    FRAMES_ANALISE_EPI = 20
+    PROPORCAO_EPI_OK = 0.30
+    FRAMES_SAIDA = 10
     
-    #Thresholds para mostrar na imagem Firebase
-    ALERT_MIN_PRESENCE_RATE = {
+    #limites para mostrar na imagem do firebase
+    PRESENCA_MINIMA_ALERTA = {
         'pessoa': 0.50,
         'capacete': 0.40,
         'bota': 0.5,
         'oculos': 0.4
     }
     
-    COLORS = {
-        EntryState.EMPTY: (128, 128, 128),
-        EntryState.ENTERING: (255, 255, 0),
-        EntryState.ANALYZING: (255, 165, 0),
-        EntryState.APPROVED: (0, 255, 0),
-        EntryState.REJECTED: (0, 0, 255),
-        EntryState.EXITING: (128, 0, 128)
+    CORES_ESTADOS = {
+        EstadoEntrada.VAZIO: (128, 128, 128),
+        EstadoEntrada.ENTRANDO: (255, 255, 0),
+        EstadoEntrada.ANALISANDO: (255, 165, 0),
+        EstadoEntrada.APROVADO: (0, 255, 0),
+        EstadoEntrada.REJEITADO: (0, 0, 255),
+        EstadoEntrada.SAINDO: (128, 0, 128)
     }
     
-    CLASS_COLORS = {
+    CORES_EPIS = {
         'pessoa': (0, 255, 255),
         'capacete': (255, 0, 0),
         'bota': (0, 165, 255),
         'oculos': (255, 0, 255)
     }
     
-    REQUIRED_EPIS = {'capacete', 'bota', 'oculos'}
+    EPIS_OBRIGATORIOS = {'capacete', 'bota', 'oculos'}
+    
+    #ordem fixa dos nomes para dashboard
+    ORDEM_EPIS_DASHBOARD = ['capacete', 'bota', 'oculos']
 
+config = Config()
 
-config = CleanConfig()
-
-
-#TRACKER DE DETECCOES FILTRADAS
-class FilteredDetectionTracker:
+#rastreamento de deteccoes durante analise
+class RastreadorDeteccoes:
     def __init__(self):
-        self.reset()
+        self.reiniciar()
     
-    def reset(self):
-        self.detection_regions = defaultdict(lambda: {
-            'bboxes': [],
-            'confidences': [],
+    def reiniciar(self):
+        self.dados_por_classe = defaultdict(lambda: {
+            'caixas': [],
+            'confiancas': [],
             'total_frames': 0,
-            'detected_frames': 0,
-            'avg_bbox': None,
-            'max_confidence': 0.0
+            'frames_detectados': 0,
+            'caixa_media': None,
+            'maior_confianca': 0.0
         })
-        self.total_analysis_frames = 0
+        self.frames_analisados = 0
     
-    def add_frame_detections(self, detections):
-        self.total_analysis_frames += 1
+    def adicionar_frame(self, deteccoes):
+        self.frames_analisados += 1
         
-        detected_classes = set()
-        
-        for detection in detections:
-            if detection['in_zone']:
-                class_name = detection['class_name']
-                detected_classes.add(class_name)
+        for deteccao in deteccoes:
+            if deteccao['na_zona']:
+                classe = deteccao['classe']
                 
-                region = self.detection_regions[class_name]
-                region['bboxes'].append(detection['bbox'])
-                region['confidences'].append(detection['confidence'])
-                region['detected_frames'] += 1
-                region['max_confidence'] = max(region['max_confidence'], detection['confidence'])
+                dados = self.dados_por_classe[classe]
+                dados['caixas'].append(deteccao['bbox'])
+                dados['confiancas'].append(deteccao['confianca'])
+                dados['frames_detectados'] += 1
+                dados['maior_confianca'] = max(dados['maior_confianca'], deteccao['confianca'])
         
-        for class_name in ['pessoa', 'capacete', 'bota', 'oculos']:
-            self.detection_regions[class_name]['total_frames'] = self.total_analysis_frames
+        #atualizar total de frames para todas as classes
+        for classe in ['pessoa', 'capacete', 'bota', 'oculos']:
+            self.dados_por_classe[classe]['total_frames'] = self.frames_analisados
     
-    def get_filtered_representative_detections(self):
-        representative_detections = []
+    def obter_deteccoes_confiaveis(self):
+        deteccoes_validas = []
         
-        for class_name, region in self.detection_regions.items():
-            if region['total_frames'] == 0:
+        for classe, dados in self.dados_por_classe.items():
+            if dados['total_frames'] == 0:
                 continue
             
-            presence_rate = region['detected_frames'] / region['total_frames']
-            min_rate = config.ALERT_MIN_PRESENCE_RATE.get(class_name, 0.30)
+            presenca = dados['frames_detectados'] / dados['total_frames']
+            minimo_necessario = config.PRESENCA_MINIMA_ALERTA.get(classe, 0.30)
             
-            if presence_rate >= min_rate and region['bboxes']:
-                avg_bbox = self._calculate_average_bbox(region['bboxes'])
+            if presenca >= minimo_necessario and dados['caixas']:
+                bbox_media = self.calcular_bbox_media(dados['caixas'])
                 
-                representative_detections.append({
-                    'class_name': class_name,
-                    'bbox': avg_bbox,
-                    'presence_rate': presence_rate,
-                    'max_confidence': region['max_confidence'],
-                    'detected_frames': region['detected_frames'],
-                    'total_frames': region['total_frames'],
-                    'is_reliable': True
+                deteccoes_validas.append({
+                    'classe': classe,
+                    'bbox': bbox_media,
+                    'presenca': presenca,
+                    'confianca_max': dados['maior_confianca'],
+                    'frames_com': dados['frames_detectados'],
+                    'total_frames': dados['total_frames'],
+                    'confiavel': True
                 })
         
-        return representative_detections
+        return deteccoes_validas
     
-    def _calculate_average_bbox(self, bboxes):
-        if not bboxes:
+    def calcular_bbox_media(self, lista_bbox):
+        if not lista_bbox:
             return None
         
-        x1_sum = y1_sum = x2_sum = y2_sum = 0
-        count = len(bboxes)
+        x1_total = y1_total = x2_total = y2_total = 0
+        qtd = len(lista_bbox)
         
-        for x1, y1, x2, y2 in bboxes:
-            x1_sum += x1
-            y1_sum += y1
-            x2_sum += x2
-            y2_sum += y2
+        for x1, y1, x2, y2 in lista_bbox:
+            x1_total += x1
+            y1_total += y1
+            x2_total += x2
+            y2_total += y2
         
-        avg_bbox = (
-            int(x1_sum / count),
-            int(y1_sum / count),
-            int(x2_sum / count),
-            int(y2_sum / count)
-        )
+        return (int(x1_total / qtd), int(y1_total / qtd),
+                int(x2_total / qtd), int(y2_total / qtd))
+
+#monitor de fps
+class MostrarFPS:
+    def __init__(self):
+        self.tempos = deque(maxlen=30)
+        self.ultima_atualizacao = 0
+        self.fps_atual = 0
         
-        return avg_bbox
+    def atualizar(self, tempo_frame):
+        self.tempos.append(tempo_frame)
+        if time.time() - self.ultima_atualizacao > 0.5:
+            if len(self.tempos) >= 5:
+                tempo_medio = sum(self.tempos) / len(self.tempos)
+                self.fps_atual = 1.0 / tempo_medio if tempo_medio > 0 else 0
+            self.ultima_atualizacao = time.time()
     
-    def get_analysis_summary(self):
-        summary = {}
-        for class_name, region in self.detection_regions.items():
-            if region['total_frames'] > 0:
-                presence_rate = region['detected_frames'] / region['total_frames']
-                min_rate = config.ALERT_MIN_PRESENCE_RATE.get(class_name, 0.30)
-                is_reliable = presence_rate >= min_rate
-                
-                summary[class_name] = {
-                    'presence_rate': presence_rate,
-                    'detected_frames': region['detected_frames'],
-                    'total_frames': region['total_frames'],
-                    'is_reliable': is_reliable,
-                    'threshold': min_rate
-                }
-        return summary
+    def obter_fps(self):
+        return self.fps_atual
 
-
-#FPS
-class SimpleFPSMonitor:
+#preprocessamento da imagem para o modelo
+class PreparadorImagem:
     def __init__(self):
-        self.times = deque(maxlen=30)
-        self.last_update = 0
-        self.cached_fps = 0
+        self.tamanho_modelo = config.TAMANHO_INFERENCIA
         
-    def update(self, frame_time):
-        self.times.append(frame_time)
-        if time.time() - self.last_update > 0.5:
-            if len(self.times) >= 5:
-                avg_time = sum(self.times) / len(self.times)
-                self.cached_fps = 1.0 / avg_time if avg_time > 0 else 0
-            self.last_update = time.time()
-    
-    def get_fps(self):
-        return self.cached_fps
+    def preparar(self, frame):
+        altura, largura = frame.shape[:2]
+        escala = min(self.tamanho_modelo[0]/largura, self.tamanho_modelo[1]/altura)
+        nova_largura, nova_altura = int(largura * escala), int(altura * escala)
+        
+        redimensionado = cv2.resize(frame, (nova_largura, nova_altura),
+                                   interpolation=cv2.INTER_LINEAR)
+        
+        pad_topo = (self.tamanho_modelo[1] - nova_altura) // 2
+        pad_base = self.tamanho_modelo[1] - nova_altura - pad_topo
+        pad_esq = (self.tamanho_modelo[0] - nova_largura) // 2
+        pad_dir = self.tamanho_modelo[0] - nova_largura - pad_esq
+        
+        com_padding = cv2.copyMakeBorder(redimensionado, pad_topo, pad_base,
+                                        pad_esq, pad_dir, cv2.BORDER_CONSTANT,
+                                        value=[114, 114, 114])
+        
+        return com_padding, escala, pad_topo, pad_esq
 
-
-#PREPROCESSAMENTO
-class FixedPreprocessor:
+#controlador principal do sistema epi
+class ControladorEPI:
     def __init__(self):
-        self.target_size = config.INFERENCE_SIZE
+        self.firebase = GerenciadorFirebase()
+        self.telegram = GerenciadorTelegram()
+        self.preparador = PreparadorImagem()
+        self.fps = MostrarFPS()
+        self.rastreador = RastreadorDeteccoes()
         
-    def process(self, frame):
-        h, w = frame.shape[:2]
-        scale = min(self.target_size[0]/w, self.target_size[1]/h)
-        new_w, new_h = int(w * scale), int(h * scale)
+        self.estado = EstadoEntrada.VAZIO
+        self.tempo_estado = time.time()
         
-        resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+        self.historico_pessoa = deque(maxlen=max(config.FRAMES_PESSOA_ESTAVEL, config.FRAMES_SAIDA))
+        self.historico_epis = {epi: deque(maxlen=config.FRAMES_ANALISE_EPI)
+                              for epi in config.EPIS_OBRIGATORIOS}
         
-        top = (self.target_size[1] - new_h) // 2
-        bottom = self.target_size[1] - new_h - top
-        left = (self.target_size[0] - new_w) // 2
-        right = self.target_size[0] - new_w - left
+        self.deteccoes_cache = []
+        self.contadores_cache = {}
+        self.ultimo_alerta = 0
+        self.frame_para_alerta = None
         
-        padded = cv2.copyMakeBorder(resized, top, bottom, left, right, 
-                                   cv2.BORDER_CONSTANT, value=[114, 114, 114])
+        #carregar modelo e classes
+        self.modelo = YOLO(config.CAMINHO_MODELO, task='detect')
+        with open(config.CAMINHO_CLASSES, "r") as arquivo:
+            self.classes = arquivo.read().strip().split("\n")
         
-        return padded, scale, top, left
+        self.zonas = []
+        self.ultima_busca_zonas = 0
+        self.resolucao_camera = None
+        self.contador_frames = 0
 
-
-#CONTROLADOR
-class CleanEPIController:
-    def __init__(self):
-        self.firebase_manager = CompatibleFirebaseManager()
-        self.telegram_manager = FastTelegramManager()
-        self.preprocessor = FixedPreprocessor()
-        self.fps_monitor = SimpleFPSMonitor()
+    def pular_frame(self):
+        self.contador_frames += 1
         
-        self.detection_tracker = FilteredDetectionTracker()
-        
-        self.state = EntryState.EMPTY
-        self.state_time = time.time()
-        
-        self.person_history = deque(maxlen=max(config.PERSON_FRAMES, config.EXIT_FRAMES))
-        self.epi_history = {epi: deque(maxlen=config.EPI_FRAMES) for epi in config.REQUIRED_EPIS}
-        
-        self.detection_cache = []
-        self.counts_cache = {}
-        
-        self.last_alert = 0
-        self.clean_analysis_frame = None
-        
-        self.model = YOLO(config.MODEL_PATH, task='detect')
-        with open(config.CLASSES_PATH, "r") as f: 
-            self.classes = f.read().strip().split("\n")
-        
-        self.zones = []
-        self.last_zone_update = 0
-        self.camera_resolution = None
-        
-        self.frame_counter = 0      
-
-    def should_skip_frame(self):
-        self.frame_counter += 1
-        
-        if self.state == EntryState.EMPTY:
-            return self.frame_counter % 2 != 0
-        elif self.state == EntryState.ANALYZING:
+        #economizar processamento quando nao ha pessoa
+        if self.estado == EstadoEntrada.VAZIO:
+            return self.contador_frames % 2 != 0
+        elif self.estado == EstadoEntrada.ANALISANDO:
             return False
-        elif self.state in [EntryState.APPROVED, EntryState.REJECTED]:
-            return self.frame_counter % 2 != 0
+        elif self.estado in [EstadoEntrada.APROVADO, EstadoEntrada.REJEITADO]:
+            return self.contador_frames % 2 != 0
         else:
             return False
 
-    def detect_objects(self, frame):
-        if self.should_skip_frame() and self.detection_cache:
-            return self.detection_cache, self.counts_cache
+    def detectar_objetos(self, frame):
+        if self.pular_frame() and self.deteccoes_cache:
+            return self.deteccoes_cache, self.contadores_cache
         
         try:
-            processed_frame, scale, pad_top, pad_left = self.preprocessor.process(frame)
+            frame_prep, escala, pad_y, pad_x = self.preparador.preparar(frame)
             
-            results = self.model.predict(
-                processed_frame,
-                conf=0.1,
-                iou=0.45,
-                verbose=False,
-                imgsz=640,
-                device='cpu',
-                half=False,
-                augment=False
+            resultados = self.modelo.predict(
+                frame_prep, conf=0.1, iou=0.45, verbose=False,
+                imgsz=640, device='cpu', half=False, augment=False
             )
             
-            detections = []
-            counts = defaultdict(int)
+            deteccoes = []
+            contadores = defaultdict(int)
             
-            if results and results[0].boxes is not None:
-                for data in results[0].boxes.data.cpu().numpy():
-                    detection = self._process_detection_balanced(
-                        data, scale, pad_top, pad_left, frame.shape
-                    )
-                    if detection:
-                        detections.append(detection)
-                        if detection['in_zone']:
-                            counts[detection['class_name']] += 1
+            if resultados and resultados[0].boxes is not None:
+                for dados in resultados[0].boxes.data.cpu().numpy():
+                    deteccao = self.processar_deteccao(dados, escala, pad_y, pad_x, frame.shape)
+                    if deteccao:
+                        deteccoes.append(deteccao)
+                        if deteccao['na_zona']:
+                            contadores[deteccao['classe']] += 1
             
-            if self.state == EntryState.ANALYZING:
-                self.detection_tracker.add_frame_detections(detections)
-                if self.clean_analysis_frame is None:
-                    self.clean_analysis_frame = frame.copy()
+            #armazenar frame limpo durante analise
+            if self.estado == EstadoEntrada.ANALISANDO:
+                self.rastreador.adicionar_frame(deteccoes)
+                if self.frame_para_alerta is None:
+                    self.frame_para_alerta = frame.copy()
             
-            self.detection_cache = detections
-            self.counts_cache = dict(counts)
-            
-            return detections, counts
+            self.deteccoes_cache = deteccoes
+            self.contadores_cache = dict(contadores)
+            return deteccoes, contadores
             
         except Exception as e:
-            print(f"Erro deteccao: {e}")
-            return self.detection_cache, self.counts_cache
+            logger.error(f"Erro na deteccao: {e}")
+            return self.deteccoes_cache, self.contadores_cache
 
-    def _process_detection_balanced(self, data, scale, pad_top, pad_left, frame_shape):
+    def processar_deteccao(self, dados, escala, pad_y, pad_x, formato_frame):
         try:
-            x1, y1, x2, y2, conf, class_id = data
-            class_name = self.classes[int(class_id)]
+            x1, y1, x2, y2, confianca, id_classe = dados
+            classe = self.classes[int(id_classe)]
             
-            if class_name not in config.REQUIRED_EPIS and class_name != 'pessoa':
+            #filtrar classes invalidas
+            if classe not in config.EPIS_OBRIGATORIOS and classe != 'pessoa':
                 return None
-            if conf < config.DETECTION_CONFIDENCE.get(class_name, 0.5):
+            #filtrar confianca baixa
+            if confianca < config.CONFIANCA_MINIMA.get(classe, 0.5):
                 return None
             
-            x1 = (x1 - pad_left) / scale
-            y1 = (y1 - pad_top) / scale
-            x2 = (x2 - pad_left) / scale
-            y2 = (y2 - pad_top) / scale
+            #converter coordenadas para frame original
+            x1 = (x1 - pad_x) / escala
+            y1 = (y1 - pad_y) / escala
+            x2 = (x2 - pad_x) / escala
+            y2 = (y2 - pad_y) / escala
             
-            x1 = max(0, min(int(x1), frame_shape[1] - 1))
-            y1 = max(0, min(int(y1), frame_shape[0] - 1))
-            x2 = max(0, min(int(x2), frame_shape[1] - 1))
-            y2 = max(0, min(int(y2), frame_shape[0] - 1))
+            x1 = max(0, min(int(x1), formato_frame[1] - 1))
+            y1 = max(0, min(int(y1), formato_frame[0] - 1))
+            x2 = max(0, min(int(x2), formato_frame[1] - 1))
+            y2 = max(0, min(int(y2), formato_frame[0] - 1))
             
+            #filtrar por area
             area = (x2 - x1) * (y2 - y1)
-            if (area < config.MIN_DETECTION_AREA.get(class_name, 0) or 
-                area > config.MAX_DETECTION_AREA.get(class_name, 999999)):
+            if (area < config.AREA_MINIMA.get(classe, 0) or
+                area > config.AREA_MAXIMA.get(classe, 999999)):
                 return None
             
-            if class_name == 'pessoa':
-                h, w = y2 - y1, x2 - x1
-                if h <= 0 or w <= 0 or w/h > 2.8 or h < frame_shape[0] * 0.07:
+            #filtros especificos por classe
+            if classe == 'pessoa':
+                altura, largura = y2 - y1, x2 - x1
+                if (altura <= 0 or largura <= 0 or
+                    largura/altura > 2.8 or altura < formato_frame[0] * 0.07):
                     return None
-            
-            if class_name == 'oculos':
-                center_y = (y1 + y2) / 2
-                if center_y > frame_shape[0] * 0.65:
+            elif classe == 'oculos':
+                centro_y = (y1 + y2) / 2
+                if centro_y > formato_frame[0] * 0.65:
                     return None
-                    
-            elif class_name == 'bota':
-                center_y = (y1 + y2) / 2
-                if center_y < frame_shape[0] * 0.35:
+            elif classe == 'bota':
+                centro_y = (y1 + y2) / 2
+                if centro_y < formato_frame[0] * 0.35:
                     return None
             
             return {
                 'bbox': (x1, y1, x2, y2),
-                'class_name': class_name,
-                'confidence': float(conf),
-                'in_zone': self._is_in_zone(x1, y1, x2, y2),
+                'classe': classe,
+                'confianca': float(confianca),
+                'na_zona': self.esta_na_zona(x1, y1, x2, y2),
                 'area': area
             }
         except:
             return None
 
-    def _is_in_zone(self, x1, y1, x2, y2):
-        if not self.zones: 
+    def esta_na_zona(self, x1, y1, x2, y2):
+        if not self.zonas:
             return True
-        cx, cy = (x1 + x2) // 2, (y1 + y2) // 2
-        for zone in self.zones:
-            if (zone['x'] <= cx <= zone['x'] + zone['width'] and 
-                zone['y'] <= cy <= zone['y'] + zone['height']):
+        
+        centro_x = (x1 + x2) // 2
+        centro_y = (y1 + y2) // 2
+        
+        for zona in self.zonas:
+            if (zona['x'] <= centro_x <= zona['x'] + zona['largura'] and
+                zona['y'] <= centro_y <= zona['y'] + zona['altura']):
                 return True
         return False
 
-    def update_state(self, counts):
-        person_detected = counts.get('pessoa', 0) > 0
-        self.person_history.append(person_detected)
+    def atualizar_estado(self, contadores):
+        tem_pessoa = contadores.get('pessoa', 0) > 0
+        self.historico_pessoa.append(tem_pessoa)
         
-        if len(self.person_history) >= config.PERSON_FRAMES:
-            stable = sum(list(self.person_history)[-config.PERSON_FRAMES:]) >= config.PERSON_FRAMES * 0.75
+        #verificar estabilidade da pessoa
+        if len(self.historico_pessoa) >= config.FRAMES_PESSOA_ESTAVEL:
+            frames_recentes = list(self.historico_pessoa)[-config.FRAMES_PESSOA_ESTAVEL:]
+            pessoa_estavel = sum(frames_recentes) >= config.FRAMES_PESSOA_ESTAVEL * 0.75
         else:
-            stable = False
+            pessoa_estavel = False
             
-        if len(self.person_history) >= config.EXIT_FRAMES:
-            exiting = sum(list(self.person_history)[-config.EXIT_FRAMES:]) <= config.EXIT_FRAMES * 0.25
+        #verificar se pessoa esta saindo
+        if len(self.historico_pessoa) >= config.FRAMES_SAIDA:
+            frames_saida = list(self.historico_pessoa)[-config.FRAMES_SAIDA:]
+            pessoa_saindo = sum(frames_saida) <= config.FRAMES_SAIDA * 0.25
         else:
-            exiting = False
+            pessoa_saindo = False
         
-        duration = time.time() - self.state_time
+        tempo_no_estado = time.time() - self.tempo_estado
         
-        if self.state == EntryState.EMPTY:
-            if stable:
-                self._change_state(EntryState.ENTERING)
+        #maquina de estados
+        if self.estado == EstadoEntrada.VAZIO:
+            if pessoa_estavel:
+                self.mudar_estado(EstadoEntrada.ENTRANDO)
                 
-        elif self.state == EntryState.ENTERING:
-            if not stable:
-                self._change_state(EntryState.EMPTY)
-            elif duration >= 1.5:
-                self._change_state(EntryState.ANALYZING)
-                self.detection_tracker.reset()
-                self.clean_analysis_frame = None
-                for epi in config.REQUIRED_EPIS:
-                    self.epi_history[epi].clear()
+        elif self.estado == EstadoEntrada.ENTRANDO:
+            if not pessoa_estavel:
+                self.mudar_estado(EstadoEntrada.VAZIO)
+            elif tempo_no_estado >= 1.5:
+                self.mudar_estado(EstadoEntrada.ANALISANDO)
+                self.iniciar_analise()
                     
-        elif self.state == EntryState.ANALYZING:
-            if not stable:
-                self._change_state(EntryState.EXITING)
+        elif self.estado == EstadoEntrada.ANALISANDO:
+            if not pessoa_estavel:
+                self.mudar_estado(EstadoEntrada.SAINDO)
             else:
-                for epi in config.REQUIRED_EPIS:
-                    self.epi_history[epi].append(counts.get(epi, 0) > 0)
-                
-                min_samples = min(len(h) for h in self.epi_history.values() if h)
-                if min_samples >= config.EPI_FRAMES:
-                    if self._all_epis_ok():
-                        self._change_state(EntryState.APPROVED)
-                    else:
-                        self._change_state(EntryState.REJECTED)
-                        self._send_alert()
+                self.analisar_epis(contadores)
                         
-        elif self.state in [EntryState.APPROVED, EntryState.REJECTED]:
-            if exiting:
-                self._change_state(EntryState.EXITING)
+        elif self.estado in [EstadoEntrada.APROVADO, EstadoEntrada.REJEITADO]:
+            if pessoa_saindo:
+                self.mudar_estado(EstadoEntrada.SAINDO)
                 
-        elif self.state == EntryState.EXITING:
-            if not person_detected and len(self.person_history) >= config.EXIT_FRAMES:
-                recent = list(self.person_history)[-config.EXIT_FRAMES:]
-                if not any(recent):
-                    self._change_state(EntryState.EMPTY)
+        elif self.estado == EstadoEntrada.SAINDO:
+            if not tem_pessoa and len(self.historico_pessoa) >= config.FRAMES_SAIDA:
+                if not any(list(self.historico_pessoa)[-config.FRAMES_SAIDA:]):
+                    self.mudar_estado(EstadoEntrada.VAZIO)
 
-    def _all_epis_ok(self):
-        for epi, history in self.epi_history.items():
-            if not history or sum(history) < len(history) * config.EPI_RATIO:
+    def iniciar_analise(self):
+        self.rastreador.reiniciar()
+        self.frame_para_alerta = None
+        for epi in config.EPIS_OBRIGATORIOS:
+            self.historico_epis[epi].clear()
+
+    def analisar_epis(self, contadores):
+        for epi in config.EPIS_OBRIGATORIOS:
+            self.historico_epis[epi].append(contadores.get(epi, 0) > 0)
+        
+        #verificar se temos dados suficientes
+        amostras_minimas = min(len(hist) for hist in self.historico_epis.values() if hist)
+        
+        if amostras_minimas >= config.FRAMES_ANALISE_EPI:
+            if self.todos_epis_ok():
+                self.mudar_estado(EstadoEntrada.APROVADO)
+            else:
+                self.mudar_estado(EstadoEntrada.REJEITADO)
+                self.enviar_alerta()
+
+    def todos_epis_ok(self):
+        for epi, historico in self.historico_epis.items():
+            if not historico:
+                return False
+            proporcao = sum(historico) / len(historico)
+            if proporcao < config.PROPORCAO_EPI_OK:
                 return False
         return True
 
-    def _change_state(self, new_state):
-        if new_state != self.state:
-            print(f"Estado: {self.state.value} → {new_state.value}")
-            self.state = new_state
-            self.state_time = time.time()
+    def mudar_estado(self, novo_estado):
+        if novo_estado != self.estado:
+            print(f"Estado: {self.estado.value} → {novo_estado.value}")
+            self.estado = novo_estado
+            self.tempo_estado = time.time()
 
-    def _send_alert(self):
-        if time.time() - self.last_alert < 8:
+    def enviar_alerta(self):
+        if time.time() - self.ultimo_alerta < 8:
             return
         
-        missing = []
-        for epi, history in self.epi_history.items():
-            if not history or sum(history) < len(history) * config.EPI_RATIO:
-                missing.append(epi)
+        #nomes em ordem fixa para dashboard
+        epis_faltantes = []
+        for epi in config.ORDEM_EPIS_DASHBOARD:
+            historico = self.historico_epis.get(epi)
+            if not historico:
+                continue
+            proporcao = sum(historico) / len(historico)
+            if proporcao < config.PROPORCAO_EPI_OK:
+                epis_faltantes.append(epi)
         
-        if missing:
-            names = {'capacete': 'Capacete', 'bota': 'Bota', 'oculos': 'Óculos'}
-            missing_names = [names.get(e, e) for e in missing]
-            msg = f"ACESSO NEGADO\nFaltando: {', '.join(missing_names)}"
+        if epis_faltantes:
+            nomes = {'capacete': 'Capacete', 'bota': 'Bota', 'oculos': 'Óculos'}
+            #manter ordem original dos faltantes
+            faltantes = [nomes.get(epi, epi) for epi in epis_faltantes]
+            mensagem = f"ACESSO NEGADO\nFaltando: {', '.join(faltantes)}"
             
-            Thread(target=self.telegram_manager.send, args=(msg,), daemon=True).start()
-            Thread(target=self._send_clean_firebase_alert, 
-                   args=(missing, msg), daemon=True).start()
+            Thread(target=self.telegram.enviar, args=(mensagem,), daemon=True).start()
+            Thread(target=self.salvar_alerta_firebase, args=(epis_faltantes, mensagem), daemon=True).start()
             
-            self.last_alert = time.time()
+            self.ultimo_alerta = time.time()
 
-    def _create_clean_alert_image(self):
-        if self.clean_analysis_frame is None:
-            h, w = self.camera_resolution[1], self.camera_resolution[0]
-            alert_frame = np.zeros((h, w, 3), dtype=np.uint8)
+    def criar_imagem_alerta(self):
+        if self.frame_para_alerta is None:
+            altura, largura = self.resolucao_camera[1], self.resolucao_camera[0]
+            frame_alerta = np.zeros((altura, largura, 3), dtype=np.uint8)
         else:
-            alert_frame = self.clean_analysis_frame.copy()
+            frame_alerta = self.frame_para_alerta.copy()
         
-        #FILTRO DE CONF
-        reliable_detections = self.detection_tracker.get_filtered_representative_detections()
+        deteccoes_confiaveis = self.rastreador.obter_deteccoes_confiaveis()
         
-        #EXIBICAO DAS CAIXAS
-        for detection in reliable_detections:
-            x1, y1, x2, y2 = detection['bbox']
-            class_name = detection['class_name']
-            presence_rate = detection['presence_rate']
+        #desenhar deteccoes na imagem
+        for det in deteccoes_confiaveis:
+            x1, y1, x2, y2 = det['bbox']
+            classe = det['classe']
+            confianca = max(0.0, min(1.0, det['confianca_max']))
             
-            color = config.CLASS_COLORS.get(class_name, (255, 255, 255))
+            cor = config.CORES_EPIS.get(classe, (255, 255, 255))
+            
+            cv2.rectangle(frame_alerta, (x1, y1), (x2, y2), cor, 2)
+            
+            texto = f"{classe.upper()}: {confianca:.0%}"
+            tamanho_texto = cv2.getTextSize(texto, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
+            
+            cv2.rectangle(frame_alerta, (x1, y1-28), (x1 + tamanho_texto[0] + 8, y1-2), cor, -1)
+            cv2.putText(frame_alerta, texto, (x1 + 4, y1 - 8),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
-            thickness = 2
-            
-            #BOUNDING BOX
-            cv2.rectangle(alert_frame, (x1, y1), (x2, y2), color, thickness)
-            
-            #NOME + PORCENTAGEM
-            label = f"{class_name.upper()}: {presence_rate:.0%}"
-            
-            #FONTE
-            font_scale = 0.6
-            font_thickness = 2
-            
-            #BACKGROUND DO TEXTO
-            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness)[0]
-
-            bg_padding = 4
-            bg_x1 = x1
-            bg_y1 = y1 - 28
-            bg_x2 = x1 + label_size[0] + (bg_padding * 2)
-            bg_y2 = y1 - 2
-            
-            cv2.rectangle(alert_frame, (bg_x1, bg_y1), (bg_x2, bg_y2), color, -1)
-            
-            text_x = x1 + bg_padding
-            text_y = y1 - 8
-            
-            cv2.putText(alert_frame, label, (text_x, text_y), 
-                       cv2.FONT_HERSHEY_SIMPLEX, font_scale, (255, 255, 255), font_thickness)
-    
-        #TIMESTAMP LIMPO
-        timestamp = datetime.now().strftime("%d/%m/%Y %H:%M")
-        cv2.putText(alert_frame, timestamp, (10, alert_frame.shape[0] - 15), 
+        #timestamp
+        agora = datetime.now().strftime("%d/%m/%Y %H:%M")
+        cv2.putText(frame_alerta, agora, (10, frame_alerta.shape[0] - 15),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (200, 200, 200), 1)
         
-        return alert_frame
+        return frame_alerta
 
-    def _send_clean_firebase_alert(self, missing_epis, message):
+    def salvar_alerta_firebase(self, epis_faltantes, mensagem):
         try:
-            clean_image = self._create_clean_alert_image()
+            imagem = self.criar_imagem_alerta()
+            _, buffer = cv2.imencode('.jpg', imagem, [cv2.IMWRITE_JPEG_QUALITY, 90])
+            imagem_b64 = base64.b64encode(buffer).decode('utf-8')
             
-            _, buffer = cv2.imencode('.jpg', clean_image, 
-                                   [int(cv2.IMWRITE_JPEG_QUALITY), 90])
-            img_base64 = base64.b64encode(buffer).decode('utf-8')
-            
-            alert_data = {
-                'mensagem': message,
-                'epis_faltantes': missing_epis,
+            dados = {
+                'mensagem': mensagem,
+                'epis_faltantes': epis_faltantes,
                 'data_hora': datetime.now().isoformat(),
-                'imagem_base64': img_base64
+                'imagem_base64': imagem_b64
             }
             
-            self.firebase_manager.save_alert(alert_data)
-            print("Alerta limpo salvo no Firebase")
-            
-            #LOG DAS DETECCOES
-            reliable_detections = self.detection_tracker.get_filtered_representative_detections()
-            if reliable_detections:
-                print("Mostrado na imagem:")
-                for det in reliable_detections:
-                    print(f"   {det['class_name']}: {det['presence_rate']:.0%}")
-            else:
-                print("Imagem enviada sem deteccoes (apenas frame limpo)")
+            self.firebase.salvar_alerta(dados)
             
         except Exception as e:
-            print(f"Erro ao enviar alerta: {e}")
+            logger.error(f"Erro ao salvar alerta: {e}")
 
-    #METODOS
-    def draw_fixed_ui(self, frame, detections, counts):
-
-        self._current_frame = frame.copy()
+    def desenhar_interface(self, frame, deteccoes, contadores):
+        display = frame.copy()
+        altura, largura = display.shape[:2]
         
-        display_frame = frame.copy()
-        h, w = display_frame.shape[:2]
+        cor_estado = config.CORES_ESTADOS.get(self.estado, (255, 255, 255))
         
-        state_color = config.COLORS.get(self.state, (255, 255, 255))
-        
-        for zone in self.zones:
-            cv2.rectangle(display_frame, 
-                        (zone['x'], zone['y']), 
-                        (zone['x'] + zone['width'], zone['y'] + zone['height']), 
-                        state_color, 3)
+        #desenhar zonas de deteccao
+        for zona in self.zonas:
+            cv2.rectangle(display, (zona['x'], zona['y']),
+                         (zona['x'] + zona['largura'], zona['y'] + zona['altura']),
+                         cor_estado, 3)
             
-            overlay = display_frame.copy()
-            cv2.rectangle(overlay, 
-                        (zone['x'], zone['y']), 
-                        (zone['x'] + zone['width'], zone['y'] + zone['height']), 
-                        state_color, -1)
-            cv2.addWeighted(overlay, 0.25, display_frame, 0.75, 0, display_frame)
+            overlay = display.copy()
+            cv2.rectangle(overlay, (zona['x'], zona['y']),
+                         (zona['x'] + zona['largura'], zona['y'] + zona['altura']),
+                         cor_estado, -1)
+            cv2.addWeighted(overlay, 0.25, display, 0.75, 0, display)
         
-        for det in detections:
-            if not det['in_zone']:
+        #desenhar deteccoes em tempo real
+        for det in deteccoes:
+            if not det['na_zona']:
                 continue
                 
             x1, y1, x2, y2 = det['bbox']
-            class_name = det['class_name']
-            conf = det['confidence']
+            classe = det['classe']
+            confianca = det['confianca']
             
-            color = config.CLASS_COLORS.get(class_name, (255, 255, 255))
-            thickness = max(2, int(conf * 3))
+            cor = config.CORES_EPIS.get(classe, (255, 255, 255))
+            espessura = max(2, int(confianca * 3))
             
-            cv2.rectangle(display_frame, (x1, y1), (x2, y2), color, thickness)
+            cv2.rectangle(display, (x1, y1), (x2, y2), cor, espessura)
             
-            label = f"{class_name.upper()}: {conf:.2f}"
-            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
+            texto = f"{classe.upper()}: {confianca:.2f}"
+            tamanho = cv2.getTextSize(texto, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
             
-            cv2.rectangle(display_frame, (x1, y1 - 20), 
-                        (x1 + label_size[0] + 5, y1), color, -1)
-            
-            cv2.putText(display_frame, label, (x1 + 2, y1 - 5), 
+            cv2.rectangle(display, (x1, y1-20), (x1 + tamanho[0] + 5, y1), cor, -1)
+            cv2.putText(display, texto, (x1 + 2, y1 - 5),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
         
-        panel_w = 250
-        panel_x = w - panel_w
+        #painel lateral com informacoes
+        self.desenhar_painel_info(display, contadores, cor_estado)
+        return display
+
+    def desenhar_painel_info(self, frame, contadores, cor_estado):
+        altura, largura = frame.shape[:2]
+        largura_painel = 250
+        x_painel = largura - largura_painel
         
-        cv2.rectangle(display_frame, (panel_x, 0), (w, 180), (25, 25, 25), -1)
+        cv2.rectangle(frame, (x_painel, 0), (largura, 180), (25, 25, 25), -1)
         
         y = 25
-        cv2.putText(display_frame, "CONTROLE EPI", (panel_x + 10, y), 
+        cv2.putText(frame, "CONTROLE EPI", (x_painel + 10, y),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
         y += 35
         
-        fps = self.fps_monitor.get_fps()
-        cv2.putText(display_frame, f"FPS: {fps:.1f}", (panel_x + 10, y), 
+        fps_valor = self.fps.obter_fps()
+        cv2.putText(frame, f"FPS: {fps_valor:.1f}", (x_painel + 10, y),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
         y += 25
         
-        cv2.circle(display_frame, (panel_x + 15, y + 5), 6, state_color, -1)
-        cv2.putText(display_frame, self.state.value, (panel_x + 30, y + 8), 
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, state_color, 1)
+        cv2.circle(frame, (x_painel + 15, y + 5), 6, cor_estado, -1)
+        cv2.putText(frame, self.estado.value, (x_painel + 30, y + 8),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.5, cor_estado, 1)
         y += 25
         
-        for cls in ['pessoa', 'capacete', 'bota', 'oculos']:
-            count = counts.get(cls, 0)
-            color = config.CLASS_COLORS.get(cls, (255, 255, 255))
+        #contadores das classes em ordem fixa
+        for classe in ['pessoa', 'capacete', 'bota', 'oculos']:
+            count = contadores.get(classe, 0)
+            cor = config.CORES_EPIS.get(classe, (255, 255, 255))
             
-            cv2.circle(display_frame, (panel_x + 12, y - 2), 4, color, -1)
-            cv2.putText(display_frame, f"{cls}: {count}", (panel_x + 25, y), 
+            cv2.circle(frame, (x_painel + 12, y - 2), 4, cor, -1)
+            cv2.putText(frame, f"{classe}: {count}", (x_painel + 25, y),
                        cv2.FONT_HERSHEY_SIMPLEX, 0.45, (255, 255, 255), 1)
             y += 18
-        
-        return display_frame
 
-    def update_zones(self):
-        if time.time() - self.last_zone_update > 25:
+    def atualizar_zonas(self):
+        if time.time() - self.ultima_busca_zonas > 25:
             try:
-                web_zones = self.firebase_manager.get_zones()
-                if web_zones and self.camera_resolution:
-                    scale_x = self.camera_resolution[0] / config.WEB_REFERENCE_RESOLUTION[0]
-                    scale_y = self.camera_resolution[1] / config.WEB_REFERENCE_RESOLUTION[1]
+                zonas_firebase = self.firebase.obter_zonas()
+                if zonas_firebase and self.resolucao_camera:
+                    escala_x = self.resolucao_camera[0] / config.RESOLUCAO_WEB[0]
+                    escala_y = self.resolucao_camera[1] / config.RESOLUCAO_WEB[1]
                     
-                    self.zones = []
-                    for wz in web_zones:
-                        zone = {
-                            'nome': wz.get('nome', 'ENTRADA'),
-                            'x': int(wz['x'] * scale_x),
-                            'y': int(wz['y'] * scale_y),
-                            'width': int(wz['width'] * scale_x),
-                            'height': int(wz['height'] * scale_y)
+                    self.zonas = []
+                    for zona in zonas_firebase:
+                        zona_convertida = {
+                            'nome': zona.get('nome', 'ENTRADA'),
+                            'x': int(zona['x'] * escala_x),
+                            'y': int(zona['y'] * escala_y),
+                            'largura': int(zona['width'] * escala_x),
+                            'altura': int(zona['height'] * escala_y)
                         }
-                        self.zones.append(zone)
+                        self.zonas.append(zona_convertida)
                     
-                    if self.zones:
-                        print(f"Zona configurada: {self.zones[0]['width']}x{self.zones[0]['height']}")
+                    if self.zonas:
+                        print(f"Zona: {self.zonas[0]['largura']}x{self.zonas[0]['altura']}")
             except:
                 pass
-            self.last_zone_update = time.time()
+            self.ultima_busca_zonas = time.time()
 
-    def run(self):
-        print("Sistema de deteccao de EPI iniciado")
+    def executar(self):
+        print("Iniciando detector EPI")
         
-        camera = None
         try:
-            camera = FixedWebcamStream(src=0)
+            camera = CapturaCamera(0)
             time.sleep(1.5)
             
-            test_frame = camera.read()
-            if test_frame is None:
-                raise RuntimeError("Câmera indisponível")
+            frame_teste = camera.obter_frame()
+            if frame_teste is None:
+                raise RuntimeError("Camera indisponivel")
             
-            self.camera_resolution = (test_frame.shape[1], test_frame.shape[0])
-            print(f"Sistema usando: {self.camera_resolution}")
+            self.resolucao_camera = (frame_teste.shape[1], frame_teste.shape[0])
+            print(f"Resolucao: {self.resolucao_camera}")
             
         except Exception as e:
-            print(f"Erro câmera: {e}")
+            logger.error(f"Erro na camera: {e}")
             return
 
         cv2.namedWindow("Detector de EPI", cv2.WINDOW_NORMAL)
         cv2.resizeWindow("Detector de EPI", 800, 600)
         
-        frame_count = 0
-        start_time = time.time()
+        contador_frames = 0
+        inicio = time.time()
 
         try:
             while True:
-                loop_start = time.time()
+                inicio_loop = time.time()
                 
-                frame = camera.read()
+                frame = camera.obter_frame()
                 if frame is None:
                     continue
                 
-                frame_count += 1
+                contador_frames += 1
                 
-                if frame_count % 100 == 1:
-                    self.update_zones()
+                #buscar zonas atualizadas periodicamente
+                if contador_frames % 100 == 1:
+                    self.atualizar_zonas()
                 
-                detections, counts = self.detect_objects(frame)
-                self.update_state(counts)
+                deteccoes, contadores = self.detectar_objetos(frame)
+                self.atualizar_estado(contadores)
                 
-                display_frame = self.draw_fixed_ui(frame, detections, counts)
-                cv2.imshow("Detector de EPI", display_frame)
+                frame_final = self.desenhar_interface(frame, deteccoes, contadores)
+                cv2.imshow("Detector de EPI", frame_final)
                 
-                frame_time = time.time() - loop_start
-                self.fps_monitor.update(frame_time)
+                tempo_frame = time.time() - inicio_loop
+                self.fps.atualizar(tempo_frame)
                 
-                if frame_count % 500 == 0:
-                    fps = self.fps_monitor.get_fps()
-                    uptime = (time.time() - start_time) / 60
-                    print(f"FPS: {fps:.1f} | Estado: {self.state.value} | {uptime:.1f}min")
+                #log periodico de performance
+                if contador_frames % 500 == 0:
+                    fps = self.fps.obter_fps()
+                    minutos = (time.time() - inicio) / 60
+                    print(f"FPS: {fps:.1f} | Estado: {self.estado.value} | {minutos:.1f}min")
                 
-                key = cv2.waitKey(1) & 0xFF
-                if key == 27:
+                tecla = cv2.waitKey(1) & 0xFF
+                if tecla == 27:
                     break
-                elif key == ord('r'):
-                    print("Reset")
-                    self.state = EntryState.EMPTY
-                    self.state_time = time.time()
-                    self.person_history.clear()
-                    self.detection_tracker.reset()
-                    self.clean_analysis_frame = None
-                    for epi in config.REQUIRED_EPIS:
-                        self.epi_history[epi].clear()
+                elif tecla == ord('r'):
+                    self.resetar_sistema()
                 
         except KeyboardInterrupt:
-            print("Parado")
+            print("Sistema interrompido")
         finally:
-            print("Finalizando...")
+            if contador_frames > 0:
+                tempo_total = time.time() - inicio
+                fps_medio = contador_frames / tempo_total
+                print(f"FPS medio: {fps_medio:.2f}")
             
-            if frame_count > 0:
-                total_time = time.time() - start_time
-                avg_fps = frame_count / total_time
-                print(f"FPS medio final: {avg_fps:.2f}")
-            
-            if camera:
-                camera.stop()
+            camera.parar()
             cv2.destroyAllWindows()
 
+    def resetar_sistema(self):
+        self.estado = EstadoEntrada.VAZIO
+        self.tempo_estado = time.time()
+        self.historico_pessoa.clear()
+        self.rastreador.reiniciar()
+        self.frame_para_alerta = None
+        for epi in config.EPIS_OBRIGATORIOS:
+            self.historico_epis[epi].clear()
 
-#FIREBASE E TELEGRAM
-class CompatibleFirebaseManager:
+#gerenciador firebase
+class GerenciadorFirebase:
     def __init__(self):
         self.db = None
-        self.connected = False
-        self._initialize()
+        self.conectado = False
+        self.inicializar()
     
-    def _initialize(self):
+    def inicializar(self):
         try:
             if not firebase_admin._apps:
-                if not os.path.exists(config.FIREBASE_KEY_PATH):
-                    print("Arquivo Firebase nao encontrado")
+                if not os.path.exists(config.CAMINHO_CHAVE_FIREBASE):
+                    logger.error("Chave Firebase nao encontrada")
                     return
                     
-                cred = credentials.Certificate(config.FIREBASE_KEY_PATH)
+                cred = credentials.Certificate(config.CAMINHO_CHAVE_FIREBASE)
                 firebase_admin.initialize_app(cred)
                 
             self.db = firestore.client()
-            self.connected = True
+            self.conectado = True
             print("Firebase conectado")
             
         except Exception as e:
-            print(f"Erro Firebase: {e}")
-            self.connected = False
+            logger.error(f"Erro Firebase: {e}")
+            self.conectado = False
     
-    def is_connected(self):
-        return self.connected and self.db is not None
+    def esta_conectado(self):
+        return self.conectado and self.db is not None
     
-    def get_zones(self):
-        if not self.is_connected():
+    def obter_zonas(self):
+        if not self.esta_conectado():
             return []
         try:
             doc = self.db.collection('configuracoes').document('zones').get()
             return doc.to_dict().get('zones', []) if doc.exists else []
         except Exception as e:
-            print(f"Erro zonas: {e}")
+            logger.error(f"Erro ao buscar zonas: {e}")
             return []
     
-    def save_alert(self, alert_data):
-        if not self.is_connected():
-            print("Firebase indisponvel - alerta nao salvo")
+    def salvar_alerta(self, dados):
+        if not self.esta_conectado():
+            logger.warning("Firebase desconectado - alerta nao salvo")
             return
             
         try:
-            self.db.collection('alertas_epi').add(alert_data)
+            self.db.collection('alertas_epi').add(dados)
             print("Alerta salvo no Firebase")
-            
         except Exception as e:
-            print(f"Erro ao salvar alerta: {e}")
+            logger.error(f"Erro ao salvar alerta: {e}")
 
-
-class FastTelegramManager:
+#gerenciador telegram
+class GerenciadorTelegram:
     def __init__(self):
-        self.session = requests.Session()
-        self.session.timeout = 5
+        self.sessao = requests.Session()
+        self.sessao.timeout = 5
         
-    def send(self, message):
-        if not config.TELEGRAM_TOKEN:
+    def enviar(self, mensagem):
+        if not config.TOKEN_TELEGRAM:
             return False
         try:
-            url = f"https://api.telegram.org/bot{config.TELEGRAM_TOKEN}/sendMessage"
-            self.session.post(url, data={'chat_id': config.TELEGRAM_CHAT_ID, 'text': message})
+            url = f"https://api.telegram.org/bot{config.TOKEN_TELEGRAM}/sendMessage"
+            dados = {'chat_id': config.ID_CHAT_TELEGRAM, 'text': mensagem}
+            self.sessao.post(url, data=dados)
             return True
         except:
             return False
 
-
-#MAIN
+#funcao principal
 def main():
-    required_files = [config.MODEL_PATH, config.CLASSES_PATH]
-    if not all(os.path.exists(f) for f in required_files):
-        print("Arquivos nao encontrados")
+    arquivos_necessarios = [config.CAMINHO_MODELO, config.CAMINHO_CLASSES]
+    arquivos_faltando = [arq for arq in arquivos_necessarios if not os.path.exists(arq)]
+    
+    if arquivos_faltando:
+        print(f"Arquivos nao encontrados: {arquivos_faltando}")
         return
     
     try:
-        controller = CleanEPIController()
-        controller.run()
+        sistema = ControladorEPI()
+        sistema.executar()
     except Exception as e:
-        print(f"Erro critico: {e}")
-
+        logger.error(f"Erro critico: {e}")
 
 if __name__ == "__main__":
     main()
