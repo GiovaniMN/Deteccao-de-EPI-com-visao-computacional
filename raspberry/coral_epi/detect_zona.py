@@ -73,7 +73,7 @@ class CapturaCamera:
 #configuracoes do sistema
 class Config:
     TOKEN_TELEGRAM = '7683594838:AAFNpr3hQuKIlWK7MGg0kFnoxeZiA4k94OQ'
-    ID_CHAT_TELEGRAM = '-4842024226'
+    ID_CHAT_TELEGRAM = '-1003141023291'
     
     CAMINHO_MODELO = '/home/epirasp/Desktop/coral_epi/modelos/epi_full_integer_quant_edgetpu.tflite'
     CAMINHO_CLASSES = '/home/epirasp/Desktop/coral_epi/modelos/classes.txt'
