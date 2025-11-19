@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard - Jupiter Supervision</title>
-  <link rel="icon" type="image/png" href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="./static/js/authGuard.js"></script>
-  <link rel="stylesheet" href="./static/css/dashboard.css">
-  <link rel="stylesheet" href="./static/css/sidebar.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Jupiter Supervision</title>
+    <link rel="icon" type="image/png"
+        href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="./static/js/authGuard.js"></script>
+    <link rel="stylesheet" href="./static/css/dashboard.css">
+    <link rel="stylesheet" href="./static/css/sidebar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
 
 </head>
+
 <body class="bg-gray-900 text-white">
     <!-- Header -->
     <header class="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700/50 fixed top-0 left-0 right-0 z-50">
@@ -22,12 +25,15 @@
                 <div class="flex items-center space-x-4">
                     <button id="sidebarToggle" class="p-2 hover:bg-gray-700 rounded-lg transition-colors lg:hidden">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg>
                     </button>
-                    <a href="dashboard.html#" class="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer">
+                    <a href="dashboard.html#"
+                        class="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer">
                         <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10">
-                            <img src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" alt="Logo Jupiter" class="w-8 h-8" />
+                            <img src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png"
+                                alt="Logo Jupiter" class="w-8 h-8" />
                         </div>
                         <div>
                             <h1 class="text-lg font-bold text-white">Jupiter Supervision</h1>
@@ -38,218 +44,243 @@
             </div>
         </div>
     </header>
-    
-     <div class="flex h-screen pt-16">
+
+    <div class="flex h-screen pt-16">
         <!-- Sidebar -->
-  <aside id="sidebar" class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 h-full flex flex-col">
-    <div class="p-6 overflow-y-auto no-scrollbar">
-        <nav class="space-y-2">
-            <a href="dashboard.html" class="flex items-center space-x-3 px-4 py-3 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/30">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                </svg>
-                <span class="font-medium">Dashboard</span>
-            </a>
-            
-            <a href="historico.html" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="font-medium">Ocorrências</span>
-            </a>
-            
-           <a href="usuarios.html" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
+        <aside id="sidebar"
+            class="w-64 bg-gray-800/30 backdrop-blur-sm border-r border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 top-16 bottom-0 lg:top-auto lg:bottom-auto lg:h-full flex flex-col">
+            <div class="p-6 flex-grow overflow-y-auto no-scrollbar">
+                <nav class="space-y-2">
+                    <a href="dashboard.html"
+                        class="flex items-center space-x-3 px-4 py-3 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/30">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                            </path>
+                        </svg>
+                        <span class="font-medium">Dashboard</span>
+                    </a>
+
+                    <a href="historico.html"
+                        class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-medium">Ocorrências</span>
+                    </a>
+
+                    <a href="usuarios.html"
+                        class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
                         <span class="material-symbols-outlined text-xl">
                             user_attributes
                         </span>
                         <span class="font-medium">Usuários</span>
                     </a>
 
-            <a href="configuracao.html" class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span class="font-medium">Configuração</span>
-            </a>
+                    <a href="configuracao.html"
+                        class="flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-700/50 rounded-xl transition-all">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924-1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="font-medium">Configuração</span>
+                    </a>
+                </nav>
+            </div>
+            <div class="p-6 border-t border-gray-700/50">
+                <a href="login.html"
+                    class="flex items-center space-x-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                    <span class="font-medium">Sair</span>
+                </a>
+            </div>
+        </aside>
 
-            
-        </nav>
-    </div>
-    <a href="login.html" class="flex items-center space-x-3 px-6 py-4 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all mt-auto mx-6 mb-6">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                </svg>
-                <span class="font-medium">Sair</span>
-            </a>
-</aside>
+        <main class="flex-grow p-6">
+            <h1 class="text-3xl font-bold mb-6 text-gray-200">Dashboard de Ocorrências</h1>
 
-  <main class="flex-grow p-6">
-    <h1 class="text-3xl font-bold mb-6 text-gray-200">Dashboard de Ocorrências</h1>
+            <!-- KPIs Melhorados -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <!-- Total de Ocorrências -->
+                <div class="kpi-card bg-gray-800/50 border-gray-700/50">
+                    <div class="kpi-icon bg-blue-500/20 text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-400">Total de Ocorrências (7d)</h3>
+                        <p id="kpi-total-ocorrencias" class="text-3xl mt-1 font-semibold text-white">-</p>
+                    </div>
+                </div>
+                <!-- Dia Mais Crítico -->
+                <div class="kpi-card bg-gray-800/50 border-gray-700/50">
+                    <div class="kpi-icon bg-yellow-500/20 text-yellow-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-400">Dia Mais Crítico</h3>
+                        <p id="kpi-dia-critico" class="text-2xl mt-1 font-semibold text-white">-</p>
+                    </div>
+                </div>
+                <!-- Principal Infração -->
+                <div class="kpi-card bg-gray-800/50 border-gray-700/50">
+                    <div class="kpi-icon bg-red-500/20 text-red-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold text-gray-400">Principal Infração</h3>
+                        <p id="kpi-principal-infracao" class="text-2xl mt-1 font-semibold text-white">-</p>
+                    </div>
+                </div>
+            </div>
 
-    <!-- KPIs Melhorados -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <!-- Total de Ocorrências -->
-      <div class="kpi-card bg-gray-800/50 border-gray-700/50">
-        <div class="kpi-icon bg-blue-500/20 text-blue-400">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-            </svg>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-gray-400">Total de Ocorrências (7d)</h3>
-          <p id="kpi-total-ocorrencias" class="text-3xl mt-1 font-semibold text-white">-</p>
-        </div>
-      </div>
-      <!-- Dia Mais Crítico -->
-      <div class="kpi-card bg-gray-800/50 border-gray-700/50">
-        <div class="kpi-icon bg-yellow-500/20 text-yellow-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-gray-400">Dia Mais Crítico</h3>
-          <p id="kpi-dia-critico" class="text-2xl mt-1 font-semibold text-white">-</p>
-        </div>
-      </div>
-      <!-- Principal Infração -->
-      <div class="kpi-card bg-gray-800/50 border-gray-700/50">
-        <div class="kpi-icon bg-red-500/20 text-red-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-        </div>
-        <div class="ml-4">
-          <h3 class="text-lg font-semibold text-gray-400">Principal Infração</h3>
-          <p id="kpi-principal-infracao" class="text-2xl mt-1 font-semibold text-white">-</p>
-        </div>
-      </div>
-    </div>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-300">Ocorrências por Dia</h3>
+                    <div class="h-80">
+                        <canvas id="ocorrenciasSemanaChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-300">Tipos de Infração</h3>
+                    <div class="h-80 flex items-center justify-center">
+                        <canvas id="infracoesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
 
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-      <div class="lg:col-span-3 bg-gray-800 p-4 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-gray-300">Ocorrências por Dia</h3>
-        <div class="h-80">
-          <canvas id="ocorrenciasSemanaChart"></canvas>
-        </div>
-      </div>
-      <div class="lg:col-span-2 bg-gray-800 p-4 rounded-xl">
-        <h3 class="text-lg font-semibold mb-4 text-gray-300">Tipos de Infração</h3>
-        <div class="h-80 flex items-center justify-center">
-          <canvas id="infracoesChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </main>
+        <script type="module">
+            import { db } from './static/js/firebaseConfig.js';
+            import { collection, query, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-  <script type="module">
-    import { db } from './static/js/firebaseConfig.js';
-    import { collection, query, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
+            // Elementos do DOM para KPIs
+            const totalEl = document.getElementById('kpi-total-ocorrencias');
+            const criticoEl = document.getElementById('kpi-dia-critico');
+            const infracaoEl = document.getElementById('kpi-principal-infracao');
 
-    // Elementos do DOM para KPIs
-    const totalEl = document.getElementById('kpi-total-ocorrencias');
-    const criticoEl = document.getElementById('kpi-dia-critico');
-    const infracaoEl = document.getElementById('kpi-principal-infracao');
+            // Variáveis para armazenar as instâncias dos gráficos
+            let ocorrenciasChartInstance = null;
+            let infracoesChartInstance = null;
 
-    // Variáveis para armazenar as instâncias dos gráficos
-    let ocorrenciasChartInstance = null;
-    let infracoesChartInstance = null;
+            // Constantes para os gráficos
+            const textColor = '#e5e7eb';
+            const gridColor = 'rgba(255, 255, 255, 0.1)';
 
-    // Constantes para os gráficos
-    const textColor = '#e5e7eb';
-    const gridColor = 'rgba(255, 255, 255, 0.1)';
+            // Query para a coleção de alertas
+            const alertasQuery = query(collection(db, 'alertas_epi'));
 
-    // Query para a coleção de alertas
-    const alertasQuery = query(collection(db, 'alertas_epi'));
+            // Listener em tempo real
+            onSnapshot(alertasQuery, (snapshot) => {
+                console.log("🔥 Dados atualizados em tempo real!");
 
-    // Listener em tempo real
-    onSnapshot(alertasQuery, (snapshot) => {
-        console.log("🔥 Dados atualizados em tempo real!");
+                let total = 0;
+                const dias = {};
+                const infracoes = {};
+                const hoje = new Date();
+                const seteDiasAtras = new Date();
+                seteDiasAtras.setDate(hoje.getDate() - 7);
 
-        let total = 0;
-        const dias = {};
-        const infracoes = {};
-        const hoje = new Date();
-        const seteDiasAtras = new Date();
-        seteDiasAtras.setDate(hoje.getDate() - 7);
+                if (snapshot.empty) {
+                    console.log("Nenhuma ocorrência encontrada.");
+                    totalEl.textContent = '0';
+                    criticoEl.textContent = '-';
+                    infracaoEl.textContent = '-';
+                    // Limpa os gráficos se não houver dados
+                    if (ocorrenciasChartInstance) ocorrenciasChartInstance.destroy();
+                    if (infracoesChartInstance) infracoesChartInstance.destroy();
+                    return;
+                }
 
-        if (snapshot.empty) {
-            console.log("Nenhuma ocorrência encontrada.");
-            totalEl.textContent = '0';
-            criticoEl.textContent = '-';
-            infracaoEl.textContent = '-';
-            // Limpa os gráficos se não houver dados
-            if(ocorrenciasChartInstance) ocorrenciasChartInstance.destroy();
-            if(infracoesChartInstance) infracoesChartInstance.destroy();
-            return;
-        }
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    const data = new Date(d.data_hora);
+                    // Filtra ocorrências dos últimos 7 dias
+                    if (data >= seteDiasAtras) {
+                        total++;
 
-        snapshot.forEach(doc => {
-            const d = doc.data();
-            const data = new Date(d.data_hora);
-            // Filtra ocorrências dos últimos 7 dias
-            if (data >= seteDiasAtras) {
-                total++;
+                        const dia = data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+                        dias[dia] = (dias[dia] || 0) + 1;
 
-                const dia = data.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-                dias[dia] = (dias[dia] || 0) + 1;
+                        const msg = d.mensagem;
+                        infracoes[msg] = (infracoes[msg] || 0) + 1;
+                    }
+                });
 
-                const msg = d.mensagem;
-                infracoes[msg] = (infracoes[msg] || 0) + 1;
-            }
-        });
+                // --- Atualiza KPIs ---
+                totalEl.textContent = total;
 
-        // --- Atualiza KPIs ---
-        totalEl.textContent = total;
+                const diaCritico = Object.entries(dias).sort((a, b) => b[1] - a[1])[0];
+                criticoEl.textContent = diaCritico ? `${diaCritico[0]} (${diaCritico[1]})` : '-';
 
-        const diaCritico = Object.entries(dias).sort((a, b) => b[1] - a[1])[0];
-        criticoEl.textContent = diaCritico ? `${diaCritico[0]} (${diaCritico[1]})` : '-';
+                const principalInfracao = Object.entries(infracoes).sort((a, b) => b[1] - a[1])[0];
+                infracaoEl.textContent = principalInfracao ? `${principalInfracao[0]} (${principalInfracao[1]})` : '-';
 
-        const principalInfracao = Object.entries(infracoes).sort((a, b) => b[1] - a[1])[0];
-        infracaoEl.textContent = principalInfracao ? `${principalInfracao[0]} (${principalInfracao[1]})` : '-';
+                // --- Atualiza Gráficos ---
 
-        // --- Atualiza Gráficos ---
+                // Destrói instâncias antigas dos gráficos para evitar sobreposição
+                if (ocorrenciasChartInstance) {
+                    ocorrenciasChartInstance.destroy();
+                }
+                if (infracoesChartInstance) {
+                    infracoesChartInstance.destroy();
+                }
 
-        // Destrói instâncias antigas dos gráficos para evitar sobreposição
-        if (ocorrenciasChartInstance) {
-            ocorrenciasChartInstance.destroy();
-        }
-        if (infracoesChartInstance) {
-            infracoesChartInstance.destroy();
-        }
+                // Cria novo gráfico de ocorrências por semana
+                ocorrenciasChartInstance = new Chart(document.getElementById('ocorrenciasSemanaChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(dias),
+                        datasets: [{
+                            label: 'Ocorrências',
+                            data: Object.values(dias),
+                            backgroundColor: 'rgba(59,130,246,0.5)',
+                            borderColor: 'rgba(59,130,246,1)',
+                            borderWidth: 1,
+                            borderRadius: 5
+                        }]
+                    },
+                    options: { /* ... opções do gráfico ... */ }
+                });
 
-        // Cria novo gráfico de ocorrências por semana
-        ocorrenciasChartInstance = new Chart(document.getElementById('ocorrenciasSemanaChart'), {
-            type: 'bar',
-            data: {
-                labels: Object.keys(dias),
-                datasets: [{
-                    label: 'Ocorrências',
-                    data: Object.values(dias),
-                    backgroundColor: 'rgba(59,130,246,0.5)',
-                    borderColor: 'rgba(59,130,246,1)',
-                    borderWidth: 1,
-                    borderRadius: 5
-                }]
-            },
-            options: { /* ... opções do gráfico ... */ }
-        });
-
-        // Cria novo gráfico de tipos de infração
-        infracoesChartInstance = new Chart(document.getElementById('infracoesChart'), {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(infracoes),
-                datasets: [{
-                    label: 'Infrações',
-                    data: Object.values(infracoes),
-                    backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)'],
-                    borderColor: '#1f2937',
-                }]
-            },
-            options: { /* ... opções do gráfico ... */ }
-        });
-    });
-  </script>
-  <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
-  <script type="module" src="./static/js/sidebar.js"></script>
-  <script type="module" src="./static/js/logout.js"></script>
+                // Cria novo gráfico de tipos de infração
+                infracoesChartInstance = new Chart(document.getElementById('infracoesChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(infracoes),
+                        datasets: [{
+                            label: 'Infrações',
+                            data: Object.values(infracoes),
+                            backgroundColor: ['rgba(255, 99, 132, 0.8)', 'rgba(54, 162, 235, 0.8)', 'rgba(255, 206, 86, 0.8)', 'rgba(75, 192, 192, 0.8)', 'rgba(153, 102, 255, 0.8)', 'rgba(255, 159, 64, 0.8)'],
+                            borderColor: '#1f2937',
+                        }]
+                    },
+                    options: { /* ... opções do gráfico ... */ }
+                });
+            });
+        </script>
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
+        <script type="module" src="./static/js/sidebar.js"></script>
+        <script type="module" src="./static/js/logout.js"></script>
 </body>
+
 </html>
