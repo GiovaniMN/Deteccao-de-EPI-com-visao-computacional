@@ -2,29 +2,3 @@
         body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
         .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        .dev-info { 
-            position: fixed; 
-            bottom: 10px; 
-            right: 10px; 
-            opacity: 0; 
-            transition: opacity 0.3s; 
-            z-index: 1000;
-        }
-        .dev-info.show { opacity: 1; }
-        .dev-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: white;
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 1001;
-            transition: all 0.3s;
-        }
-        .dev-toggle:hover {
-            background: rgba(255,255,255,0.1);
-        }
-    

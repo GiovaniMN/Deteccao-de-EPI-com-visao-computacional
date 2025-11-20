@@ -21,6 +21,7 @@ class LoginHandler {
     constructor() {
         this.initializeLoginForm();
         this.showLoginMessage();
+        this.loadRememberedUser(); // Carrega o usuário lembrado
     }
 
     initializeLoginForm() {
@@ -57,6 +58,15 @@ class LoginHandler {
         }
     }
 
+    // Carrega o nome de usuário se estiver salvo no localStorage
+    loadRememberedUser() {
+        const rememberedUser = localStorage.getItem('rememberedUser');
+        if (rememberedUser) {
+            document.getElementById('usuario').value = rememberedUser;
+            document.getElementById('lembrarMe').checked = true;
+        }
+    }
+
     // Função para descriptografar senha AES
     descriptografarSenhaAES(senhaCriptografada) {
         try {
@@ -83,6 +93,7 @@ class LoginHandler {
     async handleLogin(btnLogin, saida) {
         const usuario = document.getElementById('usuario').value.trim();
         const senha = document.getElementById('senha').value;
+        const lembrarMe = document.getElementById('lembrarMe').checked;
 
         // Validações básicas
         if (!usuario || !senha) {
@@ -96,6 +107,13 @@ class LoginHandler {
 
         try {
             console.log(`🔍 Tentativa de login para: ${usuario}`);
+
+            // Salva ou remove o usuário do "Lembrar-me"
+            if (lembrarMe) {
+                localStorage.setItem('rememberedUser', usuario);
+            } else {
+                localStorage.removeItem('rememberedUser');
+            }
 
             // Verifica primeiro usuários padrão (fallback)
             if (await this.checkDefaultUser(usuario, senha)) {

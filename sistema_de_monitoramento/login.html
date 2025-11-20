@@ -22,14 +22,7 @@
      <script type="module" src="static/js/loginHandler.js"></script>
   
 </head>
-<body class="bg-gray-900 min-h-screen flex items-center justify-center relative overflow-hidden">
-    <!-- Developer Mode Toggle (apenas visível em desenvolvimento) -->
-    <button class="dev-toggle" onclick="toggleDevInfo()" title="Toggle Developer Info">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-    </button>
-
+<body class="bg-gray-900 min-h-screen flex items-center justify-center relative">
     <!-- Background Effects -->
     <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900"></div>
     <div class="absolute top-0 left-0 w-full h-full">
@@ -111,12 +104,12 @@
                 <!-- Remember Me & Forgot Password -->
                 <div class="flex items-center justify-between">
                     <label class="flex items-center">
-                        <input type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
+                        <input type="checkbox" id="lembrarMe" class="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 rounded focus:ring-blue-500 focus:ring-2">
                         <span class="ml-2 text-sm text-gray-300">Lembrar-me</span>
                     </label>
-                    <a href="#" class="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                    <button type="button" id="forgotPasswordBtn" class="text-sm text-blue-400 hover:text-blue-300 transition-colors">
                         Esqueceu a senha?
-                    </a>
+                    </button>
                 </div>
 
                 <!-- Error Message -->
@@ -137,34 +130,7 @@
                 </button>
             </form>
 
-            <!-- Security Info (sem credenciais expostas) -->
-            <div class="mt-5 pt-5 border-t border-gray-700/50">
-                <div class="text-center">
-                    <p class="text-xs text-gray-400 mb-2">
-                        Sistema protegido por autenticação segura
-                    </p>
-                    <div class="flex flex-wrap items-center justify-center gap-2 text-xs text-gray-500">
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                            </svg>
-                            Criptografia AES
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                            Acesso Rápido
-                        </span>
-                        <span class="flex items-center">
-                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Disponível 24/7
-                        </span>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
         <!-- Back to Home -->
@@ -178,86 +144,96 @@
         </div>
     </div>
 
-    <!-- Developer Info (oculta por padrão) -->
-    <div id="devInfo" class="dev-info">
-        <div class="bg-black/80 backdrop-blur-sm border border-gray-700 rounded-lg p-3 text-xs text-white max-w-sm">
-            <div class="flex items-center mb-2">
-                <svg class="w-4 h-4 mr-2 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.996-.833-2.764 0L3.05 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-                <span class="font-semibold text-yellow-400">Modo Desenvolvedor</span>
+                        
+    <!-- Forgot Password Modal -->
+    <div id="forgotPasswordModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-lg w-full border border-gray-700">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-semibold text-white">Recuperar Senha</h3>
+                <button id="closeModalBtn" class="w-10 h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
-            <p class="text-gray-300 mb-2">Credenciais de teste:</p>
-            <div class="space-y-1">
+            <p class="text-gray-300 text-center mb-6">Digite seu e-mail para enviarmos um link de redefinição de senha.</p>
+            <form id="forgotPasswordForm" class="space-y-4">
                 <div>
-                    <span class="text-gray-400">Usuário:</span>
-                    <span class="ml-1 font-mono bg-gray-800 px-1 rounded">adm</span>
-                    <button onclick="copyToClipboard('adm')" class="ml-2 text-blue-400 hover:text-blue-300" title="Copiar">
-                        📋
-                    </button>
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-2">E-mail *</label>
+                    <input type="email" id="email" name="email" required class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
                 </div>
-                <div>
-                    <span class="text-gray-400">Senha:</span>
-                    <span class="ml-1 font-mono bg-gray-800 px-1 rounded">123</span>
-                    <button onclick="copyToClipboard('123')" class="ml-2 text-blue-400 hover:text-blue-300" title="Copiar">
-                        📋
-                    </button>
-                </div>
+                <button type="submit" id="submitBtn" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-all flex items-center justify-center space-x-2 mt-8">
+                    <span>Solicitar Redefinição</span>
+                </button>
+            </form>
+            <div id="successMessage" class="hidden mt-4 p-4 bg-green-900/50 border border-green-500/50 text-green-400 rounded-lg">
+                <p>E-mail enviado com sucesso! Verifique sua caixa de entrada.</p>
             </div>
-            <p class="text-red-400 text-xs mt-2">⚠️ Remover em produção</p>
+            <div id="errorMessage" class="hidden mt-4 p-4 bg-red-900/50 border border-red-500/50 text-red-400 rounded-lg">
+                <p>Erro ao enviar e-mail. Tente novamente.</p>
+            </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
+                                <!-- Firebase SDK -->
+        <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+        <script type="module">
+            import { db } from './static/js/firebaseConfig.js';
+            import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    <!-- Your Scripts -->
-    <script type="module" src="./static/js/firebaseConfig.js"></script>
-    <script type="module" src="./static/js/loginHandler.js"></script>
-
-    <script>
-        let devInfoVisible = false;
-        
-        function toggleDevInfo() {
-            const devInfo = document.getElementById('devInfo');
-            devInfoVisible = !devInfoVisible;
-            
-            if (devInfoVisible) {
-                devInfo.classList.add('show');
-            } else {
-                devInfo.classList.remove('show');
-            }
-        }
-
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // Feedback visual opcional
-                console.log('Copiado: ' + text);
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
+            // Modal controls
+            const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+            const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+    
+            forgotPasswordBtn.addEventListener('click', () => {
+                forgotPasswordModal.classList.remove('hidden');
             });
-        }
+    
+            closeModalBtn.addEventListener('click', () => {
+                forgotPasswordModal.classList.add('hidden');
+            });
+    
+            forgotPasswordModal.addEventListener('click', (e) => {
+                if (e.target === forgotPasswordModal) {
+                    forgotPasswordModal.classList.add('hidden');
+                }
+            });
+    
+            // EmailJS
+            emailjs.init('_IMI1xksu8m22BH_b');
+    
+            forgotPasswordForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = e.target.email.value;
 
-        // Ocultar informações de desenvolvedor em produção
-        // Detecta se está em ambiente de desenvolvimento
-        const isDevelopment = window.location.hostname === 'localhost' || 
-                             window.location.hostname === '127.0.0.1' || 
-                             window.location.hostname.includes('dev');
+                // Check if user exists
+                const usersCollection = collection(db, 'senha_login');
+                const q = query(usersCollection, where("user", "==", email));
+                const querySnapshot = await getDocs(q);
 
-        // Se não estiver em desenvolvimento, oculta completamente o botão de dev
-        if (!isDevelopment) {
-            document.querySelector('.dev-toggle').style.display = 'none';
-        }
-
-        // Shortcut para desenvolvedores: Ctrl+Shift+D
-        document.addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.shiftKey && event.key === 'D' && isDevelopment) {
-                toggleDevInfo();
-            }
-        });
-    </script>
-
-</body>
-</html>
+                if (querySnapshot.empty) {
+                    errorMessage.querySelector('p').textContent = 'Usuário não encontrado.';
+                    errorMessage.classList.remove('hidden');
+                    successMessage.classList.add('hidden');
+                    return;
+                }
+    
+                emailjs.send('service_zndz5fl', 'template_jr149ik', {
+                    to_email: email,
+                    from_name: 'Jupiter Supervision',
+                    reply_to: 'epirasp@gmail.com',
+                    message: 'Você solicitou a redefinição de senha. Por favor, entre em contato com o suporte para assistência.'
+                })
+                .then(() => {
+                    successMessage.classList.remove('hidden');
+                    errorMessage.classList.add('hidden');
+                }, (error) => {
+                    errorMessage.querySelector('p').textContent = 'Erro ao enviar e-mail. Tente novamente.';
+                    errorMessage.classList.remove('hidden');
+                    successMessage.classList.add('hidden');
+                });
+            });
+        </script>
+                            </body></html>

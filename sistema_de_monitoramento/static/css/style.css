@@ -1,0 +1,77 @@
+/* Global Styles */
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Utility Classes */
+.glass-effect {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Scrollbar Hiding */
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+/* Header Typography */
+header h1, header h2, header span {
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Responsive Table Styles (Card View for Mobile) */
+@media (max-width: 768px) {
+    .responsive-table thead {
+        display: none;
+    }
+    .responsive-table, .responsive-table tbody, .responsive-table tr, .responsive-table td {
+        display: block;
+        width: 100%;
+    }
+    .responsive-table tr {
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(75, 85, 99, 0.5);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        background-color: rgba(31, 41, 55, 0.3);
+    }
+    .responsive-table td {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 1rem;
+        align-items: start;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(55, 65, 81, 0.5);
+    }
+    .responsive-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: #9CA3AF;
+        text-align: left;
+    }
+    .responsive-table td > span {
+        text-align: right;
+        word-break: break-all;
+    }
+    .responsive-table td > button {
+        margin-left: auto;
+    }
+    .responsive-table tr td:first-child {
+        padding-top: 1rem;
+    }
+    .responsive-table tr td:last-child {
+        border-bottom: none;
+        padding-bottom: 1rem;
+    }
+}
