@@ -5,7 +5,7 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/f
 // Captura o parâmetro 'index' da URL
 function getIndexFromURL() {
   const params = new URLSearchParams(window.location.search);
-  return parseInt(params.get("index") || "0"); // Default = 0 (imagem mais recente)
+  return parseInt(params.get("index") || "0"); // Define 0 como padrão para a imagem mais recente
 }
 
 async function carregarImagemPorIndice() {
@@ -17,24 +17,24 @@ async function carregarImagemPorIndice() {
     return;
   }
 
-  // Ordenar do mais recente para o mais antigo
+  // Ordena os documentos do mais recente para o mais antigo
   const docs = snapshot.docs.map(doc => doc.data());
   docs.sort((a, b) => new Date(b.data_hora) - new Date(a.data_hora));
 
-  // Pega o índice da URL
+  // Obtém o índice da URL, com fallback para o primeiro (mais recente)
   const index = getIndexFromURL();
-  const dado = docs[index] || docs[0]; // fallback para a mais recente
+  const dado = docs[index] || docs[0]; 
 
   const imagemBase64 = dado.imagem_base64;
   const mensagem = dado.mensagem;
 
-  // Atualiza a imagem
+  // Atualiza a imagem no DOM
   const imgEl = document.getElementById("imagemAlvo");
   if (imgEl && imagemBase64) {
     imgEl.src = `data:image/jpeg;base64,${imagemBase64}`;
   }
 
-  // Atualiza a mensagem
+  // Atualiza a mensagem no DOM
   const ocorrenciaEl = document.getElementById("informacoesOcorrencia");
   if (ocorrenciaEl) {
     ocorrenciaEl.innerHTML = `<p>${mensagem}</p>`;

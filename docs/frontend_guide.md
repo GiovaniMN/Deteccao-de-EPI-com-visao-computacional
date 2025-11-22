@@ -16,7 +16,7 @@ Todos os arquivos do frontend estão localizados no diretório `sistema_de_monit
 
 - **JavaScript (`static/js/`):**
   - `firebaseConfig.js`: Script de configuração e inicialização do Firebase. **Importante:** Este arquivo é gerado dinamicamente durante o deploy pelo GitHub Actions.
-  - `back.js`: Lida com a lógica de autenticação da página `login.html`.
+
   - `dashboard.js`: Carrega os dados para os gráficos e KPIs da página `dashboard.html`.
   - `carregarTabela.js`: Popula a tabela de ocorrências na página `historico.html`.
   - `carregarImagem.js`: Carrega a imagem de uma ocorrência específica (usado em conjunto com `historico.html`).
@@ -26,7 +26,7 @@ Todos os arquivos do frontend estão localizados no diretório `sistema_de_monit
 ## 2. Funcionalidades das Páginas
 
 ### Login (`login.html`)
-- Utiliza o script `back.js`.
+
 - Autentica os usuários comparando o email e a senha fornecidos com os dados armazenados na coleção `senha_login` no Firestore.
 - **Não utiliza o serviço Firebase Authentication**, mas sim uma coleção customizada para validação.
 - Em caso de sucesso, armazena os dados do usuário no `sessionStorage` e redireciona para o `dashboard.html`.

@@ -11,6 +11,9 @@
     <link rel="icon" type="image/png"
         href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
     <script type="module" src="./static/js/authGuard.js"></script>
     <link rel="stylesheet" href="./static/css/historico.css">
     <link rel="stylesheet" href="./static/css/sidebar.css">
@@ -42,14 +45,6 @@
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <div class="hidden md:flex items-center space-x-2 bg-blue-500/10 px-3 py-1 rounded-full">
-                        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
-                            </path>
-                        </svg>
-                        <span class="text-blue-400 text-sm font-medium">Monitoramento</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -135,25 +130,53 @@
 
                 <!-- Filters -->
                 <div class="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700/50 mb-6">
-                    <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-                        <div class="flex items-center space-x-4">
-                            <div class="flex items-center space-x-2">
-                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z">
-                                    </path>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Filtrar por Equipamento -->
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gray-700/50 rounded-lg flex items-center justify-center text-gray-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
                                 </svg>
-                                <label for="ordenarPor" class="text-gray-300 font-medium">Ordenar por:</label>
                             </div>
-                            <select id="ordenarPor"
-                                class="bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="data_desc">Mais recente</option>
-                                <option value="data_asc">Mais antigo</option>
-                            </select>
+                            <div class="flex-grow">
+                                <label for="filtrarPorEquipamento" class="text-sm font-medium text-gray-300">Filtrar por equipamento</label>
+                                <select id="filtrarPorEquipamento" class="w-full mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                                    <option value="todos">Todos</option>
+                                    <option value="Capacete">Capacete</option>
+                                    <option value="Bota">Bota</option>
+                                    <option value="Oculos">Óculos</option>
+                                </select>
+                            </div>
                         </div>
 
+                        <!-- Filtrar por Data -->
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gray-700/50 rounded-lg flex items-center justify-center text-gray-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-grow">
+                                <label for="filtrarPorData" class="text-sm font-medium text-gray-300">Filtrar por data</label>
+                                <input id="filtrarPorData" type="text" placeholder="Selecione uma data" class="w-full mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            </div>
+                        </div>
 
+                        <!-- Ordenar por -->
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-gray-700/50 rounded-lg flex items-center justify-center text-gray-400">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l-4-4m-4 4v12"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-grow">
+                                <label for="ordenarPor" class="text-sm font-medium text-gray-300">Ordenar por</label>
+                                <select id="ordenarPor" class="w-full mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                                    <option value="data_desc">Mais recente</option>
+                                    <option value="data_asc">Mais antigo</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -216,6 +239,7 @@
     <!-- Sidebar Overlay for Mobile -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script type="module" src="./static/js/firebaseConfig.js"></script>
     <script type="module" src="./static/js/carregarTabela.js"></script>
     <script type="module" src="./static/js/carregarImagem.js"></script>
@@ -267,8 +291,34 @@
                 closeModal();
             }
         });
+
+        // Initialize flatpickr only when dates are loaded
+        let fpInstance = null; // Declare fpInstance in a broader scope
+
+        document.addEventListener('datesLoaded', function(e) {
+            const datesWithOccurrences = e.detail.dates;
+
+            // Destroy previous instance to prevent duplicates if data reloads
+            if (fpInstance) {
+                fpInstance.destroy();
+            }
+            
+            fpInstance = flatpickr("#filtrarPorData", {
+                dateFormat: "d/m/Y",
+                allowInput: true,
+                onDayCreate: function(dObj, dStr, fp, dayElem) {
+                    const dateString = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
+                    if (datesWithOccurrences.has(dateString)) {
+                        dayElem.classList.add("dia-com-ocorrencia");
+                    }
+                },
+                onClose: function(selectedDates, dateStr, instance) {
+                    const event = new Event('change', { 'bubbles': true });
+                    instance.input.dispatchEvent(event);
+                }
+            });
+        });
+
     </script>
     <script type="module" src="./static/js/logout.js"></script>
 </body>
-
-</html>

@@ -1,7 +1,7 @@
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-// Chave AES para criptografia simétrica (use algo mais seguro em produção)
+// Chave AES para criptografia simétrica. **ATENÇÃO:** Em produção, considere gerenciar esta chave de forma mais segura.
 const AES_KEY = "chaveSuperSecreta123!";
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const DEFAULT_ADMIN_USER = 'adm';
 
-    // 🔐 Criptografa senha com AES
+    // Criptografa a senha usando AES.
     function criptografarSenhaAES(senha) {
         return CryptoJS.AES.encrypt(senha, AES_KEY).toString();
     }
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const deleteButton = document.createElement('button');
                 deleteButton.textContent = 'Excluir';
                 deleteButton.dataset.userId = user.id;
-                deleteButton.dataset.userName = user.user; // Adiciona para a mensagem de confirmação
+                deleteButton.dataset.userName = user.user; 
                 deleteButton.className = 'deleteUserButton text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1 rounded-lg border border-red-500/50 hover:bg-red-500/20 transition-colors';
                 li.appendChild(deleteButton);
             } else {
@@ -74,7 +74,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function listenForUserChanges() {
         const usersCollection = collection(db, 'senha_login');
         onSnapshot(query(usersCollection), (snapshot) => {
-            console.log("🔥 Lista de usuários atualizada em tempo real!");
             const users = [];
             snapshot.forEach((doc) => {
                 users.push({ id: doc.id, ...doc.data() });
@@ -93,8 +92,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const password = newPasswordInput?.value;
         const confirmPassword = confirmPasswordInput?.value;
 
+        // Expressão regular para validar e-mail com TLDs comuns
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
         if (!username || !password) {
-            return displayFeedback("Usuário e senha são obrigatórios.", true);
+            return displayFeedback("E-mail e senha são obrigatórios.", true);
+        }
+        if (!emailRegex.test(username)) {
+            return displayFeedback("Por favor, insira um endereço de e-mail válido (ex: nome@dominio.com).", true);
+        }
+        if (password.length < 8) {
+            return displayFeedback("A senha deve ter no mínimo 8 caracteres.", true);
         }
         if (password !== confirmPassword) {
             return displayFeedback("As senhas não coincidem.", true);
@@ -103,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Valida se o usuário já existe antes de adicionar
         const existingUsers = await getUsersOnce();
         if (existingUsers.find(u => u.user.toLowerCase() === username.toLowerCase())) {
-            return displayFeedback("Este nome de usuário já existe.", true);
+            return displayFeedback("Este endereço de e-mail já está em uso.", true);
         }
 
         const senhaCriptografada = criptografarSenhaAES(password);

@@ -1,7 +1,5 @@
-// Script de Logout - Para ser adicionado em todas as páginas protegidas
+// Script de logout para páginas protegidas.
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚪 Configurando sistema de logout...');
-    
     // Encontra todos os links de logout
     const logoutLinks = document.querySelectorAll('a[href="login.html"]');
     
@@ -10,8 +8,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (link.textContent.includes('Sair')) {
             link.addEventListener('click', function(event) {
                 event.preventDefault();
-                
-                console.log('🔄 Executando logout...');
                 
                 // Limpa a sessão
                 localStorage.removeItem('currentUser');
@@ -26,6 +22,4 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-    
-    console.log(`✅ ${logoutLinks.length} links de logout configurados`);
 });

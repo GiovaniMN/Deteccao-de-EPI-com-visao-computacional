@@ -4,14 +4,11 @@ import { collection, query, where, getDocs } from "https://www.gstatic.com/fireb
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Dashboard script loaded.");
-
     // Elementos do DOM
     const kpiTotalOcorrencias = document.getElementById('kpi-total-ocorrencias');
     const kpiDiaCritico = document.getElementById('kpi-dia-critico');
     const kpiPrincipalInfracao = document.getElementById('kpi-principal-infracao');
     const kpiStatus = document.getElementById('kpi-status');
-    const statusCard = document.getElementById('status-card');
     const statusIconContainer = document.getElementById('status-icon-container');
 
     // Contextos dos Gráficos
@@ -30,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const now = Date.now();
         const diffSeconds = (now - lastBeat) / 1000;
-        updateStatus(diffSeconds < 120); // Offline se o último sinal foi há mais de 2 minutos
+        // Offline se o último sinal foi há mais de 2 minutos
+        updateStatus(diffSeconds < 120); 
     });
 
     function updateStatus(isOnline) {
@@ -42,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica Principal para buscar e processar dados ---
     async function fetchDataAndRender() {
-        console.log("Buscando dados dos últimos 7 dias da coleção 'alertas_epi'...");
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         const sevenDaysAgoISO = sevenDaysAgo.toISOString();
@@ -59,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 data.tipo_alerta = match ? match[1].replace(/, /g, '_') : 'desconhecido';
                 return { id: doc.id, ...data };
             });
-            console.log(`Encontrados ${alertas.length} alertas.`);
 
             if (alertas.length === 0) {
                 displayNoData();
@@ -121,7 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Destrói instâncias antigas dos gráficos para evitar sobreposição
         if (ocorrenciasChart) ocorrenciasChart.destroy();
+        // Cria novo gráfico de ocorrências por semana
         ocorrenciasChart = new Chart(ctxOcorrencias, {
             type: 'bar',
             data: {
@@ -154,7 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const labelsInfracoes = Object.keys(contagemInfracoes).map(k => k.replace(/_/g, ' ').replace(/sem /g, ''));
         const dataInfracoes = Object.values(contagemInfracoes);
 
+        // Destrói instâncias antigas dos gráficos para evitar sobreposição
         if (infracoesChart) infracoesChart.destroy();
+        // Cria novo gráfico de tipos de infração
         infracoesChart = new Chart(ctxInfracoes, {
             type: 'doughnut',
             data: {

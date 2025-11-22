@@ -4,6 +4,8 @@ import { collection, query, onSnapshot } from "https://www.gstatic.com/firebasej
 
 const tabelaBody = document.querySelector("tbody");
 const selectOrdenar = document.getElementById("ordenarPor");
+const selectFiltrar = document.getElementById("filtrarPorEquipamento");
+const datePicker = document.getElementById("filtrarPorData");
 const emptyState = document.getElementById("emptyState");
 const totalRegistrosEl = document.getElementById('total-registros');
 
@@ -17,23 +19,13 @@ function listenForData() {
   }
 
   const colecao = collection(db, "alertas_epi");
-  const q = query(colecao); // Pode adicionar orderBy aqui se quiser uma ordem padrão do DB
+  const q = query(colecao); 
 
   onSnapshot(q, (snapshot) => {
-    console.log("🔥 Histórico atualizado em tempo real!");
-
+    // Atualiza o total de registros
     if (totalRegistrosEl) {
         totalRegistrosEl.textContent = snapshot.size;
     }
-
-    if (snapshot.empty) {
-      if (tabelaBody) tabelaBody.innerHTML = "";
-      if (emptyState) emptyState.classList.remove('hidden');
-      dadosOcorrencias = [];
-      return;
-    }
-
-    if (emptyState) emptyState.classList.add('hidden');
 
     dadosOcorrencias = snapshot.docs.map(doc => {
         const data = doc.data();
@@ -44,7 +36,15 @@ function listenForData() {
         };
     });
 
-    ordenarEDesenharTabela(); // Redesenha a tabela com os novos dados
+    // Notifica o seletor de data sobre os dias com ocorrências
+    const datasComOcorrencias = new Set(dadosOcorrencias.map(doc => {
+        return new Date(doc.data_hora).toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    }));
+
+    const event = new CustomEvent('datesLoaded', { detail: { dates: datasComOcorrencias } });
+    document.dispatchEvent(event);
+
+    filtrarEOrdenarTabela(); // Ação inicial para desenhar a tabela
 
   }, (error) => {
     console.error("Erro ao escutar por atualizações do Firestore:", error);
@@ -52,25 +52,71 @@ function listenForData() {
   });
 }
 
-function ordenarEDesenharTabela() {
-  if (!selectOrdenar || !tabelaBody) {
-    console.error("Elementos necessários (selectOrdenar ou tabelaBody) não encontrados no DOM.");
+function removerAcentos(texto) {
+  if (!texto) return "";
+  return texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function filtrarEOrdenarTabela() {
+  if (!selectOrdenar || !selectFiltrar || !datePicker || !tabelaBody) {
+    console.error("Elementos de filtro ou corpo da tabela não encontrados no DOM.");
     return;
   }
-  const criterio = selectOrdenar.value;
+  const criterioOrdenacao = selectOrdenar.value;
+  const criterioFiltro = selectFiltrar.value;
+  const dataFiltro = datePicker.value;
 
-  // Cria uma cópia antes de ordenar para não modificar a ordem original se necessário
-  const dadosOrdenados = [...dadosOcorrencias];
+  let dadosFiltrados = [...dadosOcorrencias];
 
-  dadosOrdenados.sort((a, b) => {
+  // 1. Filtrar por equipamento
+  if (criterioFiltro !== "todos") {
+    const filtroNormalizado = removerAcentos(criterioFiltro.toLowerCase());
+    dadosFiltrados = dadosFiltrados.filter(doc => {
+      const mensagemNormalizada = removerAcentos((doc.mensagem || "").toLowerCase());
+      return mensagemNormalizada.includes(filtroNormalizado);
+    });
+  }
+
+  // 2. Filtrar por data
+  if (dataFiltro) {
+    const [dia, mes, ano] = dataFiltro.split('/').map(Number);
+    const dataSelecionada = new Date(ano, mes - 1, dia);
+    
+    dadosFiltrados = dadosFiltrados.filter(doc => {
+        const dataOcorrencia = new Date(doc.data_hora);
+        return dataOcorrencia.getFullYear() === dataSelecionada.getFullYear() &&
+               dataOcorrencia.getMonth() === dataSelecionada.getMonth() &&
+               dataOcorrencia.getDate() === dataSelecionada.getDate();
+    });
+  }
+  
+  // 3. Ordenar dados filtrados
+  dadosFiltrados.sort((a, b) => {
     const dateA = new Date(a.data_hora);
     const dateB = new Date(b.data_hora);
-    return criterio === "data_asc" ? dateA - dateB : dateB - dateA;
+
+    // Tratar datas inválidas, colocando-as no final
+    if (isNaN(dateA.getTime())) return 1;
+    if (isNaN(dateB.getTime())) return -1;
+
+    return criterioOrdenacao === "data_asc" ? dateA - dateB : dateB - dateA;
   });
 
+  // 4. Desenhar tabela
+  desenharTabela(dadosFiltrados);
+}
+
+function desenharTabela(dados) {
+  if (!tabelaBody) return;
   tabelaBody.innerHTML = ""; 
 
-  dadosOrdenados.forEach((doc, index) => {
+  if (dados.length === 0) {
+      if (emptyState) emptyState.classList.remove('hidden');
+  } else {
+      if (emptyState) emptyState.classList.add('hidden');
+  }
+
+  dados.forEach((doc, index) => {
     const linha = document.createElement("tr");
     linha.className = "border-t border-t-[#474747]";
 
@@ -86,7 +132,15 @@ function ordenarEDesenharTabela() {
     tdDataHora.setAttribute('data-label', 'Data e Hora');
     tdDataHora.className = "px-4 py-2 text-[#ababab] text-sm font-normal leading-normal";
     const spanDataHora = document.createElement('span');
-    const dataFormatada = new Date(doc.data_hora).toLocaleString('pt-BR');
+    const dataFormatada = new Date(doc.data_hora).toLocaleString('pt-BR', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
     spanDataHora.textContent = dataFormatada;
     tdDataHora.appendChild(spanDataHora);
 
@@ -96,7 +150,7 @@ function ordenarEDesenharTabela() {
     const viewButton = document.createElement("button");
     viewButton.textContent = "Ver Imagem";
     viewButton.className = "view-image-btn text-blue-400 hover:text-blue-300 underline cursor-pointer bg-transparent border-none p-0"; 
-    viewButton.dataset.index = index; 
+    viewButton.dataset.originalIndex = dadosOcorrencias.indexOf(doc);
     tdButton.appendChild(viewButton);
 
     linha.appendChild(tdMensagem);
@@ -107,8 +161,12 @@ function ordenarEDesenharTabela() {
   });
 }
 
-function displayImageInModal(index) {
-  const doc = dadosOcorrencias.find((d, i) => i === index);
+function displayImageInModal(originalIndex) {
+    if (originalIndex === -1) {
+        console.warn("Ocorrência não encontrada nos dados originais.");
+        return;
+    }
+  const doc = dadosOcorrencias[originalIndex];
   if (doc && doc.imagem_base64) {
     const modalImageElement = document.getElementById('modalImage'); 
     const imageModal = document.getElementById('imageModal'); 
@@ -118,15 +176,24 @@ function displayImageInModal(index) {
         imageModal.classList.remove('hidden');
         document.body.classList.add('modal-open'); 
     } else {
-        alert("Erro ao tentar exibir a imagem: elementos do modal não encontrados.");
+        console.warn("Erro ao tentar exibir a imagem: elementos do modal não encontrados.");
     }
   } else {
-    alert("Dados da imagem não encontrados para esta ocorrência.");
+    console.warn("Dados da imagem não encontrados para esta ocorrência.");
   }
 }
 
+// Listeners de Eventos
 if (selectOrdenar) {
-    selectOrdenar.addEventListener("change", ordenarEDesenharTabela);
+    selectOrdenar.addEventListener("change", filtrarEOrdenarTabela);
+}
+
+if(selectFiltrar) {
+    selectFiltrar.addEventListener("change", filtrarEOrdenarTabela);
+}
+
+if(datePicker) {
+    datePicker.addEventListener("change", filtrarEOrdenarTabela);
 }
 
 if (tabelaBody) {
@@ -134,21 +201,11 @@ if (tabelaBody) {
     const targetButton = event.target.closest('.view-image-btn'); 
     if (targetButton) {
       event.preventDefault(); 
-      const index = parseInt(targetButton.dataset.index, 10);
-      if (!isNaN(index)) {
-        // Encontra o documento correto nos dados ordenados na tela
-        const criterio = selectOrdenar.value;
-        const dadosOrdenados = [...dadosOcorrencias].sort((a, b) => {
-            const dateA = new Date(a.data_hora);
-            const dateB = new Date(b.data_hora);
-            return criterio === "data_asc" ? dateA - dateB : dateB - dateA;
-        });
-        const docParaMostrar = dadosOrdenados[index];
-        // Encontra o índice original para passar para a função do modal
-        const originalIndex = dadosOcorrencias.findIndex(d => d.data_hora === docParaMostrar.data_hora && d.mensagem === docParaMostrar.mensagem);
+      const originalIndex = parseInt(targetButton.dataset.originalIndex, 10);
+      if (!isNaN(originalIndex)) {
         displayImageInModal(originalIndex);
       } else {
-        console.error("Índice inválido obtido do botão:", targetButton.dataset.index);
+        console.error("Índice original inválido:", targetButton.dataset.originalIndex);
       }
     }
   });

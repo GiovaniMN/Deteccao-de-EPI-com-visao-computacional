@@ -1,5 +1,4 @@
-
-        body { font-family: 'Inter', sans-serif; }
+body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
         body.modal-open { overflow: hidden; }
 
@@ -42,8 +41,8 @@
 
     /* Alinha o texto do valor (dentro do span) à direita */
     td > span {
-        text-align: right;
-        word-break: break-all; /* Força a quebra de linha para evitar overflow */
+        text-align: left;
+        overflow-wrap: break-word; /* Força a quebra de linha para evitar overflow */
     }
 
     /* Alinha o botão à direita */
@@ -60,4 +59,21 @@
         padding-bottom: 1rem;
     }
 }
-    
+
+.flatpickr-day.dia-com-ocorrencia {
+    position: relative;
+    background: rgba(59, 130, 246, 0.2);
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.flatpickr-day.dia-com-ocorrencia::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: #3b82f6;
+}

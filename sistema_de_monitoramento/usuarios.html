@@ -42,15 +42,12 @@
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <div class="hidden md:flex items-center space-x-2 bg-purple-500/10 px-3 py-1 rounded-full">
-                        <svg class="w-4 h-4 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z">
-                            </path>
-                        </svg>
-                        <span class="text-purple-400 text-sm font-medium">Administração</span>
-                    </div>
-                </div>
+                                    <div class="hidden md:flex items-center space-x-2 bg-purple-500/10 px-3 py-1 rounded-full">
+                                        <svg class="w-4 h-4 text-purple-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286z" />
+                                        </svg>
+                                        <span class="text-purple-400 text-sm font-medium">Administração</span>
+                                    </div>                </div>
             </div>
         </div>
     </header>
@@ -245,10 +242,10 @@
                     <div class="flex items-start space-x-4">
 
                         <div class="flex-1">
-                            <h3 class="text-lg font-semibold text-blue-400 mb-1">Receba as Ocorrências via Telegram</h3>
+                            <h3 class="text-lg font-semibold text-blue-400 mb-1 text-center lg:text-left whitespace-nowrap">Receba as Ocorrências via Telegram</h3>
 
                             <div
-                                class="flex flex-col lg:flex-row items-start lg:items-center space-y-4 lg:space-y-0 lg:space-x-6">
+                                class="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-6 mt-4">
                                 <div class="relative">
                                     <div class="bg-white p-6 rounded-xl shadow-xl">
                                         <!-- QR Code corrigido -->
@@ -257,7 +254,7 @@
                                     </div>
                                 </div>
 
-                                <div class="flex-1">
+                                <div class="flex-1 text-center lg:text-left">
                                     <div class="space-y-3">
                                         <div class="bg-blue-500/20 p-4 rounded-lg border border-blue-400/30">
                                             <p class="text-white font-medium mb-2">Como usar:</p>
@@ -299,65 +296,11 @@
     <!-- Sidebar Overlay for Mobile -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
 
-    <script type="module" src="./static/js/userManagement.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const copyBtn = document.getElementById('copyGroupLinkBtn');
-            if (copyBtn) {
-                copyBtn.addEventListener('click', async () => {
-                    const linkField = document.getElementById('groupInviteLink');
-                    const originalHTML = copyBtn.innerHTML;
-
-                    try {
-                        await navigator.clipboard.writeText(linkField.value);
-                        copyBtn.innerHTML = `
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            <span>Copiado</span>
-                        `;
-                        copyBtn.className = copyBtn.className.replace('bg-blue-600', 'bg-green-600');
-
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalHTML;
-                            copyBtn.className = copyBtn.className.replace('bg-green-600', 'bg-blue-600');
-                        }, 2000);
-
-                    } catch (err) {
-                        linkField.select();
-                        document.execCommand('copy');
-                        copyBtn.innerHTML = '<span>Copiado</span>';
-                        setTimeout(() => {
-                            copyBtn.innerHTML = originalHTML;
-                        }, 2000);
-                    }
-                });
-            }
-        });
-
-        // Sidebar toggle functionality
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-        function toggleSidebar() {
-            sidebar.classList.toggle('-translate-x-full');
-            sidebarOverlay.classList.toggle('hidden');
-        }
-
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', toggleSidebar);
-        }
-
-        if (sidebarOverlay) {
-            sidebarOverlay.addEventListener('click', toggleSidebar);
-        }
-    </script>
-
     <script type="module" src="./static/js/userManagement.js"></script>
     <script type="module" src="./static/js/logout.js"></script>
+    <script type="module" src="./static/js/sidebar.js"></script>
+    <script type="module" src="./static/js/copyLink.js"></script>
 </body>
 
 </html>

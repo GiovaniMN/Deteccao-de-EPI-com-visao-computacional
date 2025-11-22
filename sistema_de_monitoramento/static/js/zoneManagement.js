@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Validar dados
       const validation = validateZoneData(zoneData);
       if (!validation.isValid) {
-        alert('Erro de validação:\n' + validation.errors.join('\n'));
+        console.warn('Erro de validação:', validation.errors.join('\n'));
         return;
       }
 
@@ -144,14 +144,14 @@ document.addEventListener('DOMContentLoaded', function() {
       const result = await saveZone(zoneData);
       
       if (result.success) {
-        alert(result.message);
+        console.log(result.message);
         // Limpar formulário se existir
         ['xInput', 'yInput', 'widthInput', 'heightInput', 'nomeInput'].forEach(id => {
           const element = document.getElementById(id);
           if (element) element.value = '';
         });
       } else {
-        alert(result.message);
+        console.error(result.message);
       }
     });
   }
@@ -162,7 +162,11 @@ document.addEventListener('DOMContentLoaded', function() {
     clearZonesBtn.addEventListener('click', async () => {
       if (confirm('Tem certeza que deseja remover todas as zonas? Esta ação não pode ser desfeita.')) {
         const result = await clearAllZones();
-        alert(result.message);
+        if (result.success) {
+            console.log(result.message);
+        } else {
+            console.error(result.message);
+        }
       }
     });
   }
@@ -174,9 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const result = await loadZones();
       
       if (result.success) {
-        console.log('Zonas carregadas:', result.zones);
-        
-        // Exibir zonas no console ou em uma div
+        // Exibir zonas em uma div
         const zonesDisplay = document.getElementById('zonesDisplay');
         if (zonesDisplay) {
           if (result.zones.length === 0) {
@@ -193,10 +195,9 @@ document.addEventListener('DOMContentLoaded', function() {
             zonesDisplay.innerHTML = zonesHtml;
           }
         }
-        
-        alert(`${result.zones.length} zona(s) carregada(s) com sucesso!`);
+        console.log(`${result.zones.length} zona(s) carregada(s) com sucesso!`);
       } else {
-        alert(result.message);
+        console.error(result.message);
       }
     });
   }

@@ -1,5 +1,4 @@
 // authGuard.js - Sistema de Autenticação com Controle de Perfis
-console.log('🔐 AuthGuard carregado');
 
 // Configuração de páginas e permissões
 const PROTECTED_PAGES = ['dashboard.html', 'historico.html', 'usuarios.html', 'configuracao.html'];
@@ -14,67 +13,45 @@ class AuthGuard {
 
     getCurrentPageName() {
         const path = window.location.pathname;
-        const pageName = path.split('/').pop() || 'index.html';
-        console.log(`📄 Página atual: ${pageName}`);
-        return pageName;
+        return path.split('/').pop() || 'index.html';
     }
 
     init() {
-        console.log('🚀 Iniciando verificação de autenticação...');
-        
-        // Se estiver na página de login, trata de forma especial
         if (this.currentPage === 'login.html') {
             this.handleLoginPage();
             return;
         }
 
-        // Para páginas públicas, permite acesso livre
         if (PUBLIC_PAGES.includes(this.currentPage)) {
-            console.log('✅ Página pública, acesso liberado');
             return;
         }
 
-        // Para páginas protegidas, verifica autenticação
         this.checkAuthentication();
     }
 
     handleLoginPage() {
-        console.log('📝 Processando página de login');
-        
-        // Verifica se já está logado
         const currentUser = this.getCurrentUser();
         if (currentUser && this.isValidSession()) {
-            console.log('👤 Usuário já está logado, redirecionando para dashboard...');
             window.location.replace('dashboard.html');
             return;
         }
-
-        // Limpa sessões antigas inválidas
         this.clearInvalidSessions();
     }
 
     checkAuthentication() {
-        console.log('🔍 Verificando autenticação para página protegida...');
-        
         const currentUser = this.getCurrentUser();
         
-        // Verifica se está logado
         if (!currentUser || !this.isValidSession()) {
-            console.log('❌ Usuário não autenticado, redirecionando para login...');
             this.redirectToLogin('Você precisa estar logado para acessar esta página.');
             return;
         }
 
-        // Verifica se tem permissão para páginas administrativas
         if (ADMIN_ONLY_PAGES.includes(this.currentPage)) {
             if (currentUser.profile !== 'admin') {
-                console.log(`❌ Acesso negado - ${currentUser.usuario} não é administrador`);
                 this.showAccessDeniedAndRedirect();
                 return;
             }
         }
-
-        console.log(`✅ Acesso autorizado para ${currentUser.usuario} (perfil: ${currentUser.profile})`);
         this.updateLastActivity();
     }
 
@@ -85,16 +62,16 @@ class AuthGuard {
 
             const user = JSON.parse(userData);
             
-            // Verifica estrutura mínima necessária
+            // Verifica a integridade mínima dos dados do usuário na sessão
             if (!user.usuario || !user.profile || !user.loginTime) {
-                console.log('⚠️ Dados de usuário incompletos, limpando sessão');
+                console.warn('Dados de usuário incompletos ou corrompidos, limpando sessão.');
                 this.clearSession();
                 return null;
             }
 
             return user;
         } catch (error) {
-            console.error('❌ Erro ao recuperar dados do usuário:', error);
+            console.error('Erro ao recuperar dados do usuário do localStorage:', error);
             this.clearSession();
             return null;
         }
@@ -105,20 +82,19 @@ class AuthGuard {
         if (!currentUser) return false;
 
         try {
-            // Verifica se a sessão não expirou (24 horas)
+            // A sessão expira após 24 horas
             const loginTime = new Date(currentUser.loginTime);
             const now = new Date();
-            const sessionDuration = (now - loginTime) / (1000 * 60 * 60); // em horas
+            const sessionDurationHours = (now - loginTime) / (1000 * 60 * 60);
 
-            if (sessionDuration > 24) {
-                console.log('⏰ Sessão expirada (mais de 24 horas)');
+            if (sessionDurationHours > 24) {
                 this.clearSession();
                 return false;
             }
 
             return true;
         } catch (error) {
-            console.error('❌ Erro ao validar sessão:', error);
+            console.error('Erro ao validar a sessão do usuário:', error);
             this.clearSession();
             return false;
         }
@@ -133,7 +109,6 @@ class AuthGuard {
     }
 
     clearSession() {
-        console.log('🧹 Limpando sessão do usuário');
         localStorage.removeItem('currentUser');
         localStorage.removeItem('authToken');
         sessionStorage.clear();
@@ -147,32 +122,25 @@ class AuthGuard {
     }
 
     redirectToLogin(message = '') {
-        console.log('🔄 Redirecionando para página de login...');
         this.clearSession();
         
         if (message) {
             sessionStorage.setItem('loginMessage', message);
         }
         
-        // Usa replace para evitar volta no histórico
         window.location.replace('login.html');
     }
 
     showAccessDeniedAndRedirect() {
-        console.log('🚫 Mostrando mensagem de acesso negado...');
-        
-        // Cria modal de acesso negado
         this.showAccessDeniedModal();
     }
 
     showAccessDeniedModal() {
-        // Remove modal existente se houver
         const existingModal = document.getElementById('accessDeniedModal');
         if (existingModal) {
             existingModal.remove();
         }
 
-        // Cria modal de acesso negado
         const modal = document.createElement('div');
         modal.id = 'accessDeniedModal';
         modal.className = 'fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4';
@@ -200,7 +168,6 @@ class AuthGuard {
 
         document.body.appendChild(modal);
 
-        // Event listeners para os botões
         document.getElementById('goToDashboard').addEventListener('click', () => {
             window.location.replace('dashboard.html');
         });
@@ -209,7 +176,7 @@ class AuthGuard {
             this.redirectToLogin('Sessão encerrada.');
         });
 
-        // Auto redirect após 10 segundos
+        // Redirecionamento automático para segurança
         setTimeout(() => {
             if (document.getElementById('accessDeniedModal')) {
                 window.location.replace('dashboard.html');
@@ -217,10 +184,7 @@ class AuthGuard {
         }, 10000);
     }
 
-    // Método estático para login (usado pelo loginHandler.js)
     static setUserSession(userData) {
-        console.log('💾 Salvando sessão do usuário:', userData.usuario);
-        
         const sessionData = {
             usuario: userData.usuario,
             profile: userData.profile || 'user',
@@ -229,19 +193,15 @@ class AuthGuard {
         };
 
         localStorage.setItem('currentUser', JSON.stringify(sessionData));
-        console.log('✅ Sessão salva com sucesso');
     }
 
-    // Método estático para logout
     static logout() {
-        console.log('🚪 Executando logout...');
         localStorage.removeItem('currentUser');
         localStorage.removeItem('authToken');
         sessionStorage.clear();
         window.location.replace('login.html');
     }
 
-    // Método estático para verificar se é admin
     static isAdmin() {
         try {
             const userData = localStorage.getItem('currentUser');
@@ -250,42 +210,36 @@ class AuthGuard {
             const user = JSON.parse(userData);
             return user.profile === 'admin';
         } catch (error) {
-            console.error('❌ Erro ao verificar perfil admin:', error);
+            console.error('Erro ao verificar perfil de administrador:', error);
             return false;
         }
     }
 
-    // Método estático para obter usuário atual
     static getCurrentUser() {
         try {
             const userData = localStorage.getItem('currentUser');
             return userData ? JSON.parse(userData) : null;
         } catch (error) {
-            console.error('❌ Erro ao obter usuário atual:', error);
+            console.error('Erro ao obter usuário atual:', error);
             return null;
         }
     }
 }
 
-// Inicializa o AuthGuard quando o DOM estiver carregado
+// Inicializa o AuthGuard
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        new AuthGuard();
-    });
+    document.addEventListener('DOMContentLoaded', () => new AuthGuard());
 } else {
     new AuthGuard();
 }
 
-// Torna AuthGuard disponível globalmente
 window.AuthGuard = AuthGuard;
 
-// Adiciona listener para storage changes (logout em outras abas)
+// Sincroniza o logout entre abas
 window.addEventListener('storage', (event) => {
     if (event.key === 'currentUser' && event.newValue === null) {
-        console.log('🔄 Logout detectado em outra aba');
         window.location.reload();
     }
 });
 
-console.log('✅ AuthGuard inicializado com sucesso!');
 export default AuthGuard;

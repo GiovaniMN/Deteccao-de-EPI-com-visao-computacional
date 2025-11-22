@@ -3,8 +3,6 @@ import { db } from './firebaseConfig.js';
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import AuthGuard from './authGuard.js';
 
-console.log('🔑 LoginHandler carregado');
-
 // Chave AES - deve ser a mesma do userManagement.js
 const AES_KEY = "chaveSuperSecreta123!";
 
@@ -21,33 +19,30 @@ class LoginHandler {
     constructor() {
         this.initializeLoginForm();
         this.showLoginMessage();
-        this.loadRememberedUser(); // Carrega o usuário lembrado
+        this.loadRememberedUser(); // Carrega o nome de usuário se estiver salvo no localStorage
     }
 
     initializeLoginForm() {
         const loginForm = document.getElementById('loginForm');
         const btnLogin = document.getElementById('btnLogin');
-        const saida = document.getElementById('saida');
 
         if (!loginForm) {
-            console.error('❌ Formulário de login não encontrado');
+            console.error('Formulário de login não encontrado.');
             return;
         }
 
         loginForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-            await this.handleLogin(btnLogin, saida);
+            await this.handleLogin(btnLogin);
         });
 
-        // Enter key para submissão
+        // Permite submissão com a tecla Enter
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !btnLogin.disabled) {
                 event.preventDefault();
                 loginForm.dispatchEvent(new Event('submit'));
             }
         });
-
-        console.log('✅ Formulário de login inicializado');
     }
 
     showLoginMessage() {
@@ -58,7 +53,6 @@ class LoginHandler {
         }
     }
 
-    // Carrega o nome de usuário se estiver salvo no localStorage
     loadRememberedUser() {
         const rememberedUser = localStorage.getItem('rememberedUser');
         if (rememberedUser) {
@@ -84,13 +78,13 @@ class LoginHandler {
         return senha && senha.length > 20 && (senha.includes('/') || senha.includes('+') || senha.includes('='));
     }
 
-    // Função para verificar se é uma senha SHA256
+    // Função para verificar se é uma senha SHA256 (não usada, mas mantida para referência)
     isSHA256Hash(senha) {
         // SHA256 sempre tem 64 caracteres hexadecimais
         return senha && senha.length === 64 && /^[a-f0-9]+$/i.test(senha);
     }
 
-    async handleLogin(btnLogin, saida) {
+    async handleLogin(btnLogin) {
         const usuario = document.getElementById('usuario').value.trim();
         const senha = document.getElementById('senha').value;
         const lembrarMe = document.getElementById('lembrarMe').checked;
@@ -101,14 +95,11 @@ class LoginHandler {
             return;
         }
 
-        // UI feedback
         this.setLoginLoading(btnLogin, true);
         this.hideFeedback();
 
         try {
-            console.log(`🔍 Tentativa de login para: ${usuario}`);
-
-            // Salva ou remove o usuário do "Lembrar-me"
+            // Salva ou remove o usuário no "Lembrar-me"
             if (lembrarMe) {
                 localStorage.setItem('rememberedUser', usuario);
             } else {
@@ -120,11 +111,11 @@ class LoginHandler {
                 return;
             }
 
-            // Verifica usuários na coleção senha_login
+            // Verifica usuários na coleção senha_login do Firebase
             await this.checkFirebaseUser(usuario, senha);
 
         } catch (error) {
-            console.error('❌ Erro durante login:', error);
+            console.error('Erro durante o processo de login:', error);
             this.showFeedback('Erro interno. Tente novamente.', 'error');
         } finally {
             this.setLoginLoading(btnLogin, false);
@@ -135,8 +126,6 @@ class LoginHandler {
         const defaultUser = DEFAULT_USERS[usuario];
 
         if (defaultUser && defaultUser.senha === senha) {
-            console.log('✅ Login com usuário padrão bem-sucedido');
-            
             this.loginSuccess({
                 usuario: defaultUser.usuario,
                 profile: defaultUser.profile
@@ -147,8 +136,6 @@ class LoginHandler {
     }
 
     async checkFirebaseUser(usuario, senha) {
-        console.log('🔍 Verificando usuário no Firebase (coleção senha_login)...');
-
         try {
             const usersRef = collection(db, 'senha_login');
             const q = query(usersRef, where('user', '==', usuario)); // Campo 'user' da coleção senha_login
@@ -156,7 +143,6 @@ class LoginHandler {
             const querySnapshot = await getDocs(q);
             
             if (querySnapshot.empty) {
-                console.log('❌ Usuário não encontrado na coleção senha_login');
                 this.showFeedback('Usuário ou senha incorretos.', 'error');
                 return false;
             }
@@ -170,8 +156,6 @@ class LoginHandler {
                     const senhaDescriptografada = this.descriptografarSenhaAES(userData.pass);
                     
                     if (senhaDescriptografada === senha) {
-                        console.log('✅ Login com senha AES bem-sucedido');
-                        
                         this.loginSuccess({
                             usuario: userData.user,
                             profile: userData.profile || 'user'
@@ -181,8 +165,6 @@ class LoginHandler {
                 } else {
                     // Se não estiver criptografada com AES, compara diretamente
                     if (userData.pass === senha) {
-                        console.log('✅ Login com senha em texto claro bem-sucedido');
-                        
                         this.loginSuccess({
                             usuario: userData.user,
                             profile: userData.profile || 'user'
@@ -193,29 +175,26 @@ class LoginHandler {
             });
 
             if (!userFound) {
-                console.log('❌ Senha incorreta');
                 this.showFeedback('Usuário ou senha incorretos.', 'error');
             }
 
             return userFound;
 
         } catch (error) {
-            console.error('Erro ao verificar usuário:', error);
+            console.error('Erro ao verificar usuário no Firebase:', error);
             this.showFeedback('Erro interno. Tente novamente.', 'error');
             return false;
         }
     }
 
     loginSuccess(userData) {
-        console.log(`🎉 Login bem-sucedido para: ${userData.usuario} (${userData.profile})`);
-        
         // Salva sessão usando AuthGuard
         AuthGuard.setUserSession(userData);
         
         // Feedback de sucesso
         this.showFeedback('Login realizado com sucesso! Redirecionando...', 'success');
         
-        // Redirect após pequeno delay
+        // Redireciona após um pequeno atraso
         setTimeout(() => {
             window.location.replace('dashboard.html');
         }, 1500);
@@ -263,7 +242,7 @@ class LoginHandler {
         saida.className = `text-sm text-center ${colors[type] || colors.error}`;
         saida.classList.remove('hidden');
 
-        // Auto hide após 5 segundos para mensagens não críticas
+        // Oculta a mensagem automaticamente após 5 segundos para tipos não críticos
         if (type === 'success' || type === 'info') {
             setTimeout(() => this.hideFeedback(), 5000);
         }
@@ -277,7 +256,7 @@ class LoginHandler {
     }
 }
 
-// Inicializa quando DOM estiver carregado
+// Inicializa o LoginHandler quando o DOM estiver carregado
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         new LoginHandler();
@@ -285,5 +264,3 @@ if (document.readyState === 'loading') {
 } else {
     new LoginHandler();
 }
-
-console.log('✅ LoginHandler inicializado com sucesso!');
