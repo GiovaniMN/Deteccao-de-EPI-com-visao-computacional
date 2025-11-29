@@ -118,11 +118,11 @@ function desenharTabela(dados) {
 
   dados.forEach((doc, index) => {
     const linha = document.createElement("tr");
-    linha.className = "border-t border-t-[#474747]";
+    linha.className = "border-t border-gray-200 dark:border-gray-700";
 
     const tdMensagem = document.createElement("td");
     tdMensagem.setAttribute('data-label', 'Ocorrência');
-    tdMensagem.className = "px-4 py-2 text-[#ababab] text-sm font-normal leading-normal";
+    tdMensagem.className = "px-4 py-2 text-gray-700 dark:text-gray-400 text-sm font-normal leading-normal";
     const spanMensagem = document.createElement('span');
     spanMensagem.textContent = doc.mensagem;
     spanMensagem.className = 'min-w-0 break-words';
@@ -130,7 +130,7 @@ function desenharTabela(dados) {
 
     const tdDataHora = document.createElement("td");
     tdDataHora.setAttribute('data-label', 'Data e Hora');
-    tdDataHora.className = "px-4 py-2 text-[#ababab] text-sm font-normal leading-normal";
+    tdDataHora.className = "px-4 py-2 text-gray-700 dark:text-gray-400 text-sm font-normal leading-normal";
     const spanDataHora = document.createElement('span');
     const dataFormatada = new Date(doc.data_hora).toLocaleString('pt-BR', {
         year: 'numeric',
@@ -149,7 +149,7 @@ function desenharTabela(dados) {
     tdButton.className = "px-4 py-2 text-sm font-bold leading-normal tracking-[0.015em]"; 
     const viewButton = document.createElement("button");
     viewButton.textContent = "Ver Imagem";
-    viewButton.className = "view-image-btn text-blue-400 hover:text-blue-300 underline cursor-pointer bg-transparent border-none p-0"; 
+    viewButton.className = "view-image-btn text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline cursor-pointer bg-transparent border-none p-0"; 
     viewButton.dataset.originalIndex = dadosOcorrencias.indexOf(doc);
     tdButton.appendChild(viewButton);
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -10,6 +10,17 @@
     <title>Jupiter Supervision - Supervisão Inteligente de EPIs</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+        // Apply theme immediately to prevent flicker
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage))) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="module" src="./static/js/authGuard.js"></script>
@@ -19,28 +30,41 @@
 <link rel="icon" type="image/png"
     href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png">
 
-<body class="bg-gray-900 text-white overflow-x-hidden">
-    <header class="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700/50 fixed top-0 left-0 right-0 z-50">
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white overflow-x-hidden transition-colors duration-300">
+    <header class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700/50 fixed top-0 left-0 right-0 z-50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <a href="#"
                     class="flex items-center space-x-3 hover:opacity-80 transition-opacity cursor-pointer">
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-white/10">
+                    <div class="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-600/10 dark:bg-white/10">
                         <img src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png"
                             alt="Logo Jupiter" class="w-8 h-8" />
                     </div>
                     <div>
-                        <h1 class="text-lg font-bold text-white">Jupiter Supervision</h1>
-                        <p class="text-xs text-gray-400">Supervisão Inteligente</p>
+                        <h1 class="text-lg font-bold text-gray-900 dark:text-white">Jupiter Supervision</h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400">Supervisão Inteligente</p>
                     </div>
                 </a>
                 <nav class="hidden md:flex items-center space-x-8">
-                    <a href="#features" class="text-gray-300 hover:text-white transition-colors">Recursos</a>
-                    <a href="#technology" class="text-gray-300 hover:text-white transition-colors">Tecnologia</a>
-                    <button id="contactButton" class="text-gray-300 hover:text-white transition-colors">Contato</button>
+                    <a href="#features" class="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-white transition-colors">Recursos</a>
+                    <a href="#technology" class="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-white transition-colors">Tecnologia</a>
+                    <button id="contactButton" class="text-gray-600 hover:text-blue-600 dark:text-gray-300 dark:hover:text-white transition-colors">Contato</button>
+                    
                     <button onclick="location.href='login.html'"
                         class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 transform hover:scale-105">
-                        Acesso Sistema
+                        Acessar Sistema
+                    </button>
+
+                    <!-- Theme Toggle Button -->
+                    <button id="themeToggle" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors focus:outline-none" aria-label="Alternar tema">
+                        <!-- Sun Icon (Show in Dark Mode) -->
+                        <svg class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <!-- Moon Icon (Show in Light Mode) -->
+                        <svg class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
                     </button>
                 </nav>
                 <!-- Mobile contact button -->
@@ -59,29 +83,29 @@
     <!-- Hero Section -->
     <section class="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div
-            class="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-blue-900 via-transparent to-transparent z-0">
+            class="absolute top-0 left-0 w-full h-48 bg-gradient-to-b from-blue-100 via-transparent to-transparent dark:from-blue-900 dark:via-transparent dark:to-transparent z-0">
             <img src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png"
                 alt="Jupiter Logo" class="absolute right-10 top-6 w-32 h-32 opacity-30">
         </div>
         <div class="absolute inset-0 tech-grid opacity-20"></div>
-        <div class="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-purple-900/20 to-gray-900/40"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-100/50 via-purple-100/50 to-gray-100/50 dark:from-blue-900/20 dark:via-purple-900/20 dark:to-gray-900/40"></div>
 
         <!-- Floating Elements -->
-        <div class="absolute top-20 left-10 w-20 h-20 bg-blue-500/20 rounded-full animate-float"></div>
-        <div class="absolute top-40 right-20 w-16 h-16 bg-purple-500/20 rounded-full animate-float"
+        <div class="absolute top-20 left-10 w-20 h-20 bg-blue-500/10 dark:bg-blue-500/20 rounded-full animate-float"></div>
+        <div class="absolute top-40 right-20 w-16 h-16 bg-purple-500/10 dark:bg-purple-500/20 rounded-full animate-float"
             style="animation-delay: -2s;"></div>
-        <div class="absolute bottom-40 left-20 w-12 h-12 bg-green-500/20 rounded-full animate-float"
+        <div class="absolute bottom-40 left-20 w-12 h-12 bg-green-500/10 dark:bg-green-500/20 rounded-full animate-float"
             style="animation-delay: -4s;"></div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-16">
             <h1 class="text-4xl md:text-6xl font-bold mb-4">
-                <span class="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-400 bg-clip-text text-transparent">
+                <span class="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 dark:from-blue-400 dark:via-purple-400 dark:to-blue-400 bg-clip-text text-transparent">
                     Segurança
                 </span>
                 <br>
-                <span class="text-white">Inteligente</span>
+                <span class="text-gray-900 dark:text-white">Inteligente</span>
             </h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+            <p class="text-lg md:text-xl text-gray-700 dark:text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
                 Monitoramento com IA para detecção automática de capacetes, óculos e botas de segurança em tempo real.
             </p>
 
@@ -91,35 +115,35 @@
                     Acessar Sistema
                 </button>
                 <button id="openModalBtn"
-                    class="border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white px-6 py-3 rounded-xl font-semibold text-lg transition-all duration-200">
+                    class="border border-gray-300 hover:border-gray-400 dark:border-gray-600 dark:hover:border-gray-500 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-6 py-3 rounded-xl font-semibold text-lg transition-all duration-200">
                     Ver Demonstração
                 </button>
             </div>
 
             <!-- Stats -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                <div class="glass-effect rounded-2xl p-5 border border-white/10">
-                    <div class="text-2xl font-bold text-blue-400 mb-1">Detecção de EPI</div>
-                    <div class="text-gray-300 text-sm">Capacetes, óculos e botas</div>
+                <div class="glass-effect bg-white/80 dark:bg-transparent rounded-2xl p-5 border border-gray-200 dark:border-white/10">
+                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">Detecção de EPI</div>
+                    <div class="text-gray-700 dark:text-gray-300 text-sm">Capacetes, óculos e botas</div>
                 </div>
-                <div class="glass-effect rounded-2xl p-5 border border-white/10">
-                    <div class="text-2xl font-bold text-purple-400 mb-1">Plataforma Web</div>
-                    <div class="text-gray-300 text-sm">Acesso de qualquer lugar</div>
+                <div class="glass-effect bg-white/80 dark:bg-transparent rounded-2xl p-5 border border-gray-200 dark:border-white/10">
+                    <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">Plataforma Web</div>
+                    <div class="text-gray-700 dark:text-gray-300 text-sm">Acesso de qualquer lugar</div>
                 </div>
-                <div class="glass-effect rounded-2xl p-5 border border-white/10">
-                    <div class="text-2xl font-bold text-green-400 mb-1">Alertas em Tempo Real</div>
-                    <div class="text-gray-300 text-sm">Notificações via Telegram</div>
+                <div class="glass-effect bg-white/80 dark:bg-transparent rounded-2xl p-5 border border-gray-200 dark:border-white/10">
+                    <div class="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">Alertas em Tempo Real</div>
+                    <div class="text-gray-700 dark:text-gray-300 text-sm">Notificações via Telegram</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-16 bg-gray-800/50">
+    <section id="features" class="py-16 bg-gray-50 dark:bg-gray-800/50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-white mb-3">Recursos Avançados</h2>
-                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">Recursos Avançados</h2>
+                <p class="text-lg text-gray-700 dark:text-gray-400 max-w-3xl mx-auto">
                     Tecnologia de ponta para garantir a segurança no ambiente de trabalho
                 </p>
             </div>
@@ -127,7 +151,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Feature 1 -->
                 <div
-                    class="bg-gray-800/50 rounded-2xl p-6 border border-gray-700/50 hover:border-blue-500/50 transition-all duration-300 group">
+                    class="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-none hover:border-blue-500/50 transition-all duration-300 group">
                     <div
                         class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,14 +162,14 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Detecção Rápida</h3>
-                    <p class="text-gray-400 text-sm">Identifica a presença ou ausência de EPIs em segundos utilizando
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Detecção Rápida</h3>
+                    <p class="text-gray-700 dark:text-gray-400 text-sm">Identifica a presença ou ausência de EPIs em segundos utilizando
                         ferramentas de visão computacional.</p>
                 </div>
 
                 <!-- Feature 2 -->
                 <div
-                    class="bg-gray-800/50 rounded-2xl p-6 border border-gray-700/50 hover:border-purple-500/50 transition-all duration-300 group">
+                    class="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-none hover:border-purple-500/50 transition-all duration-300 group">
                     <div
                         class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -153,14 +177,14 @@
                                 d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Alertas Inteligentes</h3>
-                    <p class="text-gray-400 text-sm">Notificações automáticas via Telegram, quando os EPIs não são
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Alertas Inteligentes</h3>
+                    <p class="text-gray-700 dark:text-gray-400 text-sm">Notificações automáticas via Telegram, quando os EPIs não são
                         detectados.</p>
                 </div>
 
                 <!-- Feature 3 -->
                 <div
-                    class="bg-gray-800/50 rounded-2xl p-6 border border-gray-700/50 hover:border-green-500/50 transition-all duration-300 group">
+                    class="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-none hover:border-green-500/50 transition-all duration-300 group">
                     <div
                         class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,48 +193,48 @@
                             </path>
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Dashboard Analítico</h3>
-                    <p class="text-gray-400 text-sm">Visualize estatísticas e histórico de ocorrências.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Dashboard Analítico</h3>
+                    <p class="text-gray-700 dark:text-gray-400 text-sm">Visualize estatísticas e histórico de ocorrências.</p>
                 </div>
 
                 <!-- Feature 4 -->
                 <div
-                    class="bg-gray-800/50 rounded-2xl p-6 border border-gray-700/50 hover:border-yellow-500/50 transition-all duration-300 group">
+                    class="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-none hover:border-yellow-500/50 transition-all duration-300 group">
                     <div
                         class="w-14 h-14 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Configuração de Zona</h3>
-                    <p class="text-gray-400 text-sm">Permite definir áreas de interesse específicas na imagem da câmera
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Configuração de Zona</h3>
+                    <p class="text-gray-700 dark:text-gray-400 text-sm">Permite definir áreas de interesse específicas na imagem da câmera
                         para focar o monitoramento e reduzir alarmes falsos.</p>
                 </div>
 
                 <!-- Feature 5 -->
                 <div
-                    class="bg-gray-800/50 rounded-2xl p-6 border border-gray-700/50 hover:border-red-500/50 transition-all duration-300 group">
+                    class="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-none hover:border-red-500/50 transition-all duration-300 group">
                     <div
                         class="w-14 h-14 bg-gradient-to-br from-red-500 to-red-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Criptografia de Dados</h3>
-                    <p class="text-gray-400 text-sm">Dados criptografados e armazenados no Firebase.</p>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Criptografia de Dados</h3>
+                    <p class="text-gray-700 dark:text-gray-400 text-sm">Dados criptografados e armazenados no Firebase.</p>
                 </div>
 
                 <!-- Feature 6 -->
                 <div
-                    class="bg-gray-800/50 rounded-2xl p-6 border border-gray-700/50 hover:border-indigo-500/50 transition-all duration-300 group">
+                    class="bg-white dark:bg-gray-800/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-lg dark:shadow-none hover:border-indigo-500/50 transition-all duration-300 group">
                     <div
                         class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                         <svg class="w-7 h-7 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286z" />
                         </svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-white mb-3">Controle de Acesso</h3>
-                    <p class="text-gray-400 text-sm">Sistema de gerenciamento de usuários para controlar quem pode
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Controle de Acesso</h3>
+                    <p class="text-gray-700 dark:text-gray-400 text-sm">Sistema de gerenciamento de usuários para controlar quem pode
                         visualizar e configurar o sistema de monitoramento.</p>
                 </div>
             </div>
@@ -218,11 +242,11 @@
     </section>
 
     <!-- Technology Section -->
-    <section id="technology" class="py-16 bg-gray-900">
+    <section id="technology" class="py-16 bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-white mb-3">Tecnologia de Ponta</h2>
-                <p class="text-lg text-gray-400 max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-3">Tecnologia de Ponta</h2>
+                <p class="text-lg text-gray-700 dark:text-gray-400 max-w-3xl mx-auto">
                     Construído com avançadas tecnologias de IA e visão computacional
                 </p>
             </div>
@@ -230,42 +254,42 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div class="text-center group">
                     <div
-                        class="w-16 h-16 bg-gray-800/50 border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                        class="w-16 h-16 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
                         <img src="https://cdn.prod.website-files.com/680a070c3b99253410dd3dcf/680a070c3b99253410dd3e61_Ultralytics_mark_blue.svg"
                             alt="Ultralytics Logo" class="w-full h-full">
                     </div>
-                    <h3 class="text-white font-semibold mb-1">Yolov8n</h3>
-                    <p class="text-gray-400 text-xs">Detecção de objetos em tempo real</p>
+                    <h3 class="text-gray-900 dark:text-white font-semibold mb-1">Yolov8n</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-xs">Detecção de objetos em tempo real</p>
                 </div>
 
                 <div class="text-center group">
                     <div
-                        class="w-16 h-16 bg-gray-800/50 border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform p-2">
+                        class="w-16 h-16 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform p-2">
                         <img src="https://www.vectorlogo.zone/logos/opencv/opencv-icon.svg" alt="OpenCV Logo"
                             class="w-full h-full">
                     </div>
-                    <h3 class="text-white font-semibold mb-1">OpenCV</h3>
-                    <p class="text-gray-400 text-xs">Processamento de imagem</p>
+                    <h3 class="text-gray-900 dark:text-white font-semibold mb-1">OpenCV</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-xs">Processamento de imagem</p>
                 </div>
 
                 <div class="text-center group">
                     <div
-                        class="w-16 h-16 bg-gray-800/50 border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform p-2">
+                        class="w-16 h-16 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform p-2">
                         <img src="https://www.vectorlogo.zone/logos/firebase/firebase-icon.svg" alt="Firebase Logo"
                             class="w-full h-full">
                     </div>
-                    <h3 class="text-white font-semibold mb-1">Firebase</h3>
-                    <p class="text-gray-400 text-xs">Backend e armazenamento</p>
+                    <h3 class="text-gray-900 dark:text-white font-semibold mb-1">Firebase</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-xs">Backend e armazenamento</p>
                 </div>
 
                 <div class="text-center group">
                     <div
-                        class="w-16 h-16 bg-gray-800/50 border border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform p-3">
+                        class="w-16 h-16 bg-white dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/50 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform p-3">
                         <img src="https://www.vectorlogo.zone/logos/telegram/telegram-icon.svg" alt="Telegram Logo"
                             class="w-full h-full">
                     </div>
-                    <h3 class="text-white font-semibold mb-1">Telegram</h3>
-                    <p class="text-gray-400 text-xs">Notificações instantâneas</p>
+                    <h3 class="text-gray-900 dark:text-white font-semibold mb-1">Telegram</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-xs">Notificações instantâneas</p>
                 </div>
             </div>
         </div>
@@ -289,20 +313,20 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 border-t border-gray-800 py-8">
+    <footer class="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-8 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="md:flex md:items-center md:justify-between">
                 <div class="flex items-center space-x-3 mb-4 md:mb-0">
-                    <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-white/10">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-blue-600/10 dark:bg-white/10">
                         <img src="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png"
                             alt="Jupiter Logo" class="w-7 h-7" />
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-white">Jupiter Supervision</h3>
-                        <p class="text-gray-400 text-xs">Supervisão Inteligente de EPIs</p>
+                        <h3 class="text-lg font-bold text-gray-900 dark:text-white">Jupiter Supervision</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-xs">Supervisão Inteligente de EPIs</p>
                     </div>
                 </div>
-                <div class="text-center text-gray-400 text-sm">
+                <div class="text-center text-gray-700 dark:text-gray-400 text-sm">
                     <p>&copy; 2025 Jupiter Supervision. Todos os direitos reservados.</p>
                 </div>
             </div>
@@ -312,7 +336,7 @@
     <!-- Video Modal -->
     <div id="videoModal" class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
         <div
-            class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-4xl w-full border border-gray-700 relative text-center">
+            class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-4xl w-full border border-gray-200 dark:border-gray-700 relative text-center">
             <button id="closeVideoModalBtn"
                 class="absolute top-4 right-4 w-10 h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full flex items-center justify-center transition-colors z-10">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,7 +344,7 @@
                     </path>
                 </svg>
             </button>
-            <h3 class="text-xl font-semibold text-white mb-6">Demonstração do Sistema</h3>
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-6">Demonstração do Sistema</h3>
             <div class="aspect-video">
                 <iframe id="videoFrame" class="w-full h-full" src="https://www.youtube.com/embed/E2_C373V-Us"
                     title="Jupiter Supervision - Demonstração" frameborder="0"
@@ -333,9 +357,9 @@
     <!-- Contact Modal - Info Channels -->
     <div id="contactModal"
         class="hidden fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4">
-        <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-lg w-full border border-gray-700">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-lg w-full border border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-semibold text-white">Entre em Contato</h3>
+                <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Entre em Contato</h3>
                 <button id="closeModalButton"
                     class="w-10 h-10 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-full flex items-center justify-center transition-colors">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -350,7 +374,7 @@
                 <p class="text-gray-300 text-center mb-6">Entre em contato conosco através dos nossos canais</p>
 
                 <!-- Email -->
-                <div class="bg-gray-900 rounded-xl p-4 border border-gray-700 hover:border-blue-500/50 transition-all">
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:border-blue-500/50 transition-all">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -360,15 +384,15 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="text-gray-400 text-sm">E-mail</p>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">E-mail</p>
                             <a href="mailto:epirasp@gmail.com"
-                                class="text-white font-medium hover:text-blue-400 transition-colors">epirasp@gmail.com</a>
+                                class="text-gray-900 dark:text-white font-medium hover:text-blue-600 dark:hover:text-blue-400 transition-colors">epirasp@gmail.com</a>
                         </div>
                     </div>
                 </div>
 
                 <!-- Phone -->
-                <div class="bg-gray-900 rounded-xl p-4 border border-gray-700 hover:border-green-500/50 transition-all">
+                <div class="bg-gray-50 dark:bg-gray-900 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:border-green-500/50 transition-all">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
                             <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -378,9 +402,9 @@
                             </svg>
                         </div>
                         <div class="flex-1">
-                            <p class="text-gray-400 text-sm">Telefone / WhatsApp</p>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm">Telefone / WhatsApp</p>
                             <a href="tel:+5513991383281"
-                                class="text-white font-medium hover:text-green-400 transition-colors">(13)
+                                class="text-gray-900 dark:text-white font-medium hover:text-green-600 dark:hover:text-green-400 transition-colors">(13)
                                 99138-3281</a>
                         </div>
                     </div>
@@ -411,38 +435,38 @@
 
                 <form id="contactForm" class="space-y-4">
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Nome *</label>
+                        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nome *</label>
                         <input type="text" id="name" name="name" required
-                            class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
                     </div>
 
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">E-mail *</label>
+                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">E-mail *</label>
                         <input type="email" id="email" name="email" required
-                            class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
                     </div>
 
                     <div>
-                        <label for="telefone" class="block text-sm font-medium text-gray-300 mb-2">Telefone</label>
+                        <label for="telefone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Telefone</label>
                         <input type="tel" id="telefone" name="telefone"
-                            class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
                     </div>
 
                     <div>
-                        <label for="company" class="block text-sm font-medium text-gray-300 mb-2">Empresa</label>
+                        <label for="company" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Empresa</label>
                         <input type="text" id="company" name="company"
-                            class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors">
                     </div>
 
                     <div>
-                        <label for="mensagem" class="block text-sm font-medium text-gray-300 mb-2">Mensagem *</label>
+                        <label for="mensagem" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mensagem *</label>
                         <textarea id="mensagem" name="mensagem" rows="4" required
-                            class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"></textarea>
+                            class="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:border-blue-500 transition-colors resize-none"></textarea>
                     </div>
 
                     <div class="flex gap-3 mt-6">
                         <button type="button" id="cancelButton"
-                            class="flex-1 px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors">
+                            class="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-semibold rounded-lg transition-colors">
                             Cancelar
                         </button>
                         <button type="submit" id="submitButton"
@@ -704,6 +728,24 @@
             console.error('Falha ao carregar o Firebase:', error);
             window.firebaseLoaded = false;
         }
+    </script>
+    <script>
+        // Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const htmlRoot = document.documentElement;
+
+        // Initialize theme based on localStorage or default to dark
+        // Logic moved to head to prevent flicker
+
+        themeToggleBtn.addEventListener('click', function() {
+            if (htmlRoot.classList.contains('dark')) {
+                htmlRoot.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                htmlRoot.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
     </script>
 </body>
 

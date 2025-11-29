@@ -143,7 +143,7 @@ class AuthGuard {
 
         const modal = document.createElement('div');
         modal.id = 'accessDeniedModal';
-        modal.className = 'fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4';
+        modal.className = 'fixed inset-0 bg-gray-900 flex items-center justify-center z-[100] p-4';
         modal.innerHTML = `
             <div class="bg-gray-800 rounded-2xl p-8 shadow-2xl max-w-md w-full border border-red-500/30">
                 <div class="text-center">

@@ -45,10 +45,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         users.forEach(user => {
             const li = document.createElement('li');
-            li.className = 'flex items-center justify-between bg-gray-700/50 p-3 rounded-xl shadow';
+            li.className = 'flex items-center justify-between bg-gray-100 dark:bg-gray-700/50 p-3 rounded-xl shadow-sm dark:shadow';
 
             const usernameSpan = document.createElement('span');
-            usernameSpan.className = 'text-gray-200 font-medium';
+            usernameSpan.className = 'text-gray-700 dark:text-gray-200 font-medium';
             usernameSpan.textContent = user.user;
             li.appendChild(usernameSpan);
 
@@ -57,12 +57,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 deleteButton.textContent = 'Excluir';
                 deleteButton.dataset.userId = user.id;
                 deleteButton.dataset.userName = user.user; 
-                deleteButton.className = 'deleteUserButton text-red-400 hover:text-red-300 text-sm font-medium px-3 py-1 rounded-lg border border-red-500/50 hover:bg-red-500/20 transition-colors';
+                deleteButton.className = 'deleteUserButton text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm font-medium px-3 py-1 rounded-lg border border-red-200 dark:border-red-500/50 hover:bg-red-50 dark:hover:bg-red-500/20 transition-colors';
                 li.appendChild(deleteButton);
             } else {
                 const adminLabel = document.createElement('span');
                 adminLabel.textContent = 'Admin';
-                adminLabel.className = 'text-xs font-semibold text-purple-400 bg-purple-500/10 px-2 py-1 rounded-full';
+                adminLabel.className = 'text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-500/10 px-2 py-1 rounded-full';
                 li.appendChild(adminLabel);
             }
 
