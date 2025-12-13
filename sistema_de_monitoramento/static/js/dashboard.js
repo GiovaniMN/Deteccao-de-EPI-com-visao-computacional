@@ -4,20 +4,20 @@ import { collection, query, where, getDocs } from "https://www.gstatic.com/fireb
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Elementos do DOM
+    //elementos do dom
     const kpiTotalOcorrencias = document.getElementById('kpi-total-ocorrencias');
     const kpiDiaCritico = document.getElementById('kpi-dia-critico');
     const kpiPrincipalInfracao = document.getElementById('kpi-principal-infracao');
     const kpiStatus = document.getElementById('kpi-status');
     const statusIconContainer = document.getElementById('status-icon-container');
 
-    // Contextos dos Gráficos
+    //contextos dos graficos
     const ctxOcorrencias = document.getElementById('ocorrenciasSemanaChart').getContext('2d');
     const ctxInfracoes = document.getElementById('infracoesChart').getContext('2d');
 
     let ocorrenciasChart, infracoesChart;
 
-    // --- Lógica de Status do Sistema (Heartbeat) ---
+    // --- logica de status do sistema (heartbeat) ---
     const heartbeatRef = ref(rtdb, 'status/last_beat');
     onValue(heartbeatRef, (snapshot) => {
         const lastBeat = snapshot.val();
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         const now = Date.now();
         const diffSeconds = (now - lastBeat) / 1000;
-        // Offline se o último sinal foi há mais de 2 minutos
+        //offline se o ultimo sinal foi ha mais de 2 minutos
         updateStatus(diffSeconds < 120); 
     });
 
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         kpiStatus.className = isOnline ? 'text-green-400' : 'text-red-400';
     }
 
-    // --- Lógica Principal para buscar e processar dados ---
+    // --- logica principal para buscar e processar dados ---
     async function fetchDataAndRender() {
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -117,9 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Destrói instâncias antigas dos gráficos para evitar sobreposição
+        //destroi instancias antigas dos graficos para evitar sobreposicao
         if (ocorrenciasChart) ocorrenciasChart.destroy();
-        // Cria novo gráfico de ocorrências por semana
+        //cria novo grafico de ocorrencias por semana
         ocorrenciasChart = new Chart(ctxOcorrencias, {
             type: 'bar',
             data: {
@@ -152,9 +152,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const labelsInfracoes = Object.keys(contagemInfracoes).map(k => k.replace(/_/g, ' ').replace(/sem /g, ''));
         const dataInfracoes = Object.values(contagemInfracoes);
 
-        // Destrói instâncias antigas dos gráficos para evitar sobreposição
+        //destroi instancias antigas dos graficos para evitar sobreposicao
         if (infracoesChart) infracoesChart.destroy();
-        // Cria novo gráfico de tipos de infração
+        //cria novo grafico de tipos de infracao
         infracoesChart = new Chart(ctxInfracoes, {
             type: 'doughnut',
             data: {

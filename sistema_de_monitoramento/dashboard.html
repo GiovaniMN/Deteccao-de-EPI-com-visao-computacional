@@ -2,8 +2,8 @@
 <html lang="pt-BR" class="dark">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Jupiter Supervision</title>
     <link rel="icon" type="image/png"
         href="https://img.icons8.com/external-topaz-kerismaker/48/external-Jupiter-space-topaz-kerismaker.png" />
@@ -12,7 +12,7 @@
         tailwind.config = {
             darkMode: 'class',
         }
-        // Apply theme immediately to prevent flicker
+        //aplicar tema imediatamente
         if (localStorage.theme === 'dark' || (!('theme' in localStorage))) {
             document.documentElement.classList.add('dark');
         } else {
@@ -29,7 +29,7 @@
 </head>
 
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-white transition-colors duration-300">
-    <!-- Header -->
+    <!-- cabecalho -->
     <header class="bg-white/80 dark:bg-gray-800/50 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700/50 fixed top-0 left-0 right-0 z-50 transition-colors duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -53,13 +53,13 @@
                     </a>
                 </div>
                 
-                <!-- Theme Toggle Button -->
+                <!-- alternar tema -->
                 <button id="themeToggle" class="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors focus:outline-none" aria-label="Alternar tema">
-                    <!-- Sun Icon (Show in Dark Mode) -->
+                    <!-- icone sol -->
                     <svg class="w-6 h-6 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
-                    <!-- Moon Icon (Show in Light Mode) -->
+                    <!-- icone lua -->
                     <svg class="w-6 h-6 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                     </svg>
@@ -69,7 +69,7 @@
     </header>
 
     <div class="flex h-screen pt-16">
-        <!-- Sidebar -->
+        <!-- barra lateral -->
         <aside id="sidebar"
             class="w-64 flex-shrink-0 bg-white/80 dark:bg-gray-800/30 backdrop-blur-sm border-r border-gray-200 dark:border-gray-700/50 transition-all duration-300 lg:translate-x-0 -translate-x-full fixed lg:relative z-40 top-16 bottom-0 lg:top-auto lg:bottom-auto lg:h-full flex flex-col">
             <div class="p-6 flex-grow overflow-y-auto no-scrollbar">
@@ -119,15 +119,15 @@
                     <span class="font-medium block dark:hidden">Modo Escuro</span>
                     <span class="font-medium hidden dark:block">Tema Claro</span>
                     <div class="relative w-14 h-7 bg-gray-200 dark:bg-gray-700 rounded-full border border-gray-300 dark:border-gray-600 transition-colors duration-300 flex items-center">
-                        <!-- Sun Icon -->
+                        <!-- icone sol -->
                         <svg class="w-4 h-4 text-yellow-500 absolute left-1.5 opacity-100 dark:opacity-0 transition-opacity duration-300" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" clip-rule="evenodd"></path>
                         </svg>
-                        <!-- Moon Icon -->
+                        <!-- icone lua -->
                         <svg class="w-4 h-4 text-blue-300 absolute right-1.5 opacity-0 dark:opacity-100 transition-opacity duration-300" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
                         </svg>
-                        <!-- Toggle Dot -->
+                        <!-- ponto de alternancia -->
                         <div class="absolute left-1 top-1 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 dark:translate-x-7"></div>
                     </div>
                 </button>
@@ -212,24 +212,24 @@
             import { db } from './static/js/firebaseConfig.js';
             import { collection, query, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js';
 
-            // Elementos do DOM para KPIs
+            //elementos do dom para kpis
             const totalEl = document.getElementById('kpi-total-ocorrencias');
             const criticoEl = document.getElementById('kpi-dia-critico');
             const infracaoEl = document.getElementById('kpi-principal-infracao');
 
-            // Variáveis para armazenar as instâncias dos gráficos
+            //variaveis para armazenar as instancias dos graficos
             let ocorrenciasChartInstance = null;
             let infracoesChartInstance = null;
 
-            // Constantes para os gráficos
+            //constantes para os graficos
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#e5e7eb' : '#374151';
             const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
-            // Query para a coleção de alertas
+            //query para a colecao de alertas
             const alertasQuery = query(collection(db, 'alertas_epi'));
 
-            // Listener em tempo real
+            //listener em tempo real
             onSnapshot(alertasQuery, (snapshot) => {
                 console.log("🔥 Dados atualizados em tempo real!");
 
@@ -245,7 +245,7 @@
                     totalEl.textContent = '0';
                     criticoEl.textContent = '-';
                     infracaoEl.textContent = '-';
-                    // Limpa os gráficos se não houver dados
+                    //limpa os graficos se nao houver dados
                     if (ocorrenciasChartInstance) ocorrenciasChartInstance.destroy();
                     if (infracoesChartInstance) infracoesChartInstance.destroy();
                     return;
@@ -254,7 +254,7 @@
                 snapshot.forEach(doc => {
                     const d = doc.data();
                     const data = new Date(d.data_hora);
-                    // Filtra ocorrências dos últimos 7 dias
+                    //filtra ocorrencias dos ultimos 7 dias
                     if (data >= seteDiasAtras) {
                         total++;
 
@@ -266,7 +266,7 @@
                     }
                 });
 
-                // --- Atualiza KPIs ---
+                // --- atualiza kpis ---
                 totalEl.textContent = total;
 
                 const diaCritico = Object.entries(dias).sort((a, b) => b[1] - a[1])[0];
@@ -275,9 +275,9 @@
                 const principalInfracao = Object.entries(infracoes).sort((a, b) => b[1] - a[1])[0];
                 infracaoEl.textContent = principalInfracao ? `${principalInfracao[0]} (${principalInfracao[1]})` : '-';
 
-                // --- Atualiza Gráficos ---
+                // --- atualiza graficos ---
 
-                // Destrói instâncias antigas dos gráficos para evitar sobreposição
+                //destroi instancias antigas dos graficos para evitar sobreposicao
                 if (ocorrenciasChartInstance) {
                     ocorrenciasChartInstance.destroy();
                 }
@@ -285,7 +285,7 @@
                     infracoesChartInstance.destroy();
                 }
 
-                // Cria novo gráfico de ocorrências por semana
+                //cria novo grafico de ocorrencias por semana
                 ocorrenciasChartInstance = new Chart(document.getElementById('ocorrenciasSemanaChart'), {
                     type: 'bar',
                     data: {
@@ -321,7 +321,7 @@
                     }
                 });
 
-                // Cria novo gráfico de tipos de infração
+                //cria novo grafico de tipos de infracao
                 infracoesChartInstance = new Chart(document.getElementById('infracoesChart'), {
                     type: 'doughnut',
                     data: {
@@ -351,13 +351,11 @@
         <script type="module" src="./static/js/sidebar.js"></script>
         <script type="module" src="./static/js/logout.js"></script>
     <script>
-        // Theme Toggle Logic
+        //logica de alternancia de tema
         const htmlRoot = document.documentElement;
         const themeToggleBtns = document.querySelectorAll('#themeToggle, #sidebarThemeToggle');
 
-        // Initialize theme based on localStorage or default to dark
-        // Logic moved to head to prevent flicker
-
+        //inicializar tema baseado no localstorage ou padrao dark
         themeToggleBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 if (htmlRoot.classList.contains('dark')) {
@@ -367,7 +365,7 @@
                     htmlRoot.classList.add('dark');
                     localStorage.theme = 'dark';
                 }
-                // Reload page to update charts colors if necessary (simplest approach for now)
+                //recarregar pagina para atualizar cores dos graficos se necessario (abordagem mais simples por enquanto)
                 location.reload(); 
             });
         });

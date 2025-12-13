@@ -1,8 +1,8 @@
-// Import Firebase SDK
+// import firebase sdk
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
 import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, orderBy, limit, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-// Configuração do Firebase
+//configuracao do firebase
 const firebaseConfig = {
     apiKey: "AIzaSyBkgN9tJxWc3jVPSQ6DpQpOhNhFZyi5W3Y",
     authDomain: "jupiter-supervision.firebaseapp.com",
@@ -14,11 +14,11 @@ const firebaseConfig = {
     databaseURL: "https://jupiter-supervision-default-rtdb.firebaseio.com/"
 };
 
-// Inicializar Firebase
+//inicializar firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Constantes de resolução para conversão de coordenadas
+//constantes de resolucao para conversao de coordenadas
 const WEB_REFERENCE_RESOLUTION = { width: 640, height: 480 };
 const CAMERA_RESOLUTION = { width: 1280, height: 720 };
 const SCALE_X = CAMERA_RESOLUTION.width / WEB_REFERENCE_RESOLUTION.width;
@@ -107,14 +107,14 @@ async function loadLatestImage() {
             return;
         }
 
-        // Carrega a imagem
+        //carrega a imagem
         const imageDataUrl = `data:image/jpeg;base64,${data.imagem_base64}`;
 
         return new Promise((resolve, reject) => {
             img.onload = () => {
                 showImageSuccess(data.data_hora);
                 resizeCanvas();
-                listenForZoneChanges(); // Inicia o listener para a zona
+                listenForZoneChanges(); //inicia o listener para a zona
                 showFeedback('Imagem carregada com sucesso! Agora você pode definir a zona de detecção.', 'success');
                 resolve();
             };
@@ -165,35 +165,35 @@ function drawZone() {
     ctx.strokeStyle = '#60a5fa';
     ctx.lineWidth = 4;
 
-    // Canto superior esquerdo
+    //canto superior esquerdo
     ctx.beginPath();
     ctx.moveTo(zone.x, zone.y + cornerSize);
     ctx.lineTo(zone.x, zone.y);
     ctx.lineTo(zone.x + cornerSize, zone.y);
     ctx.stroke();
 
-    // Canto superior direito
+    //canto superior direito
     ctx.beginPath();
     ctx.moveTo(zone.x + zone.width - cornerSize, zone.y);
     ctx.lineTo(zone.x + zone.width, zone.y);
     ctx.lineTo(zone.x + zone.width, zone.y + cornerSize);
     ctx.stroke();
 
-    // Canto inferior esquerdo
+    //canto inferior esquerdo
     ctx.beginPath();
     ctx.moveTo(zone.x, zone.y + zone.height - cornerSize);
     ctx.lineTo(zone.x, zone.y + zone.height);
     ctx.lineTo(zone.x + cornerSize, zone.y + zone.height);
     ctx.stroke();
 
-    // Canto inferior direito
+    //canto inferior direito
     ctx.beginPath();
     ctx.moveTo(zone.x + zone.width - cornerSize, zone.y + zone.height);
     ctx.lineTo(zone.x + zone.width, zone.y + zone.height);
     ctx.lineTo(zone.x + zone.width, zone.y + zone.height - cornerSize);
     ctx.stroke();
 
-    // Adiciona texto centralizado
+    //adiciona texto centralizado
     ctx.fillStyle = 'white';
     ctx.font = 'bold 16px Inter';
     ctx.textAlign = 'center';
@@ -204,7 +204,7 @@ function drawZone() {
     updateDebugInfo('Zona desenhada no canvas');
 }
 
-// Converte coordenadas do canvas para coordenadas de referência web (640x480)
+//converte coordenadas do canvas para coordenadas de referencia web (640x480)
 function canvasToWebCoords(canvasZone) {
     const scaleX = WEB_REFERENCE_RESOLUTION.width / canvas.width;
     const scaleY = WEB_REFERENCE_RESOLUTION.height / canvas.height;
@@ -218,7 +218,7 @@ function canvasToWebCoords(canvasZone) {
     };
 }
 
-// Converte coordenadas web para coordenadas da câmera
+//converte coordenadas web para coordenadas da camera
 function webToCameraCoords(webZone) {
     return {
         nome: webZone.nome,
@@ -229,7 +229,7 @@ function webToCameraCoords(webZone) {
     };
 }
 
-// Converte coordenadas web para coordenadas do canvas atual
+//converte coordenadas web para coordenadas do canvas atual
 function webToCanvasCoords(webZone) {
     const scaleX = canvas.width / WEB_REFERENCE_RESOLUTION.width;
     const scaleY = canvas.height / WEB_REFERENCE_RESOLUTION.height;
@@ -257,18 +257,18 @@ function updateCoordinatesDisplay() {
     const camCoordHeight = document.getElementById('cam-coord-height');
 
     if (zone) {
-        // Converte para coordenadas web de referência
+        //converte para coordenadas web de referencia
         const webZone = canvasToWebCoords(zone);
         const cameraZone = webToCameraCoords(webZone);
 
-        // Coordenadas web (640x480)
+        //coordenadas web (640x480)
         coordX.textContent = `${webZone.x}px`;
         coordY.textContent = `${webZone.y}px`;
         coordWidth.textContent = `${webZone.width}px`;
         coordHeight.textContent = `${webZone.height}px`;
         zoneArea.textContent = `${(webZone.width * webZone.height).toLocaleString()} px²`;
 
-        // Coordenadas da câmera (1280x720)
+        //coordenadas da camera (1280x720)
         camCoordX.textContent = `${cameraZone.x}px`;
         camCoordY.textContent = `${cameraZone.y}px`;
         camCoordWidth.textContent = `${cameraZone.width}px`;
@@ -403,13 +403,13 @@ document.getElementById('saveButton').addEventListener('click', async () => {
     }
 
     try {
-        // Converte as coordenadas do canvas para o formato de referência web antes de salvar
+        //converte as coordenadas do canvas para o formato de referencia web antes de salvar
         const webZone = canvasToWebCoords(zone);
         const cameraZone = webToCameraCoords(webZone);
 
         const docRef = doc(db, 'configuracoes', 'zones');
 
-        // Salva as coordenadas web (que serão convertidas pela aplicação)
+        //salva as coordenadas web (que serao convertidas pela aplicacao)
         await setDoc(docRef, {
             zones: [webZone],
             lastUpdated: new Date().toISOString(),
@@ -472,7 +472,7 @@ function showFeedback(message, type) {
     }, 5000);
 }
 
-// Sidebar toggle functionality
+//sidebar toggle functionality
 const sidebar = document.getElementById('sidebar');
 const sidebarToggle = document.getElementById('sidebarToggle');
 const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -485,9 +485,9 @@ function toggleSidebar() {
 if (sidebarToggle) sidebarToggle.addEventListener('click', toggleSidebar);
 if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleSidebar);
 
-// Inicialização
+//inicializacao
 updateCoordinatesDisplay();
 updateDebugInfo('Sistema inicializado');
 
-// Carrega a imagem mais recente automaticamente
+//carrega a imagem mais recente automaticamente
 loadLatestImage();

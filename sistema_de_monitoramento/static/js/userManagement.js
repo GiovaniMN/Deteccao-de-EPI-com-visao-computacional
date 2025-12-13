@@ -1,7 +1,7 @@
 import { db } from './firebaseConfig.js';
 import { collection, addDoc, getDocs, deleteDoc, doc, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-// Chave AES para criptografia simétrica. **ATENÇÃO:** Em produção, considere gerenciar esta chave de forma mais segura.
+//chave aes para criptografia simetrica. atencao: em producao, considere gerenciar esta chave de forma mais segura.
 const AES_KEY = "chaveSuperSecreta123!";
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const DEFAULT_ADMIN_USER = 'adm';
 
-    // Criptografa a senha usando AES.
+    //criptografa a senha usando aes.
     function criptografarSenhaAES(senha) {
         return CryptoJS.AES.encrypt(senha, AES_KEY).toString();
     }
 
-    // Função para buscar usuários uma única vez (para validação)
+    //funcao para buscar usuarios uma unica vez (para validacao)
     async function getUsersOnce() {
         const usersCollection = collection(db, 'senha_login');
         const querySnapshot = await getDocs(usersCollection);
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderUserList(users) {
         if (!userListUL) return;
 
-        userListUL.innerHTML = ''; // Limpa a lista antes de renderizar
+        userListUL.innerHTML = ''; //limpa a lista antes de renderizar
 
         if (users.length === 0) {
             const li = document.createElement('li');
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Listener em tempo real para a lista de usuários
+    //listener em tempo real para a lista de usuarios
     function listenForUserChanges() {
         const usersCollection = collection(db, 'senha_login');
         onSnapshot(query(usersCollection), (snapshot) => {
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const password = newPasswordInput?.value;
         const confirmPassword = confirmPasswordInput?.value;
 
-        // Expressão regular para validar e-mail com TLDs comuns
+        //expressao regular para validar e-mail com tlds comuns
         const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
         if (!username || !password) {
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return displayFeedback("As senhas não coincidem.", true);
         }
 
-        // Valida se o usuário já existe antes de adicionar
+        //valida se o usuario ja existe antes de adicionar
         const existingUsers = await getUsersOnce();
         if (existingUsers.find(u => u.user.toLowerCase() === username.toLowerCase())) {
             return displayFeedback("Este endereço de e-mail já está em uso.", true);
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => { feedbackP.textContent = ''; }, 4000);
     }
 
-    // --- Setup Inicial ---
+    // --- setup inicial ---
     if (addUserForm) {
         addUserForm.addEventListener('submit', handleAddUserFormSubmit);
     }
@@ -161,5 +161,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         userListUL.addEventListener('click', handleDeleteUserClick);
     }
 
-    listenForUserChanges(); // Inicia o listener em tempo real
+    listenForUserChanges(); //inicia o listener em tempo real
 });

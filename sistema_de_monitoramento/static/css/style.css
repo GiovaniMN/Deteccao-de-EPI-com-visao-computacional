@@ -1,9 +1,9 @@
-/* Global Styles */
+/* estilos globais */
 body {
     font-family: 'Inter', sans-serif;
 }
 
-/* Utility Classes */
+/* classes utilitarias */
 .glass-effect {
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.05);
@@ -13,24 +13,24 @@ body.modal-open {
     overflow: hidden;
 }
 
-/* Scrollbar Hiding */
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* esconder scrollbar */
+/* esconde scrollbar para chrome, safari e opera */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
 
-/* Hide scrollbar for IE, Edge and Firefox */
+/* esconde scrollbar para ie, edge e firefox */
 .no-scrollbar {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
 
-/* Header Typography */
+/* tipografia do cabecalho */
 header h1, header h2, header span {
     font-family: 'Inter', sans-serif !important;
 }
 
-/* Responsive Table Styles (Card View for Mobile) */
+/* estilos de tabela responsivos (card view para mobile) */
 @media (max-width: 768px) {
     .responsive-table thead {
         display: none;

@@ -9,7 +9,7 @@ const datePicker = document.getElementById("filtrarPorData");
 const emptyState = document.getElementById("emptyState");
 const totalRegistrosEl = document.getElementById('total-registros');
 
-let dadosOcorrencias = []; // Armazena todos os dados para modais e ordenação
+let dadosOcorrencias = []; //armazena todos os dados para modais e ordenacao
 
 function listenForData() {
   if (!db) {
@@ -22,7 +22,7 @@ function listenForData() {
   const q = query(colecao); 
 
   onSnapshot(q, (snapshot) => {
-    // Atualiza o total de registros
+    //atualiza o total de registros
     if (totalRegistrosEl) {
         totalRegistrosEl.textContent = snapshot.size;
     }
@@ -36,15 +36,15 @@ function listenForData() {
         };
     });
 
-    // Notifica o seletor de data sobre os dias com ocorrências
+    //notifica o seletor de data sobre os dias com ocorrencias
     const datasComOcorrencias = new Set(dadosOcorrencias.map(doc => {
-        return new Date(doc.data_hora).toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        return new Date(doc.data_hora).toISOString().split('T')[0]; //formato yyyy-mm-dd
     }));
 
     const event = new CustomEvent('datesLoaded', { detail: { dates: datasComOcorrencias } });
     document.dispatchEvent(event);
 
-    filtrarEOrdenarTabela(); // Ação inicial para desenhar a tabela
+    filtrarEOrdenarTabela(); //acao inicial para desenhar a tabela
 
   }, (error) => {
     console.error("Erro ao escutar por atualizações do Firestore:", error);
@@ -68,7 +68,7 @@ function filtrarEOrdenarTabela() {
 
   let dadosFiltrados = [...dadosOcorrencias];
 
-  // 1. Filtrar por equipamento
+  // 1. filtrar por equipamento
   if (criterioFiltro !== "todos") {
     const filtroNormalizado = removerAcentos(criterioFiltro.toLowerCase());
     dadosFiltrados = dadosFiltrados.filter(doc => {
@@ -77,7 +77,7 @@ function filtrarEOrdenarTabela() {
     });
   }
 
-  // 2. Filtrar por data
+  // 2. filtrar por data
   if (dataFiltro) {
     const [dia, mes, ano] = dataFiltro.split('/').map(Number);
     const dataSelecionada = new Date(ano, mes - 1, dia);
@@ -90,19 +90,19 @@ function filtrarEOrdenarTabela() {
     });
   }
   
-  // 3. Ordenar dados filtrados
+  // 3. ordenar dados filtrados
   dadosFiltrados.sort((a, b) => {
     const dateA = new Date(a.data_hora);
     const dateB = new Date(b.data_hora);
 
-    // Tratar datas inválidas, colocando-as no final
+    //tratar datas invalidas colocando-as no final
     if (isNaN(dateA.getTime())) return 1;
     if (isNaN(dateB.getTime())) return -1;
 
     return criterioOrdenacao === "data_asc" ? dateA - dateB : dateB - dateA;
   });
 
-  // 4. Desenhar tabela
+  // 4. desenhar tabela
   desenharTabela(dadosFiltrados);
 }
 
@@ -183,7 +183,7 @@ function displayImageInModal(originalIndex) {
   }
 }
 
-// Listeners de Eventos
+//listeners de eventos
 if (selectOrdenar) {
     selectOrdenar.addEventListener("change", filtrarEOrdenarTabela);
 }
@@ -211,5 +211,5 @@ if (tabelaBody) {
   });
 }
 
-// Inicia o listener quando o DOM estiver pronto
+//inicia o listener quando o dom estiver pronto
 window.addEventListener("DOMContentLoaded", listenForData);

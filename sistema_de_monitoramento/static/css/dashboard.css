@@ -1,4 +1,4 @@
-/* Estilos personalizados para o dashboard */
+/* estilos personalizados para o dashboard */
 
 header h1, header h2, header span {
   font-family: 'Inter', sans-serif !important;
@@ -30,7 +30,7 @@ header h1, header h2, header span {
     flex-shrink: 0;
 }
 
-/* Efeito de brilho no hover */
+/* efeito de brilho no hover */
 .kpi-card:hover .kpi-icon {
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
 }

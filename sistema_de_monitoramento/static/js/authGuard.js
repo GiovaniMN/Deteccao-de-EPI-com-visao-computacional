@@ -1,6 +1,6 @@
-// authGuard.js - Sistema de Autenticação com Controle de Perfis
+// authGuard.js - sistema de autenticacao com controle de perfis
 
-// Configuração de páginas e permissões
+//configuracao de paginas e permissoes
 const PROTECTED_PAGES = ['dashboard.html', 'historico.html', 'usuarios.html', 'configuracao.html'];
 const ADMIN_ONLY_PAGES = ['usuarios.html', 'configuracao.html'];
 const PUBLIC_PAGES = ['index.html', 'login.html'];
@@ -62,7 +62,7 @@ class AuthGuard {
 
             const user = JSON.parse(userData);
             
-            // Verifica a integridade mínima dos dados do usuário na sessão
+            //verificar integridade minima dos dados
             if (!user.usuario || !user.profile || !user.loginTime) {
                 console.warn('Dados de usuário incompletos ou corrompidos, limpando sessão.');
                 this.clearSession();
@@ -82,7 +82,7 @@ class AuthGuard {
         if (!currentUser) return false;
 
         try {
-            // A sessão expira após 24 horas
+            //sessao expira apos 24 horas
             const loginTime = new Date(currentUser.loginTime);
             const now = new Date();
             const sessionDurationHours = (now - loginTime) / (1000 * 60 * 60);
@@ -176,7 +176,7 @@ class AuthGuard {
             this.redirectToLogin('Sessão encerrada.');
         });
 
-        // Redirecionamento automático para segurança
+        //redirecionamento automatico para seguranca
         setTimeout(() => {
             if (document.getElementById('accessDeniedModal')) {
                 window.location.replace('dashboard.html');
@@ -226,7 +226,7 @@ class AuthGuard {
     }
 }
 
-// Inicializa o AuthGuard
+//inicializa authguard
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => new AuthGuard());
 } else {
@@ -235,7 +235,7 @@ if (document.readyState === 'loading') {
 
 window.AuthGuard = AuthGuard;
 
-// Sincroniza o logout entre abas
+//sincroniza logout entre abas
 window.addEventListener('storage', (event) => {
     if (event.key === 'currentUser' && event.newValue === null) {
         window.location.reload();

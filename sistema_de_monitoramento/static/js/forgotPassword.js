@@ -1,9 +1,9 @@
-// forgotPassword.js - Manipulador da funcionalidade "Esqueci a Senha"
+// forgotPassword.js - manipulador da funcionalidade "esqueci a senha"
 import { db } from './firebaseConfig.js';
 import { collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Controles do modal
+    //controles do modal
     const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
     const forgotPasswordModal = document.getElementById('forgotPasswordModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const errorMessage = forgotPasswordModal.querySelector('#errorMessage');
 
     if (!forgotPasswordBtn || !forgotPasswordModal || !closeModalBtn || !forgotPasswordForm) {
-        return; // Elementos não encontrados, o script não precisa continuar
+        return; //elementos nao encontrados
     }
 
     forgotPasswordBtn.addEventListener('click', () => {
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Inicializa EmailJS
+    //inicializa emailjs
     try {
         emailjs.init('_IMI1xksu8m22BH_b');
     } catch (error) {
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setLoading(submitBtn, true);
 
-        // Verifica se o usuário existe no banco de dados
+        //verifica se o usuario existe no banco de dados
         try {
             const usersCollection = collection(db, 'senha_login');
             const q = query(usersCollection, where("user", "==", email));
@@ -63,9 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Se o usuário existe, envia o e-mail
+            //se o usuario existe, envia o e-mail
             await emailjs.send('service_zndz5fl', 'template_32fstzi', {
-                to_email: 'epirasp@gmail.com', // E-mail do administrador para notificação
+                to_email: 'epirasp@gmail.com', //e-mail do administrador para notificacao
                 from_name: 'Jupiter Supervision',
                 reply_to: email,
                 nome: "Sistema de Supervisão Jupiter",
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             showSuccess('Solicitação enviada! Se o e-mail estiver correto, você receberá um link para redefinir sua senha.');
-            e.target.email.value = ''; // Limpa o campo
+            e.target.email.value = ''; //limpa o campo
             setTimeout(() => forgotPasswordModal.classList.add('hidden'), 5000);
 
         } catch (error) {

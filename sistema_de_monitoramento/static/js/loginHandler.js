@@ -1,16 +1,16 @@
-// loginHandler.js - Manipulador de Login com coleção senha_login
+// loginHandler.js - manipulador de login com colecao senha_login
 import { db } from './firebaseConfig.js';
 import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 import AuthGuard from './authGuard.js';
 
-// Chave AES - deve ser a mesma do userManagement.js
+//chave aes - deve ser a mesma do userManagement.js
 const AES_KEY = "chaveSuperSecreta123!";
 
-// Configuração de usuários padrão (fallback)
+//configuracao de usuarios padrao (fallback)
 const DEFAULT_USERS = {
     'adm': {
         usuario: 'adm',
-        senha: '123', // Senha em texto claro para comparação
+        senha: '123', //senha em texto claro para comparacao
         profile: 'admin'
     }
 };
@@ -19,7 +19,7 @@ class LoginHandler {
     constructor() {
         this.initializeLoginForm();
         this.showLoginMessage();
-        this.loadRememberedUser(); // Carrega o nome de usuário se estiver salvo no localStorage
+        this.loadRememberedUser(); //carrega o nome de usuario se estiver salvo no localstorage
     }
 
     initializeLoginForm() {
@@ -36,7 +36,7 @@ class LoginHandler {
             await this.handleLogin(btnLogin);
         });
 
-        // Permite submissão com a tecla Enter
+        //permite submissao com a tecla enter
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !btnLogin.disabled) {
                 event.preventDefault();
@@ -61,7 +61,7 @@ class LoginHandler {
         }
     }
 
-    // Função para descriptografar senha AES
+    //funcao para descriptografar senha aes
     descriptografarSenhaAES(senhaCriptografada) {
         try {
             const bytes = CryptoJS.AES.decrypt(senhaCriptografada, AES_KEY);
@@ -72,15 +72,15 @@ class LoginHandler {
         }
     }
 
-    // Função para verificar se é uma senha criptografada com AES
+    //funcao para verificar se e uma senha criptografada com aes
     isAESEncrypted(senha) {
-        // Senhas AES geralmente são mais longas e contêm caracteres específicos
+        //senhas aes geralmente sao mais longas e contem caracteres especificos
         return senha && senha.length > 20 && (senha.includes('/') || senha.includes('+') || senha.includes('='));
     }
 
-    // Função para verificar se é uma senha SHA256 (não usada, mas mantida para referência)
+    //funcao para verificar se e uma senha sha256 (nao usada, mas mantida para referencia)
     isSHA256Hash(senha) {
-        // SHA256 sempre tem 64 caracteres hexadecimais
+        //sha256 sempre tem 64 caracteres hexadecimais
         return senha && senha.length === 64 && /^[a-f0-9]+$/i.test(senha);
     }
 
@@ -89,7 +89,7 @@ class LoginHandler {
         const senha = document.getElementById('senha').value;
         const lembrarMe = document.getElementById('lembrarMe').checked;
 
-        // Validações básicas
+        //validacoes basicas
         if (!usuario || !senha) {
             this.showFeedback('Por favor, preencha todos os campos.', 'error');
             return;
@@ -99,19 +99,19 @@ class LoginHandler {
         this.hideFeedback();
 
         try {
-            // Salva ou remove o usuário no "Lembrar-me"
+            //salva ou remove o usuario no "lembrar-me"
             if (lembrarMe) {
                 localStorage.setItem('rememberedUser', usuario);
             } else {
                 localStorage.removeItem('rememberedUser');
             }
 
-            // Verifica primeiro usuários padrão (fallback)
+            //verifica primeiro usuarios padrao (fallback)
             if (await this.checkDefaultUser(usuario, senha)) {
                 return;
             }
 
-            // Verifica usuários na coleção senha_login do Firebase
+            //verifica usuarios na colecao senha_login do firebase
             await this.checkFirebaseUser(usuario, senha);
 
         } catch (error) {
@@ -138,7 +138,7 @@ class LoginHandler {
     async checkFirebaseUser(usuario, senha) {
         try {
             const usersRef = collection(db, 'senha_login');
-            const q = query(usersRef, where('user', '==', usuario)); // Campo 'user' da coleção senha_login
+            const q = query(usersRef, where('user', '==', usuario)); //campo 'user' da colecao senha_login
 
             const querySnapshot = await getDocs(q);
             
@@ -151,7 +151,7 @@ class LoginHandler {
             querySnapshot.forEach((doc) => {
                 const userData = doc.data();
                 
-                // Verifica se a senha está criptografada com AES
+                //verifica se a senha esta criptografada com aes
                 if (this.isAESEncrypted(userData.pass)) {
                     const senhaDescriptografada = this.descriptografarSenhaAES(userData.pass);
                     
@@ -163,7 +163,7 @@ class LoginHandler {
                         userFound = true;
                     }
                 } else {
-                    // Se não estiver criptografada com AES, compara diretamente
+                    //se nao estiver criptografada com aes, compara diretamente
                     if (userData.pass === senha) {
                         this.loginSuccess({
                             usuario: userData.user,
@@ -188,13 +188,13 @@ class LoginHandler {
     }
 
     loginSuccess(userData) {
-        // Salva sessão usando AuthGuard
+        //salva sessao usando authguard
         AuthGuard.setUserSession(userData);
         
-        // Feedback de sucesso
+        //feedback de sucesso
         this.showFeedback('Login realizado com sucesso! Redirecionando...', 'success');
         
-        // Redireciona após um pequeno atraso
+        //redireciona apos um pequeno atraso
         setTimeout(() => {
             window.location.replace('dashboard.html');
         }, 1500);
@@ -242,7 +242,7 @@ class LoginHandler {
         saida.className = `text-sm text-center ${colors[type] || colors.error}`;
         saida.classList.remove('hidden');
 
-        // Oculta a mensagem automaticamente após 5 segundos para tipos não críticos
+        //oculta a mensagem automaticamente apos 5 segundos para tipos nao criticos
         if (type === 'success' || type === 'info') {
             setTimeout(() => this.hideFeedback(), 5000);
         }
@@ -256,7 +256,7 @@ class LoginHandler {
     }
 }
 
-// Inicializa o LoginHandler quando o DOM estiver carregado
+//inicializa o loginhandler quando o dom estiver carregado
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         new LoginHandler();

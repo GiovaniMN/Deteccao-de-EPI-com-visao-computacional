@@ -1,4 +1,4 @@
-// copyLink.js - Lida com a funcionalidade de copiar o link do grupo do Telegram.
+// copyLink.js - lida com a funcionalidade de copiar o link do grupo do telegram.
 document.addEventListener('DOMContentLoaded', () => {
     const copyBtn = document.getElementById('copyGroupLinkBtn');
     if (copyBtn) {
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }, 2000);
 
             } catch (err) {
-                // Fallback para navegadores mais antigos
+                //fallback para navegadores mais antigos
                 linkField.select();
                 document.execCommand('copy');
                 

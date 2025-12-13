@@ -2,10 +2,10 @@
 import { db } from "./firebaseConfig.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-// Captura o parâmetro 'index' da URL
+//captura o parametro 'index' da url
 function getIndexFromURL() {
   const params = new URLSearchParams(window.location.search);
-  return parseInt(params.get("index") || "0"); // Define 0 como padrão para a imagem mais recente
+  return parseInt(params.get("index") || "0"); //define 0 como padrao para a imagem mais recente
 }
 
 async function carregarImagemPorIndice() {
@@ -17,24 +17,24 @@ async function carregarImagemPorIndice() {
     return;
   }
 
-  // Ordena os documentos do mais recente para o mais antigo
+  //ordena os documentos do mais recente para o mais antigo
   const docs = snapshot.docs.map(doc => doc.data());
   docs.sort((a, b) => new Date(b.data_hora) - new Date(a.data_hora));
 
-  // Obtém o índice da URL, com fallback para o primeiro (mais recente)
+  //obtem o indice da url, com fallback para o primeiro (mais recente)
   const index = getIndexFromURL();
   const dado = docs[index] || docs[0]; 
 
   const imagemBase64 = dado.imagem_base64;
   const mensagem = dado.mensagem;
 
-  // Atualiza a imagem no DOM
+  //atualiza a imagem no dom
   const imgEl = document.getElementById("imagemAlvo");
   if (imgEl && imagemBase64) {
     imgEl.src = `data:image/jpeg;base64,${imagemBase64}`;
   }
 
-  // Atualiza a mensagem no DOM
+  //atualiza a mensagem no dom
   const ocorrenciaEl = document.getElementById("informacoesOcorrencia");
   if (ocorrenciaEl) {
     ocorrenciaEl.innerHTML = `<p>${mensagem}</p>`;

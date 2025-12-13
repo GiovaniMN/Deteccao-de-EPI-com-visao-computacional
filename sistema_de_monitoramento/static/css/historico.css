@@ -2,18 +2,18 @@ body { font-family: 'Inter', sans-serif; }
         .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.05); }
         body.modal-open { overflow: hidden; }
 
-/* Estilos para transformar a tabela em cards em telas pequenas */
+/* estilos para transformar a tabela em cards em telas pequenas */
 @media (max-width: 768px) {
-    /* Esconde o cabeçalho da tabela */
+    /* esconde o cabecalho da tabela */
     table thead {
         display: none;
     }
-    /* Transforma a tabela, tbody, tr e td em blocos */
+    /* transforma a tabela, tbody, tr e td em blocos */
     table, tbody, tr, td {
         display: block;
         width: 100%;
     }
-    /* Estiliza as linhas como cards */
+    /* estiliza as linhas como cards */
     tr {
         margin-bottom: 1.5rem; /* Aumenta a margem para 24px */
         border: 1px solid rgba(75, 85, 99, 0.5); /* border-gray-700/50 */
@@ -21,7 +21,7 @@ body { font-family: 'Inter', sans-serif; }
         overflow: hidden;
         background-color: rgba(31, 41, 55, 0.3); /* Adiciona um fundo sutil (bg-gray-800/30) */
     }
-    /* Usa CSS Grid para um layout de coluna robusto */
+    /* usa css grid para um layout de coluna robusto */
     td {
         display: grid;
         grid-template-columns: max-content 1fr; /* Coluna do label se ajusta ao conteúdo, valor ocupa o resto */
@@ -31,7 +31,7 @@ body { font-family: 'Inter', sans-serif; }
         border-bottom: 1px solid rgba(55, 65, 81, 0.5);
     }
 
-    /* Estilo do label (pseudo-elemento) */
+    /* estilo do label (pseudo-elemento) */
     td::before {
         content: attr(data-label);
         font-weight: 600;
@@ -39,18 +39,18 @@ body { font-family: 'Inter', sans-serif; }
         text-align: left;
     }
 
-    /* Alinha o texto do valor (dentro do span) à direita */
+    /* alinha o texto do valor (dentro do span) a direita */
     td > span {
         text-align: left;
         overflow-wrap: break-word; /* Força a quebra de linha para evitar overflow */
     }
 
-    /* Alinha o botão à direita */
+    /* alinha o botao a direita */
     td > button {
         margin-left: auto;
     }
 
-    /* Remove a borda do último item e ajusta padding */
+    /* remove a borda do ultimo item e ajusta padding */
     tr td:first-child {
         padding-top: 1rem;
     }
