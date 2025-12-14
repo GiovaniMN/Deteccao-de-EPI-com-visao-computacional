@@ -1,64 +1,111 @@
-# Sistema de Monitoramento de EPIs com Raspberry Pi e YOLOv8 🚨📷
+# Sistema de Monitoramento de EPIs com Visão Computacional 🛡️👁️
 
-Este repositório contém o código fonte para um sistema de visão computacional em tempo real projetado para verificar o uso de Equipamentos de Proteção Individual (EPIs). O sistema é otimizado para rodar em **Raspberry Pi 4** com aceleração **Google Coral Edge TPU**, mas também inclui versões para execução em desktops (Windows/Linux) para fins de teste.
+> **Nota:** Este README é uma demonstração do projeto. Para guias de instalação, configuração e execução, consulte a **[Documentação Técnica](docs/USAGE.md)**.
 
-O sistema monitora a presença de pessoas e verifica se estão utilizando **Capacete**, **Botas** e **Óculos**. Em caso de inconformidade, alertas são enviados para o **Telegram** e registrados no **Firebase**.
+Este projeto apresenta uma solução completa de **IoT e Inteligência Artificial** para a segurança no trabalho, capaz de monitorar automaticamente o uso de Equipamentos de Proteção Individual (EPIs) em tempo real. Desenvolvido para rodar na borda (Edge AI) com **Raspberry Pi 4** e **Google Coral Edge TPU**, o sistema garante alta performance e baixa latência, integrando-se à nuvem para gestão e alertas.
 
-## 📚 Documentação
+---
 
-A documentação detalhada foi organizada na pasta `docs/`:
+## 🎯 O Problema e a Solução
 
-- **[Configuração de Hardware](docs/HARDWARE_SETUP.md)**: Detalhes sobre Raspberry Pi e Coral Edge TPU.
-- **[Configuração de Software](docs/SOFTWARE_SETUP.md)**: Instalação de dependências e ambiente Python.
-- **[Configuração do Sistema](docs/CONFIGURATION.md)**: Como configurar chaves do Firebase, Bot do Telegram e caminhos de arquivos.
-- **[Guia de Uso](docs/USAGE.md)**: Como rodar os scripts de detecção em produção e teste.
+A fiscalização manual de EPIs é sujeita a falhas humanas e não pode estar presente em todos os lugares o tempo todo. Nosso sistema automatiza esse processo usando a infraestrutura de câmeras existente ou pontos de verificação dedicados.
 
-## 🚀 Começando Rapidamente
+### Arquitetura do Sistema
+O sistema opera em um fluxo contínuo de detecção, análise e notificação:
 
-### 1. Clonar o Repositório
-```bash
-git clone https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git
-cd SEU_REPOSITORIO
-```
+1.  **Captura & Processamento na Borda:** Uma Raspberry Pi 4, acelerada por um Coral USB, processa o vídeo localmente usando um modelo **YOLOv8n (nano)** otimizado.
+2.  **Lógica de Estado:** Uma máquina de estados filtra ruídos e monitora o ciclo de entrada do colaborador: `Entrando` ➔ `Analisando` ➔ `Aprovado/Rejeitado`.
+3.  **Nuvem & Alertas:**
+    *   **Firebase Firestore:** Armazena logs de acesso e links para imagens de evidência.
+    *   **Telegram Bot:** Envia alertas instantâneos com foto para os supervisores em caso de infração.
+    *   **Dashboard Web:** Interface para gestão, visualização de histórico e configuração de zonas de detecção.
 
-### 2. Instalar Dependências
-```bash
-pip install -r requirements.txt
-```
+---
 
-### 3. Configurar
-Edite os arquivos de script ou siga o guia de **[Configuração](docs/CONFIGURATION.md)** para adicionar suas chaves do Firebase e Telegram.
+## 🚀 Performance e Resultados
 
-### 4. Executar
-**No Windows (Teste):**
-```bash
-python src/deteccao_win.py
-```
+O modelo foi treinado e validado com um dataset personalizado, alcançando métricas expressivas que viabilizam o uso em ambientes reais.
 
-**Na Raspberry Pi (Produção):**
-```bash
-python raspberry/coral_epi/detect_zona.py
-```
+### Métricas de Detecção (YOLOv8n)
 
-## 📁 Estrutura do Projeto
+| Métrica Global | Valor |
+| :--- | :--- |
+| **mAP@0.5** | **93.9%** |
+| **Precisão (P)** | **94.7%** |
+| **Revocação (R)** | **87.3%** |
 
-*   **`raspberry/coral_epi/`**: Contém o código de produção para Raspberry Pi.
-    *   `detect_zona.py`: Script principal com lógica de detecção, máquina de estados e integração com hardware/cloud.
-*   **`src/`**: Scripts de desenvolvimento e teste.
-    *   `deteccao_win.py`: Versão adaptada para rodar em Windows com webcam padrão e modelo PyTorch.
-*   **`models/`**: Armazena os modelos YOLOv8 treinados (`.pt` e `.tflite`) e metadados.
-*   **`sistema_de_monitoramento/`**: Interface web (Frontend) para visualização de dashboards e histórico.
-*   **`docs/`**: Documentação detalhada do projeto.
+**Desempenho por Classe:**
 
-## ✨ Funcionalidades
+| Classe | Precisão | Análise |
+| :--- | :--- | :--- |
+| 👤 **Pessoa** | **97.4%** | Alta confiabilidade na detecção de presença humana. |
+| ⛑️ **Capacete** | **96.9%** | Excelente distinção, fundamental para segurança em obras. |
+| 👓 **Óculos** | **94.7%** | Detecção robusta mesmo sendo objetos pequenos. |
+| 🥾 **Bota** | **89.7%** | Bom desempenho, com oportunidades de melhoria via dataset. |
 
-- **Detecção em Tempo Real:** Monitoramento contínuo usando YOLOv8.
-- **Aceleração de Hardware:** Suporte a Google Coral Edge TPU para alta performance na borda.
-- **Máquina de Estados Inteligente:** Lógica para filtrar falsos positivos e gerenciar o fluxo de entrada (Vazio -> Entrando -> Analisando -> Aprovado/Rejeitado -> Saindo).
-- **Notificações:** Alertas imediatos via Telegram com detalhes dos EPIs faltantes.
-- **Nuvem:** Integração com Firebase Firestore para log de eventos e imagens.
-- **Zonas de Interesse:** Suporte a definição de zonas de detecção configuráveis remotamente via Firebase.
+### Visualizações do Modelo
+<div align="center">
+  <img src="models/yolov8n_pt/confusion_matrix_normalized.png" alt="Matriz de Confusão" width="45%">
+  <img src="models/yolov8n_pt/results.png" alt="Gráficos de Treinamento" width="45%">
+</div>
+<br>
 
-## 📄 Licença
+### Benchmark de Hardware (FPS)
 
-Este projeto é licenciado sob a MIT License. Veja o arquivo [LICENSE](LICENSE) para detalhes.
+A utilização do acelerador **Google Coral Edge TPU** provou-se essencial para a viabilidade do projeto em hardware embarcado.
+
+| Hardware | FPS Médio | Status |
+| :--- | :---: | :--- |
+| **PC (i5-13500 + Windows)** | **30 FPS** | Ideal para testes e servidores centrais. |
+| **Raspberry Pi 4 + Coral TPU** | **7 - 15 FPS** | **Produção.** Fluido e responsivo em tempo real. |
+| Raspberry Pi 4 (CPU pura) | < 1 FPS | Inviável para monitoramento em tempo real. |
+
+---
+
+## 🧠 Inteligência do Sistema
+
+O software não apenas detecta objetos, mas entende o contexto através de uma **Máquina de Estados Finitos**:
+
+1.  **VAZIO:** Monitoramento passivo (economia de recursos).
+2.  **ENTRANDO:** Detecta uma pessoa se aproximando de forma estável.
+3.  **ANALISANDO:** Coleta amostras por `N` frames (buffer temporal) para garantir que a detecção não é um falso positivo momentâneo.
+4.  **DECISÃO (APROVADO/REJEITADO):**
+    *   ✅ **Aprovado:** Todos os EPIs (Capacete, Óculos, Bota) detectados na proporção exigida.
+    *   ❌ **Rejeitado:** Alerta visual na tela, envio de notificação ao Telegram e registro no banco de dados.
+5.  **SAINDO:** Aguarda a pessoa liberar a zona para reiniciar o ciclo.
+
+---
+
+## 📸 Demonstração Visual
+
+*As imagens abaixo representam saídas reais do modelo durante a fase de validação.*
+
+<div align="center">
+  <img src="models/yolov8n_pt/val_batch0_pred.jpg" alt="Exemplo de Predição" width="80%">
+  <p><em>Identificação simultânea de múltiplos EPIs em colaboradores.</em></p>
+</div>
+
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+*   **Hardware:** Raspberry Pi 4, Google Coral USB Accelerator, Webcam.
+*   **IA/Visão:** YOLOv8 (Ultralytics), TensorFlow Lite (EdgeTPU), OpenCV.
+*   **Backend/Cloud:** Firebase (Firestore, Storage, Hosting), Python.
+*   **Frontend:** HTML5, JavaScript, Tailwind CSS (Dashboard).
+*   **Comunicação:** Telegram Bot API.
+
+---
+
+## 📚 Documentação Técnica
+
+Deseja replicar este projeto ou entender o código a fundo?
+Acesse nossa documentação completa na pasta `docs/`:
+
+*   [🔌 **Hardware Setup:**](docs/HARDWARE_SETUP.md) Montagem e drivers do Coral.
+*   [💻 **Software Setup:**](docs/SOFTWARE_SETUP.md) Instalação do ambiente Python.
+*   [⚙️ **Configuração:**](docs/CONFIGURATION.md) Chaves de API e variáveis.
+*   [▶️ **Como Executar:**](docs/USAGE.md) Rodando os scripts de produção e teste.
+
+---
+*Projeto desenvolvido pelo Grupo 6 - Engenharia da Computação*
